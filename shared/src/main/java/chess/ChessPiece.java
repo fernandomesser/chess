@@ -52,8 +52,31 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
+        PieceType type = getPieceType();
 
-        return new ArrayList<>();
+        switch (type){
+            case KING -> {
+                KingMovesCalculator king = new KingMovesCalculator();
+                return king.pieceMoves(board, myPosition);
+            }
+            case QUEEN -> {
+                return null;
+            }
+            case BISHOP -> {
+                return null;
+            }
+            case KNIGHT -> {
+                return null;
+            }
+            case ROOK -> {
+                return null;
+            }
+            case PAWN -> {
+                return null;
+            }
+            default -> throw new IllegalStateException("Unexpected value: " + type);
+        }
+
 
     }
 }
