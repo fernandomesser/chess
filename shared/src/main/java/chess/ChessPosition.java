@@ -46,11 +46,5 @@ public class ChessPosition {
         return Objects.hash(row, col);
     }
 
-    @Override
-    public String toString() {
-        return "ChessPosition{" +
-                "row=" + row +
-                ", col=" + col +
-                '}';
-    }
+
 }
