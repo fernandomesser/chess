@@ -28,11 +28,12 @@ public class KingMovesCalculator implements PieceMovesCalculator {
 
             }
            }
+           return null;
        }
         return validMoves;
     }
 
     private boolean inBound(int checkRow, int checkCol) {
-        return checkRow > 0 && checkRow < 9 && checkCol > 0 && checkCol < 9;
+        return checkRow >= 0 && checkRow < 8 && checkCol >= 0 && checkCol < 8;
     }
 }
