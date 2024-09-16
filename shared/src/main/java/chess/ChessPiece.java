@@ -71,7 +71,8 @@ public class ChessPiece {
                 return null;
             }
             case ROOK -> {
-                return null;
+                RookMovesCalculator rook = new RookMovesCalculator();
+                return rook.pieceMoves(board, myPosition);
             }
             case PAWN -> {
                 return null;
