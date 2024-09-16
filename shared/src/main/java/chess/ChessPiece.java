@@ -61,7 +61,9 @@ public class ChessPiece {
                 return king.pieceMoves(board, myPosition);
             }
             case QUEEN -> {
-                return null;
+                QueenMovesCalculator queen = new QueenMovesCalculator();
+                return queen.pieceMoves(board, myPosition);
+
             }
             case BISHOP -> {
                 BishopMovesCalculator bishop = new BishopMovesCalculator();
