@@ -70,7 +70,8 @@ public class ChessPiece {
                 return bishop.pieceMoves(board, myPosition);
             }
             case KNIGHT -> {
-                return null;
+                KnightMovesCalculator knight = new KnightMovesCalculator();
+                return knight.pieceMoves(board, myPosition);
             }
             case ROOK -> {
                 RookMovesCalculator rook = new RookMovesCalculator();

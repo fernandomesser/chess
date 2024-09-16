@@ -24,7 +24,7 @@ public class RookMovesCalculator implements PieceMovesCalculator {
 
                 if (board.getPiece(newPosition)==null){
                     validMoves.add(new ChessMove(myPosition, newPosition, null));
-                }else if (board.getPiece(newPosition).getTeamColor() != board.getPiece(myPosition).getTeamColor()){
+                }else if (!board.getPiece(newPosition).getTeamColor().equals(board.getPiece(myPosition).getTeamColor())){
                     validMoves.add(new ChessMove(myPosition, newPosition, null));
                     break;
                 }else{

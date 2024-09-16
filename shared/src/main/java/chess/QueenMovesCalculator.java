@@ -22,11 +22,11 @@ public class QueenMovesCalculator implements PieceMovesCalculator{
                 checkRow += move[0];
                 checkCol += move[1];
 
-                if(!inBound(checkRow, checkCol)){break;}
                 ChessPosition newPosition = new ChessPosition(checkRow, checkCol);
+                if(!inBound(checkRow, checkCol)){break;}
                 if (board.getPiece(newPosition)==null){
                     validMoves.add(new ChessMove(myPosition, newPosition, null));
-                } else if (board.getPiece(newPosition).getTeamColor()!=board.getPiece(myPosition).getTeamColor()) {
+                } else if (!board.getPiece(newPosition).getTeamColor().equals(board.getPiece(myPosition).getTeamColor())) {
                     validMoves.add(new ChessMove(myPosition, newPosition, null));
                     break;
                 }else {break;}
