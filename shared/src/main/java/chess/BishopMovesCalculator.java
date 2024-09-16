@@ -29,9 +29,7 @@ public class BishopMovesCalculator implements PieceMovesCalculator{
                 }else if (board.getPiece(newPosition).getTeamColor() != board.getPiece(myPosition).getTeamColor()){
                     validMoves.add(new ChessMove(myPosition, newPosition, null));
                     break;
-                }else{
-                    break;
-                }
+                }else{break;}
                     {
 
                 }
@@ -42,6 +40,6 @@ public class BishopMovesCalculator implements PieceMovesCalculator{
     }
 
         private boolean inBound(int row, int col) {
-        return (row > 0 && row < 9) && (col > 0 && col < 9);
+            return (row > 0 && row < 9) && (col > 0 && col < 9);
     }
 }

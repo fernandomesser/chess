@@ -15,9 +15,28 @@ public class QueenMovesCalculator implements PieceMovesCalculator{
         Collection<ChessMove> validMoves = new ArrayList<>();
 
         for (int[] move: MOVES){
-            
-        }
+            var checkRow = myPosition.getRow();
+            var checkCol = myPosition.getColumn();
 
+            while (true){
+                checkRow += move[0];
+                checkCol += move[1];
+
+                if(!inBound(checkRow, checkCol)){break;}
+                ChessPosition newPosition = new ChessPosition(checkRow, checkCol);
+                if (board.getPiece(newPosition)==null){
+                    validMoves.add(new ChessMove(myPosition, newPosition, null));
+                } else if (board.getPiece(newPosition).getTeamColor()!=board.getPiece(myPosition).getTeamColor()) {
+                    validMoves.add(new ChessMove(myPosition, newPosition, null));
+                    break;
+                }else {break;}
+
+            }
+        }
         return validMoves;
+    }
+
+    private boolean inBound(int row, int col) {
+        return (row > 0 && row < 9) && (col > 0 && col < 9);
     }
 }
