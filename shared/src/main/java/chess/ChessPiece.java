@@ -78,7 +78,8 @@ public class ChessPiece {
                 return rook.pieceMoves(board, myPosition);
             }
             case PAWN -> {
-                return null;
+                PawnMovesCalculator pawn = new PawnMovesCalculator();
+                return pawn.pieceMoves(board, myPosition);
             }
             default -> throw new IllegalStateException("Unexpected value: " + type);
         }
