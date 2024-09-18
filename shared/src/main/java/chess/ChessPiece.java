@@ -100,4 +100,62 @@ public class ChessPiece {
         return Objects.hash(type, pieceColor);
     }
 
+    @Override
+    public String toString() {
+        switch (type){
+            case KING -> {
+                if (pieceColor.equals(ChessGame.TeamColor.WHITE)){
+                    return "K";
+                } else if (pieceColor.equals(ChessGame.TeamColor.BLACK)) {
+                    return "k";
+                }
+                break;
+            }
+            case PAWN -> {
+                if (pieceColor.equals(ChessGame.TeamColor.WHITE)){
+                    return "P";
+                } else if (pieceColor.equals(ChessGame.TeamColor.BLACK)) {
+                    return "p";
+                }
+                break;
+            }
+            case ROOK -> {
+                if (pieceColor.equals(ChessGame.TeamColor.WHITE)){
+                    return "R";
+                } else if (pieceColor.equals(ChessGame.TeamColor.BLACK)) {
+                    return "r";
+                }
+                break;
+            }
+            case QUEEN -> {
+                if (pieceColor.equals(ChessGame.TeamColor.WHITE)){
+                    return "Q";
+                } else if (pieceColor.equals(ChessGame.TeamColor.BLACK)) {
+                    return "q";
+                }
+                break;
+            }
+            case BISHOP -> {
+                if (pieceColor.equals(ChessGame.TeamColor.WHITE)){
+                    return "B";
+                } else if (pieceColor.equals(ChessGame.TeamColor.BLACK)) {
+                    return "b";
+                }
+                break;
+            }
+            case KNIGHT -> {
+                if (pieceColor.equals(ChessGame.TeamColor.WHITE)){
+                    return "N";
+                } else if (pieceColor.equals(ChessGame.TeamColor.BLACK)) {
+                    return "n";
+                }
+                break;
+            }
+            default -> {
+                return null;
+            }
+
+        }
+        return null;
+    }
 }

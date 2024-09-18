@@ -22,6 +22,9 @@ public class ChessPosition {
      * 1 codes for the bottom row
      */
     public int getRow() {
+        if (row<0){
+            return 0;
+        }
         return row;
     }
 
@@ -30,6 +33,9 @@ public class ChessPosition {
      * 1 codes for the left row
      */
     public int getColumn() {
+        if (col<0){
+            return 0;
+        }
         return col;
     }
 
