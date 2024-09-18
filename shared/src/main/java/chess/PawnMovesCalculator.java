@@ -28,11 +28,14 @@ public class PawnMovesCalculator implements PieceMovesCalculator{
                 if (board.getPiece(newPosition)==null){
                     validMoves.add(new ChessMove(myPosition, newPosition, null));
                 }
-                if (board.getPiece(diagonalL)!=null){
-                    if (board.getPiece(diagonalL).getTeamColor().equals(board.getPiece(myPosition).getTeamColor())){
-                        validMoves.add(new ChessMove(myPosition, diagonalL, null));
+                if (inBound(diagonalL.getRow(),diagonalL.getColumn())){
+                    if (board.getPiece(diagonalL)!=null){
+                        if (board.getPiece(diagonalL).getTeamColor().equals(board.getPiece(myPosition).getTeamColor())){
+                            validMoves.add(new ChessMove(myPosition, diagonalL, null));
+                        }
                     }
                 }
+
 
 
             }
