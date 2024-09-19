@@ -58,8 +58,8 @@ public class PawnMovesCalculator implements PieceMovesCalculator{
         return validMoves;
     }
 
-    private void startMove(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> validMoves, int row, int col, int[][] movesStartBlack) {
-        for (int[] move: movesStartBlack){
+    private void startMove(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> validMoves, int row, int col, int[][] movesStart) {
+        for (int[] move: movesStart){
             int checkRow = row + move[0];
             int checkCol = col + move[1];
             ChessPosition position = new ChessPosition(checkRow, checkCol);
