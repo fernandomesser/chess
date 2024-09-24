@@ -76,18 +76,6 @@ public class ChessBoard {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ChessBoard board)) return false;
-        return Arrays.deepEquals(squares, board.squares);
-    }
-
-    @Override
-    public int hashCode() {
-        return Arrays.deepHashCode(squares);
-    }
-
-        @Override
         public String toString() {
             StringBuilder board = new StringBuilder();
             for (int i=0; i<8; i++){
