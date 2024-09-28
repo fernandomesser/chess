@@ -73,6 +73,24 @@ public class ChessBoard {
         for (int i = 1; i < 9; i++){
             addPiece(new ChessPosition(7, i), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
         }
+
+        for (int i =2; i<6;i++){
+            for (int j =2; j<6;j++){
+                squares[i][j] = null;
+            }
+        }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ChessBoard board)) return false;
+        return Arrays.deepEquals(squares, board.squares);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.deepHashCode(squares);
     }
 
     @Override
