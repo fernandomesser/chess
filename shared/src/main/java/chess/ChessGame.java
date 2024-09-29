@@ -1,5 +1,7 @@
 package chess;
 
+import chess.Pieces.King;
+
 import java.util.Collection;
 import java.util.Objects;
 
@@ -15,8 +17,8 @@ public class ChessGame {
     private ChessBoard board;
     public ChessGame() {
         this.turn = TeamColor.WHITE;
-        this.board = new ChessBoard();
-        this.board.resetBoard();
+        board = new ChessBoard();
+        board.resetBoard();
     }
 
     /**
@@ -75,18 +77,38 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
+        boolean inCheck = false;
+        King king = new King(teamColor, null);
         for (int i = 1; i < 9; i++){
             for (int j = 1; j < 9; j++){
-
+                ChessPosition kingPosition = new ChessPosition(i,j);
+                ChessPiece piece = board.getPiece(kingPosition);
+                if (piece != null && piece.getTeamColor().equals(teamColor) && piece.getPieceType().equals(king.getPieceType())) {
+                    king.setPosition(kingPosition);
+                    break;
+                }
+            }
+            if (king.getPosition()!=null){
+                break;
             }
         }
 
-
-
-
-
-
-        return false;
+        for (int i = 1; i < 9; i++){
+            for (int j = 1; j < 9; j++){
+                ChessPosition opponentPosition = new ChessPosition(i,j);
+                ChessPiece piece = board.getPiece(opponentPosition);
+                if (piece != null && !piece.getTeamColor().equals(teamColor)) {
+                    Collection<ChessMove> movesList = piece.pieceMoves(board, opponentPosition);
+                    for (ChessMove moves: movesList) {
+                        if (moves.getEndPosition().equals(king.getPosition())){
+                            inCheck = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return inCheck;
     }
 
     /**
@@ -116,8 +138,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        this.board = new ChessBoard();
-        this.board.resetBoard();
+        this.board = board;
     }
 
     /**

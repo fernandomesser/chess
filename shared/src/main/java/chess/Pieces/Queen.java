@@ -9,7 +9,9 @@ import java.util.Collection;
 public class Queen implements Piece{
 
     private ChessGame.TeamColor teamColor;
-    public Queen(ChessGame.TeamColor teamColor){
+    private ChessPosition position;
+    public Queen(ChessGame.TeamColor teamColor, ChessPosition position){
+        this.position=position;
         this.teamColor = teamColor;
     }
     @Override
@@ -26,5 +28,15 @@ public class Queen implements Piece{
     @Override
     public ChessPiece.PieceType getPieceType() {
         return ChessPiece.PieceType.QUEEN;
+    }
+
+    @Override
+    public ChessPosition getPosition() {
+        return position;
+    }
+
+    @Override
+    public void setPosition(ChessPosition newPosition) {
+        position=newPosition;
     }
 }

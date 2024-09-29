@@ -9,4 +9,7 @@ public interface Piece {
     public ChessGame.TeamColor getTeamColor();
     public ChessPiece.PieceType getPieceType();
 
+    public ChessPosition getPosition();
+    public void setPosition(ChessPosition newPosition);
+
 }

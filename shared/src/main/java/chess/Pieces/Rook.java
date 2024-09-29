@@ -9,7 +9,9 @@ import java.util.Collection;
 public class Rook implements Piece{
 
     private ChessGame.TeamColor teamColor;
-    public Rook(ChessGame.TeamColor teamColor){
+    private ChessPosition position;
+    public Rook(ChessGame.TeamColor teamColor, ChessPosition position){
+        this.position = position;
         this.teamColor = teamColor;
     }
     @Override
@@ -26,5 +28,15 @@ public class Rook implements Piece{
     @Override
     public ChessPiece.PieceType getPieceType() {
         return ChessPiece.PieceType.ROOK;
+    }
+
+    @Override
+    public ChessPosition getPosition() {
+        return position;
+    }
+
+    @Override
+    public void setPosition(ChessPosition newPosition) {
+        position=newPosition;
     }
 }

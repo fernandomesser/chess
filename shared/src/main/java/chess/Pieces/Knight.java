@@ -9,8 +9,10 @@ import java.util.Collection;
 public class Knight implements Piece{
 
     private ChessGame.TeamColor teamColor;
-    public Knight(ChessGame.TeamColor teamColor){
+    private ChessPosition position;
+    public Knight(ChessGame.TeamColor teamColor, ChessPosition position){
         this.teamColor = teamColor;
+        this.position = position;
     }
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
@@ -26,5 +28,15 @@ public class Knight implements Piece{
     @Override
     public ChessPiece.PieceType getPieceType() {
         return ChessPiece.PieceType.KNIGHT;
+    }
+
+    @Override
+    public ChessPosition getPosition() {
+        return position;
+    }
+
+    @Override
+    public void setPosition(ChessPosition newPosition) {
+        position=newPosition;
     }
 }

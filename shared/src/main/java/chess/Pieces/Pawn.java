@@ -8,7 +8,9 @@ import java.util.Collection;
 public class Pawn implements Piece{
 
     private ChessGame.TeamColor teamColor;
-    public Pawn(ChessGame.TeamColor teamColor){
+    private ChessPosition position;
+    public Pawn(ChessGame.TeamColor teamColor, ChessPosition position){
+        this.position = position;
         this.teamColor = teamColor;
     }
     @Override
@@ -25,5 +27,15 @@ public class Pawn implements Piece{
     @Override
     public ChessPiece.PieceType getPieceType() {
         return ChessPiece.PieceType.PAWN;
+    }
+
+    @Override
+    public ChessPosition getPosition() {
+        return position;
+    }
+
+    @Override
+    public void setPosition(ChessPosition newPosition) {
+        position=newPosition;
     }
 }

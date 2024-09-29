@@ -9,8 +9,10 @@ import java.util.Collection;
 public class Bishop implements Piece {
 
     private ChessGame.TeamColor teamColor;
-    public Bishop(ChessGame.TeamColor teamColor){
+    private ChessPosition position;
+    public Bishop(ChessGame.TeamColor teamColor, ChessPosition position){
         this.teamColor = teamColor;
+        this.position = position;
     }
 
     @Override
@@ -27,5 +29,15 @@ public class Bishop implements Piece {
     @Override
     public ChessPiece.PieceType getPieceType() {
         return ChessPiece.PieceType.BISHOP;
+    }
+
+    @Override
+    public ChessPosition getPosition() {
+        return position;
+    }
+
+    @Override
+    public void setPosition(ChessPosition newPosition) {
+        position = newPosition;
     }
 }

@@ -8,8 +8,12 @@ import java.util.Collection;
 public class King implements Piece{
 
     private ChessGame.TeamColor teamColor;
-    public King(ChessGame.TeamColor teamColor){
+    private ChessPosition position;
+    private ChessPiece.PieceType type;
+    public King(ChessGame.TeamColor teamColor, ChessPosition position){
+        type = ChessPiece.PieceType.KING;
         this.teamColor = teamColor;
+        this.position = position;
     }
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
@@ -24,6 +28,16 @@ public class King implements Piece{
 
     @Override
     public ChessPiece.PieceType getPieceType() {
-        return ChessPiece.PieceType.KING;
+        return type;
+    }
+
+    @Override
+    public ChessPosition getPosition() {
+        return position;
+    }
+
+    @Override
+    public void setPosition(ChessPosition newPosition) {
+        position = newPosition;
     }
 }
