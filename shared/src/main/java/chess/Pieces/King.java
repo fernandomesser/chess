@@ -3,6 +3,7 @@ package chess.Pieces;
 import chess.*;
 import chess.MovesCalculator.KingMovesCalculator;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 public class King implements Piece{
@@ -15,6 +16,23 @@ public class King implements Piece{
         this.teamColor = teamColor;
         this.position = position;
     }
+
+    public Collection<ChessMove> validMoves(ChessBoard board, ChessPosition startPosition){
+        Collection<ChessMove> validMoves = new ArrayList<>();
+        Collection<ChessMove> kingMoves = pieceMoves(board,startPosition);
+        for (ChessMove move:kingMoves) {
+            ChessBoard cloneBoard = board;
+            ChessBoard.move(cloneBoard, move);
+
+            if (!ChessGame.check(cloneBoard,this.getTeamColor())){
+                validMoves.add(move);
+            }
+
+
+        }
+        return validMoves;
+    }
+
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         KingMovesCalculator king = new KingMovesCalculator();

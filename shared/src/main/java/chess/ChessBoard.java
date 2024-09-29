@@ -105,4 +105,13 @@ public class ChessBoard {
             }
             return board.toString();
         }
+
+    public void removePiece(ChessBoard boardClone, ChessPosition position){
+        boardClone.addPiece(position,null);
+    }
+    public static void move(ChessBoard brd, ChessMove move)  {
+        ChessPiece piece = brd.getPiece(move.getStartPosition());
+        brd.addPiece(move.getEndPosition(), piece);
+        brd.removePiece(brd,move.getStartPosition());
+    }
 }
