@@ -1,11 +1,17 @@
-package chess;
+package chess.MovesCalculator;
+
+import chess.ChessBoard;
+import chess.ChessMove;
+import chess.ChessPosition;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class RookMovesCalculator implements PieceMovesCalculator {
+
+public class BishopMovesCalculator implements PieceMovesCalculator{
+
     private static final int[][] MOVES = {
-        {1, 0},{-1, 0},{0, 1},{0, -1}
+            {1, 1}, {-1, -1}, {1, -1}, {-1, 1}
     };
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
@@ -27,18 +33,17 @@ public class RookMovesCalculator implements PieceMovesCalculator {
                 }else if (!board.getPiece(newPosition).getTeamColor().equals(board.getPiece(myPosition).getTeamColor())){
                     validMoves.add(new ChessMove(myPosition, newPosition, null));
                     break;
-                }else{
-                    break;
-                }
-                {
+                }else{break;}
+                    {
 
                 }
+                }
+
             }
-
-        }
         return validMoves;
     }
-    private boolean inBound(int row, int col) {
-        return (row > 0 && row < 9) && (col > 0 && col < 9);
+
+        private boolean inBound(int row, int col) {
+            return (row > 0 && row < 9) && (col > 0 && col < 9);
     }
 }

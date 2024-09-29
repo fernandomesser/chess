@@ -51,7 +51,11 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+//        ChessPiece piece = board.getPiece(startPosition);
+//        if (piece==null||!piece.getTeamColor().equals(getTeamTurn())){
+//            return null;
+//        }
+        return null;
     }
 
     /**
@@ -71,7 +75,18 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        for (int i = 1; i < 9; i++){
+            for (int j = 1; j < 9; j++){
+
+            }
+        }
+
+
+
+
+
+
+        return false;
     }
 
     /**
