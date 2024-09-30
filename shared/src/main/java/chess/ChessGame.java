@@ -1,6 +1,6 @@
 package chess;
 
-import chess.Pieces.King;
+import chess.Pieces.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -64,18 +64,31 @@ public class ChessGame {
                 return validMoves;
             }
             case QUEEN -> {
+                Queen queen = new Queen(getTeamTurn(),startPosition);
+                validMoves.addAll(queen.validMoves(board,startPosition));
+                return validMoves;
             }
             case BISHOP -> {
+                Bishop bishop = new Bishop(getTeamTurn(),startPosition);
+                validMoves.addAll(bishop.validMoves(board,startPosition));
+                return validMoves;
             }
             case KNIGHT -> {
+                Knight knight = new Knight(getTeamTurn(),startPosition);
+                validMoves.addAll(knight.validMoves(board,startPosition));
+                return validMoves;
             }
             case ROOK -> {
+                Rook rook = new Rook(getTeamTurn(),startPosition);
+                validMoves.addAll(rook.validMoves(board,startPosition));
+                return validMoves;
             }
             case PAWN -> {
+                Pawn pawn = new Pawn(getTeamTurn(),startPosition);
+                validMoves.addAll(pawn.validMoves(board,startPosition));
+                return validMoves;
             }
         }
-
-
         return null;
     }
 

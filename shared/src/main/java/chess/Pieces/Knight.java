@@ -4,6 +4,7 @@ import chess.*;
 import chess.MovesCalculator.KingMovesCalculator;
 import chess.MovesCalculator.KnightMovesCalculator;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 public class Knight implements Piece{
@@ -14,6 +15,21 @@ public class Knight implements Piece{
         this.teamColor = teamColor;
         this.position = position;
     }
+
+    public Collection<ChessMove> validMoves(ChessBoard board, ChessPosition startPosition){
+        Collection<ChessMove> validMoves = new ArrayList<>();
+        Collection<ChessMove> pieceMoves = pieceMoves(board,startPosition);
+        for (ChessMove move:pieceMoves) {
+            ChessBoard cloneBoard = board.cloneBoard();
+            ChessBoard.move(cloneBoard, move);
+
+            if (!ChessGame.check(cloneBoard,this.getTeamColor())){
+                validMoves.add(move);
+            }
+        }
+        return validMoves;
+    }
+
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         KnightMovesCalculator Knight = new KnightMovesCalculator();

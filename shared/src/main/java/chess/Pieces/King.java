@@ -10,17 +10,15 @@ public class King implements Piece{
 
     private ChessGame.TeamColor teamColor;
     private ChessPosition position;
-    private ChessPiece.PieceType type;
     public King(ChessGame.TeamColor teamColor, ChessPosition position){
-        type = ChessPiece.PieceType.KING;
         this.teamColor = teamColor;
         this.position = position;
     }
 
     public Collection<ChessMove> validMoves(ChessBoard board, ChessPosition startPosition){
         Collection<ChessMove> validMoves = new ArrayList<>();
-        Collection<ChessMove> kingMoves = pieceMoves(board,startPosition);
-        for (ChessMove move:kingMoves) {
+        Collection<ChessMove> pieceMoves = pieceMoves(board,startPosition);
+        for (ChessMove move:pieceMoves) {
             ChessBoard cloneBoard = board.cloneBoard();
             ChessBoard.move(cloneBoard, move);
 
@@ -44,7 +42,7 @@ public class King implements Piece{
 
     @Override
     public ChessPiece.PieceType getPieceType() {
-        return type;
+        return ChessPiece.PieceType.KING;
     }
 
     @Override

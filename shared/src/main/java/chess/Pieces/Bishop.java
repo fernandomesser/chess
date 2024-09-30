@@ -4,6 +4,7 @@ import chess.*;
 import chess.MovesCalculator.BishopMovesCalculator;
 import chess.MovesCalculator.PieceMovesCalculator;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 public class Bishop implements Piece {
@@ -13,6 +14,20 @@ public class Bishop implements Piece {
     public Bishop(ChessGame.TeamColor teamColor, ChessPosition position){
         this.teamColor = teamColor;
         this.position = position;
+    }
+
+    public Collection<ChessMove> validMoves(ChessBoard board, ChessPosition startPosition){
+        Collection<ChessMove> validMoves = new ArrayList<>();
+        Collection<ChessMove> pieceMoves = pieceMoves(board,startPosition);
+        for (ChessMove move:pieceMoves) {
+            ChessBoard cloneBoard = board.cloneBoard();
+            ChessBoard.move(cloneBoard, move);
+
+            if (!ChessGame.check(cloneBoard,this.getTeamColor())){
+                validMoves.add(move);
+            }
+        }
+        return validMoves;
     }
 
     @Override
