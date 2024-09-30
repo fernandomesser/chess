@@ -114,4 +114,14 @@ public class ChessBoard {
         brd.addPiece(move.getEndPosition(), piece);
         brd.removePiece(brd,move.getStartPosition());
     }
+    public ChessBoard cloneBoard() {
+        ChessBoard cloneBoard = new ChessBoard();
+
+        for (int i = 1; i < 9; i++) {
+            for (int j = 1; j < 9; j++) {
+                cloneBoard.addPiece(new ChessPosition(i, j), this.squares[i - 1][j - 1]);
+            }
+        }
+        return cloneBoard;
+    }
 }

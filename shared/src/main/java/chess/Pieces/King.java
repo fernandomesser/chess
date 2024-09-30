@@ -21,14 +21,12 @@ public class King implements Piece{
         Collection<ChessMove> validMoves = new ArrayList<>();
         Collection<ChessMove> kingMoves = pieceMoves(board,startPosition);
         for (ChessMove move:kingMoves) {
-            ChessBoard cloneBoard = board;
+            ChessBoard cloneBoard = board.cloneBoard();
             ChessBoard.move(cloneBoard, move);
 
             if (!ChessGame.check(cloneBoard,this.getTeamColor())){
                 validMoves.add(move);
             }
-
-
         }
         return validMoves;
     }

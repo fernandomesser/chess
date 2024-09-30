@@ -56,13 +56,12 @@ public class ChessGame {
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece.PieceType type = board.getPiece(startPosition).getPieceType();
         Collection<ChessMove> validMoves = new ArrayList<>();
-        ChessBoard boardClone = board;
 
         switch (type){
             case KING -> {
                 King king = new King(getTeamTurn(),startPosition);
                 validMoves.addAll(king.validMoves(board,startPosition));
-
+                return validMoves;
             }
             case QUEEN -> {
             }
@@ -87,9 +86,24 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        ChessBoard clone = board.cloneBoard();
         ChessPiece piece = board.getPiece(move.getStartPosition());
-        board.addPiece(move.getEndPosition(), piece);
-        board.removePiece(board, move.getStartPosition());
+        Collection<ChessMove> validMoves = validMoves(move.getStartPosition());
+        boolean moveValid = false;
+        for (ChessMove moves: validMoves){
+            if (moves.equals(move)){
+                moveValid = true;
+            }
+        }
+        if (moveValid){
+            ChessBoard.move(clone,move);
+        }
+        if (!isInCheck(getTeamTurn())&&board.getPiece(move.getStartPosition()).getTeamColor().equals(getTeamTurn())){
+            ChessBoard.move(board,move);
+        }
+        else {
+            throw new InvalidMoveException();
+        }
     }
 
     /**
