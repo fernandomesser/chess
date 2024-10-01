@@ -22,7 +22,7 @@ public class King implements Piece{
             ChessBoard cloneBoard = board.cloneBoard();
             ChessBoard.move(cloneBoard, move);
 
-            if (!ChessGame.check(cloneBoard,this.getTeamColor())){
+            if (!ChessGame.check(cloneBoard,getTeamColor())&&!ChessGame.checkMate(cloneBoard,getTeamColor())&&!ChessGame.staleMate(cloneBoard,getTeamColor())){
                 validMoves.add(move);
             }
         }
