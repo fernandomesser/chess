@@ -272,7 +272,12 @@ public class ChessGame {
                         }
                     }
                 }
+                if (!staleMate){
+                    break;
+                }
             }
+        }else {
+            return false;
         }
         return staleMate;
     }
