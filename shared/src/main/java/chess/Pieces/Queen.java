@@ -23,7 +23,7 @@ public class Queen implements Piece{
             ChessBoard cloneBoard = board.cloneBoard();
             ChessBoard.move(cloneBoard, move, null);
 
-            if (!ChessGame.check(cloneBoard,getTeamColor())&&!ChessGame.checkMate(cloneBoard,getTeamColor())&&!ChessGame.staleMate(cloneBoard,getTeamColor())){
+            if (!ChessGame.check(cloneBoard,getTeamColor())){
                 validMoves.add(move);
             }
         }

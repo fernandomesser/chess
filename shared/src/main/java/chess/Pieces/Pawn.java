@@ -22,7 +22,7 @@ public class Pawn implements Piece{
             ChessBoard cloneBoard = board.cloneBoard();
             ChessBoard.move(cloneBoard, move, move.getPromotionPiece());
 
-            if (!ChessGame.check(cloneBoard,getTeamColor())&&!ChessGame.checkMate(cloneBoard,getTeamColor())&&!ChessGame.staleMate(cloneBoard,getTeamColor())){
+            if (!ChessGame.check(cloneBoard,getTeamColor())){
                 validMoves.add(move);
             }
         }
