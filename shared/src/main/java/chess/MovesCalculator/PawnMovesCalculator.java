@@ -79,15 +79,17 @@ public class PawnMovesCalculator implements PieceMovesCalculator{
             var checkRow = row + move[0];
             var checkCol = col + move[1];
             ChessPosition newPosition = new ChessPosition(checkRow, checkCol);
+            if(inBound(newPosition)){
+                if (board.getPiece(newPosition) == null && !isPromotion(newPosition)){
+                    validMoves.add(new ChessMove(myPosition, newPosition, null));
+                }
+                if (board.getPiece(newPosition) == null && isPromotion(newPosition)){
+                    validMoves.add(new ChessMove(myPosition, newPosition, ChessPiece.PieceType.ROOK));
+                    validMoves.add(new ChessMove(myPosition, newPosition, ChessPiece.PieceType.KNIGHT));
+                    validMoves.add(new ChessMove(myPosition, newPosition, ChessPiece.PieceType.BISHOP));
+                    validMoves.add(new ChessMove(myPosition, newPosition, ChessPiece.PieceType.QUEEN));
+                }
 
-            if (board.getPiece(newPosition) == null && !isPromotion(newPosition)){
-                validMoves.add(new ChessMove(myPosition, newPosition, null));
-            }
-            if (board.getPiece(newPosition) == null && isPromotion(newPosition)){
-                validMoves.add(new ChessMove(myPosition, newPosition, ChessPiece.PieceType.ROOK));
-                validMoves.add(new ChessMove(myPosition, newPosition, ChessPiece.PieceType.KNIGHT));
-                validMoves.add(new ChessMove(myPosition, newPosition, ChessPiece.PieceType.BISHOP));
-                validMoves.add(new ChessMove(myPosition, newPosition, ChessPiece.PieceType.QUEEN));
             }
         }
     }

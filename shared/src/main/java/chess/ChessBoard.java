@@ -109,17 +109,23 @@ public class ChessBoard {
     public void removePiece(ChessBoard boardClone, ChessPosition position){
         boardClone.addPiece(position,null);
     }
-    public static void move(ChessBoard brd, ChessMove move)  {
+    public static void move(ChessBoard brd, ChessMove move, ChessPiece.PieceType promotionType)  {
         ChessPiece piece = brd.getPiece(move.getStartPosition());
-        brd.addPiece(move.getEndPosition(), piece);
-        brd.removePiece(brd,move.getStartPosition());
+        if(promotionType!=null){
+            ChessPiece promotionPiece = new ChessPiece(piece.getTeamColor(),promotionType);
+            brd.addPiece(move.getEndPosition(), promotionPiece);
+            brd.removePiece(brd,move.getStartPosition());
+        }else{
+            brd.addPiece(move.getEndPosition(), piece);
+            brd.removePiece(brd,move.getStartPosition());
+        }
     }
     public ChessBoard cloneBoard() {
         ChessBoard cloneBoard = new ChessBoard();
 
         for (int i = 1; i < 9; i++) {
             for (int j = 1; j < 9; j++) {
-                cloneBoard.addPiece(new ChessPosition(i, j), this.squares[i - 1][j - 1]);
+                cloneBoard.addPiece(new ChessPosition(i, j), getPiece(new ChessPosition(i,j)));
             }
         }
         return cloneBoard;

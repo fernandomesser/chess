@@ -21,7 +21,7 @@ public class Bishop implements Piece {
         Collection<ChessMove> pieceMoves = pieceMoves(board,startPosition);
         for (ChessMove move:pieceMoves) {
             ChessBoard cloneBoard = board.cloneBoard();
-            ChessBoard.move(cloneBoard, move);
+            ChessBoard.move(cloneBoard, move, null);
 
             if (!ChessGame.check(cloneBoard,getTeamColor())&&!ChessGame.checkMate(cloneBoard,getTeamColor())&&!ChessGame.staleMate(cloneBoard,getTeamColor())){
                 validMoves.add(move);
