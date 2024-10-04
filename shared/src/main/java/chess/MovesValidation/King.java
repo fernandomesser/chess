@@ -1,24 +1,23 @@
-package chess.Pieces;
+package chess.MovesValidation;
 
 import chess.*;
 import chess.MovesCalculator.KingMovesCalculator;
-import chess.MovesCalculator.RookMovesCalculator;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class Rook implements Piece{
+public class King implements Piece{
 
     private ChessGame.TeamColor teamColor;
     private ChessPosition position;
-    public Rook(ChessGame.TeamColor teamColor, ChessPosition position){
-        this.position = position;
+    public King(ChessGame.TeamColor teamColor, ChessPosition position){
         this.teamColor = teamColor;
+        this.position = position;
     }
 
     public Collection<ChessMove> validMoves(ChessBoard board, ChessPosition startPosition){
         Collection<ChessMove> validMoves = new ArrayList<>();
-        Collection<ChessMove> pieceMoves = pieceMoves(board,startPosition);
+        Collection<ChessMove> pieceMoves = allMoves(board,startPosition);
         for (ChessMove move:pieceMoves) {
             ChessBoard cloneBoard = board.cloneBoard();
             ChessBoard.move(cloneBoard, move, null);
@@ -29,10 +28,11 @@ public class Rook implements Piece{
         }
         return validMoves;
     }
+
     @Override
-    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        RookMovesCalculator Rook = new RookMovesCalculator();
-        return Rook.pieceMoves(board, myPosition);
+    public Collection<ChessMove> allMoves(ChessBoard board, ChessPosition myPosition) {
+        KingMovesCalculator king = new KingMovesCalculator();
+        return king.pieceMoves(board, myPosition);
     }
 
     @Override
@@ -42,7 +42,7 @@ public class Rook implements Piece{
 
     @Override
     public ChessPiece.PieceType getPieceType() {
-        return ChessPiece.PieceType.ROOK;
+        return ChessPiece.PieceType.KING;
     }
 
     @Override
@@ -52,6 +52,6 @@ public class Rook implements Piece{
 
     @Override
     public void setPosition(ChessPosition newPosition) {
-        position=newPosition;
+        position = newPosition;
     }
 }

@@ -1,27 +1,27 @@
-package chess.Pieces;
+package chess.MovesValidation;
 
 import chess.*;
-import chess.MovesCalculator.BishopMovesCalculator;
-import chess.MovesCalculator.PieceMovesCalculator;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class Bishop implements Piece {
+public class PieceValidation implements Piece{
 
     private ChessGame.TeamColor teamColor;
     private ChessPosition position;
-    public Bishop(ChessGame.TeamColor teamColor, ChessPosition position){
-        this.teamColor = teamColor;
+    private ChessPiece piece;
+    public PieceValidation(ChessGame.TeamColor teamColor, ChessPosition position,ChessPiece piece){
+        this.piece = piece;
         this.position = position;
+        this.teamColor = teamColor;
     }
 
     public Collection<ChessMove> validMoves(ChessBoard board, ChessPosition startPosition){
         Collection<ChessMove> validMoves = new ArrayList<>();
-        Collection<ChessMove> pieceMoves = pieceMoves(board,startPosition);
+        Collection<ChessMove> pieceMoves = allMoves(board,startPosition);
         for (ChessMove move:pieceMoves) {
             ChessBoard cloneBoard = board.cloneBoard();
-            ChessBoard.move(cloneBoard, move, null);
+            ChessBoard.move(cloneBoard, move, move.getPromotionPiece());
 
             if (!ChessGame.check(cloneBoard,getTeamColor())){
                 validMoves.add(move);
@@ -31,9 +31,8 @@ public class Bishop implements Piece {
     }
 
     @Override
-    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        BishopMovesCalculator bishop = new BishopMovesCalculator();
-        return bishop.pieceMoves(board, myPosition);
+    public Collection<ChessMove> allMoves(ChessBoard board, ChessPosition myPosition) {
+        return piece.pieceMoves(board,myPosition);
     }
 
     @Override
@@ -43,7 +42,7 @@ public class Bishop implements Piece {
 
     @Override
     public ChessPiece.PieceType getPieceType() {
-        return ChessPiece.PieceType.BISHOP;
+        return piece.getPieceType();
     }
 
     @Override
@@ -53,6 +52,6 @@ public class Bishop implements Piece {
 
     @Override
     public void setPosition(ChessPosition newPosition) {
-        position = newPosition;
+        position=newPosition;
     }
 }

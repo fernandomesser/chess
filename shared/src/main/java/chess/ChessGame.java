@@ -1,6 +1,6 @@
 package chess;
 
-import chess.Pieces.*;
+import chess.MovesValidation.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -52,44 +52,13 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        ChessPiece.PieceType type = board.getPiece(startPosition).getPieceType();
+        ChessPiece piece = board.getPiece(startPosition);
         TeamColor color = board.getPiece(startPosition).getTeamColor();
         Collection<ChessMove> validMoves = new ArrayList<>();
 
-        switch (type){
-            case KING -> {
-                King king = new King(color,startPosition);
-                validMoves.addAll(king.validMoves(board,startPosition));
-                return validMoves;
-            }
-            case QUEEN -> {
-                Queen queen = new Queen(color,startPosition);
-                validMoves.addAll(queen.validMoves(board,startPosition));
-                return validMoves;
-            }
-            case BISHOP -> {
-                Bishop bishop = new Bishop(color,startPosition);
-                validMoves.addAll(bishop.validMoves(board,startPosition));
-                return validMoves;
-            }
-            case KNIGHT -> {
-                Knight knight = new Knight(color,startPosition);
-                validMoves.addAll(knight.validMoves(board,startPosition));
-                return validMoves;
-            }
-            case ROOK -> {
-                Rook rook = new Rook(color,startPosition);
-                validMoves.addAll(rook.validMoves(board,startPosition));
-                return validMoves;
-            }
-            case PAWN -> {
-                Pawn pawn = new Pawn(color,startPosition);
-                validMoves.addAll(pawn.validMoves(board,startPosition));
-                return validMoves;
-            }default -> {
-                return null;
-            }
-        }
+        PieceValidation pieceValidation = new PieceValidation(color,startPosition,piece);
+        validMoves.addAll(pieceValidation.validMoves(board,startPosition));
+        return validMoves;
     }
 
     /**
