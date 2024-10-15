@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class PawnMovesCalculator implements PieceMovesCalculator {
+
+    //All possible directions based on conditions
     private static final int[][] MOVES_WHITE = {{1, 0}};
     private static final int[][] MOVES_START_WHITE = {{1, 0}, {2, 0}};
     private static final int[][] MOVES_CAPTURE_WHITE = {{1, -1}, {1, 1}};
@@ -14,6 +16,7 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
     private static final int[][] MOVES_START_BLACK = {{-1, 0}, {-2, 0}};
     private static final int[][] MOVES_CAPTURE_BLACK = {{-1, -1}, {-1, 0}, {-1, 1}};
 
+    //Returns a List of all possible moves for the piece
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> validMoves = new ArrayList<>();
@@ -22,24 +25,25 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
 
         //Get valid moves for White Pawn not in start position
         if (myPosition.getRow() != 2 && board.getPiece(myPosition).getTeamColor().equals(ChessGame.TeamColor.WHITE)) {
-            movePiece(board, myPosition, validMoves, row, col, MOVES_WHITE);
+            notStartPosition(board, myPosition, validMoves, row, col, MOVES_WHITE);
         }
         //Get valid moves for Black Pawn not in start position
         if (myPosition.getRow() != 7 && board.getPiece(myPosition).getTeamColor().equals(ChessGame.TeamColor.BLACK)) {
-            movePiece(board, myPosition, validMoves, row, col, MOVES_BLACK);
+            notStartPosition(board, myPosition, validMoves, row, col, MOVES_BLACK);
         }
 
         //Get valid moves for White Pawn in start position
         if (myPosition.getRow() == 2 && board.getPiece(myPosition).getTeamColor().equals(ChessGame.TeamColor.WHITE)) {
-            startMove(board, myPosition, validMoves, row, col, MOVES_START_WHITE);
+            startPosition(board, myPosition, validMoves, row, col, MOVES_START_WHITE);
         }
 
         //Get valid moves for Black Pawn in start position
         if (myPosition.getRow() == 7 && board.getPiece(myPosition).getTeamColor().equals(ChessGame.TeamColor.BLACK)) {
-            startMove(board, myPosition, validMoves, row, col, MOVES_START_BLACK);
+            startPosition(board, myPosition, validMoves, row, col, MOVES_START_BLACK);
         }
 
 
+        //Calculate Capture Moves
         int[][] captureMoves = !board.getPiece(myPosition).getTeamColor().equals(ChessGame.TeamColor.BLACK) ? MOVES_CAPTURE_WHITE : MOVES_CAPTURE_BLACK;
         for (int[] move : captureMoves) {
             int checkRow = row + move[0];
@@ -58,25 +62,11 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
                 }
             }
         }
-
         return validMoves;
     }
 
-    private void startMove(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> validMoves, int row, int col, int[][] movesStart) {
-        for (int[] move : movesStart) {
-            int checkRow = row + move[0];
-            int checkCol = col + move[1];
-            ChessPosition position = new ChessPosition(checkRow, checkCol);
-
-            if (board.getPiece(position) == null) {
-                validMoves.add(new ChessMove(myPosition, position, null));
-            } else {
-                break;
-            }
-        }
-    }
-
-    private void movePiece(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> validMoves, int row, int col, int[][] moves) {
+    //Calculate moves of a Pawn not in start position
+    private void notStartPosition(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> validMoves, int row, int col, int[][] moves) {
         for (int[] move : moves) {
             var checkRow = row + move[0];
             var checkCol = col + move[1];
@@ -96,11 +86,28 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
         }
     }
 
+    //Calculate moves of a Pawn in start position
+    private void startPosition(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> validMoves, int row, int col, int[][] movesStart) {
+        for (int[] move : movesStart) {
+            int checkRow = row + move[0];
+            int checkCol = col + move[1];
+            ChessPosition position = new ChessPosition(checkRow, checkCol);
 
+            if (board.getPiece(position) == null) {
+                validMoves.add(new ChessMove(myPosition, position, null));
+            } else {
+                break;
+            }
+        }
+    }
+
+
+    //Check if move is out of bounds
     private boolean inBound(ChessPosition position) {
         return (position.getRow() > 0 && position.getRow() < 9) && (position.getColumn() > 0 && position.getColumn() < 9);
     }
 
+    //Check if move is a Promotion move
     private boolean isPromotion(ChessPosition position) {
         return (position.getRow() == 8) || (position.getRow() == 1);
     }

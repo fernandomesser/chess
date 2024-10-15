@@ -1,7 +1,5 @@
 package chess;
 
-import chess.MovesValidation.*;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
@@ -55,9 +53,9 @@ public class ChessGame {
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece piece = board.getPiece(startPosition);
         TeamColor color = board.getPiece(startPosition).getTeamColor();
-        PieceValidation pieceValidation = new PieceValidation(color, startPosition, piece);
+        MoveValidation moveValidation = new MoveValidation(color, startPosition, piece);
 
-        return new ArrayList<>(pieceValidation.validMoves(board, startPosition));
+        return new ArrayList<>(moveValidation.validMoves(board, startPosition));
     }
 
     /**
@@ -72,7 +70,7 @@ public class ChessGame {
         if (piece == null || !piece.getTeamColor().equals(getTeamTurn())) {
             throw new InvalidMoveException();
         }
-
+        //Validate the move
         Collection<ChessMove> validMoves = validMoves(move.getStartPosition());
         for (ChessMove moves : validMoves) {
             if (moves.equals(move)) {
@@ -81,7 +79,7 @@ public class ChessGame {
             }
         }
         if (moveValid) {
-            ChessBoard.move(board, move, move.getPromotionPiece());
+            ChessBoard.movePiece(board, move, move.getPromotionPiece());
             if (getTeamTurn().equals(TeamColor.BLACK)) {
                 setTeamTurn(TeamColor.WHITE);
             } else {
@@ -109,13 +107,11 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        boolean mate = true;
         if (check(board, teamColor)) {
-            mate = endGame(board, teamColor, mate);
+            return isGameOver(board, teamColor);
         } else {
             return false;
         }
-        return mate;
     }
 
     /**
@@ -126,13 +122,11 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStaleMate(TeamColor teamColor) {
-        boolean mate = true;
         if (!check(board, teamColor)) {
-            mate = endGame(board, teamColor, mate);
+            return isGameOver(board, teamColor);
         } else {
             return false;
         }
-        return mate;
     }
 
     /**
@@ -165,9 +159,11 @@ public class ChessGame {
         return Objects.hash(turn, getBoard());
     }
 
+    //Check if the board is in check
     public static boolean check(ChessBoard board, TeamColor teamColor) {
         boolean inCheck = false;
-        PieceValidation king = new PieceValidation(teamColor, null, new ChessPiece(teamColor, ChessPiece.PieceType.KING));
+        //Find the King
+        MoveValidation king = new MoveValidation(teamColor, null, new ChessPiece(teamColor, ChessPiece.PieceType.KING));
         for (int i = 1; i < 9; i++) {
             for (int j = 1; j < 9; j++) {
                 ChessPosition kingPosition = new ChessPosition(i, j);
@@ -182,6 +178,7 @@ public class ChessGame {
             }
         }
 
+        //Check if King is in danger
         for (int i = 1; i < 9; i++) {
             for (int j = 1; j < 9; j++) {
                 ChessPosition opponentPosition = new ChessPosition(i, j);
@@ -203,7 +200,9 @@ public class ChessGame {
         return inCheck;
     }
 
-    private static boolean endGame(ChessBoard board, TeamColor teamColor, boolean mate) {
+    //Check if Game over. No valid moves to save King
+    private static boolean isGameOver(ChessBoard board, TeamColor teamColor) {
+        boolean mate = true;
         for (int i = 1; i < 9; i++) {
             for (int j = 1; j < 9; j++) {
                 ChessPosition position = new ChessPosition(i, j);
@@ -212,7 +211,7 @@ public class ChessGame {
                     Collection<ChessMove> pieceMoves = piece.pieceMoves(board, position);
                     for (ChessMove pieceMove : pieceMoves) {
                         ChessBoard cloneBoard = board.cloneBoard();
-                        ChessBoard.move(cloneBoard, pieceMove, null);
+                        ChessBoard.movePiece(cloneBoard, pieceMove, null);
                         if (!check(cloneBoard, teamColor)) {
                             mate = false;
                             break;

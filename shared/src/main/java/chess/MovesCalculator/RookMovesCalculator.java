@@ -8,10 +8,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class RookMovesCalculator implements PieceMovesCalculator {
+
+    //All possible directions
     private static final int[][] MOVES = {
             {1, 0}, {-1, 0}, {0, 1}, {0, -1}
     };
 
+    //Returns a List of all possible moves for the piece
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> validMoves = new ArrayList<>();
@@ -46,6 +49,7 @@ public class RookMovesCalculator implements PieceMovesCalculator {
         return validMoves;
     }
 
+    //Checks if move is out of bounds
     private boolean inBound(int row, int col) {
         return (row > 0 && row < 9) && (col > 0 && col < 9);
     }

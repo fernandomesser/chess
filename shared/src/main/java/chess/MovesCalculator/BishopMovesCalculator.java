@@ -10,10 +10,12 @@ import java.util.Collection;
 
 public class BishopMovesCalculator implements PieceMovesCalculator {
 
+    //All Possible Directions
     private static final int[][] MOVES = {
             {1, 1}, {-1, -1}, {1, -1}, {-1, 1}
     };
 
+    //Returns a List of all possible moves for the piece
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> validMoves = new ArrayList<>();
@@ -48,6 +50,7 @@ public class BishopMovesCalculator implements PieceMovesCalculator {
         return validMoves;
     }
 
+    //Check if Move is out of bounds
     private boolean inBound(int row, int col) {
         return (row > 0 && row < 9) && (col > 0 && col < 9);
     }

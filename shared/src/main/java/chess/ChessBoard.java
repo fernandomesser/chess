@@ -107,22 +107,25 @@ public class ChessBoard {
         return board.toString();
     }
 
-    public void removePiece(ChessBoard boardClone, ChessPosition position) {
-        boardClone.addPiece(position, null);
+    //Removes a piece in the board
+    public void removePiece(ChessBoard board, ChessPosition position) {
+        board.addPiece(position, null);
     }
 
-    public static void move(ChessBoard brd, ChessMove move, ChessPiece.PieceType promotionType) {
-        ChessPiece piece = brd.getPiece(move.getStartPosition());
+    //Move a piece in the board
+    public static void movePiece(ChessBoard board, ChessMove move, ChessPiece.PieceType promotionType) {
+        ChessPiece piece = board.getPiece(move.getStartPosition());
         if (promotionType != null) {
             ChessPiece promotionPiece = new ChessPiece(piece.getTeamColor(), promotionType);
-            brd.addPiece(move.getEndPosition(), promotionPiece);
-            brd.removePiece(brd, move.getStartPosition());
+            board.addPiece(move.getEndPosition(), promotionPiece);
+            board.removePiece(board, move.getStartPosition());
         } else {
-            brd.addPiece(move.getEndPosition(), piece);
-            brd.removePiece(brd, move.getStartPosition());
+            board.addPiece(move.getEndPosition(), piece);
+            board.removePiece(board, move.getStartPosition());
         }
     }
 
+    //Clones the board
     public ChessBoard cloneBoard() {
         ChessBoard cloneBoard = new ChessBoard();
 

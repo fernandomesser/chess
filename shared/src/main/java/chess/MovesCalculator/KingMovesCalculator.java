@@ -9,6 +9,7 @@ import java.util.Collection;
 
 public class KingMovesCalculator implements PieceMovesCalculator {
 
+    //All Possible Directions
     private static final int[][] MOVES = {
 
             {1, -1}, {1, 0}, {1, 1},
@@ -17,6 +18,7 @@ public class KingMovesCalculator implements PieceMovesCalculator {
 
     };
 
+    //Returns a List of all possible moves for the piece
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> validMoves = new ArrayList<>();
