@@ -5,37 +5,39 @@ import chess.*;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class PawnMovesCalculator implements PieceMovesCalculator{
-    private static final int[][] MOVES_WHITE ={{1, 0}};
-    private static final int[][] MOVES_START_WHITE ={{1, 0},{2, 0}};
-    private static final int[][] MOVES_CAPTURE_WHITE ={{1, -1},{1, 1}};
+public class PawnMovesCalculator implements PieceMovesCalculator {
+    private static final int[][] MOVES_WHITE = {{1, 0}};
+    private static final int[][] MOVES_START_WHITE = {{1, 0}, {2, 0}};
+    private static final int[][] MOVES_CAPTURE_WHITE = {{1, -1}, {1, 1}};
 
-    private static final int[][] MOVES_BLACK ={{-1, 0}};
-    private static final int[][] MOVES_START_BLACK ={{-1, 0},{-2, 0}};
-    private static final int[][] MOVES_CAPTURE_BLACK ={{-1, -1},{-1,0},{-1, 1}};
+    private static final int[][] MOVES_BLACK = {{-1, 0}};
+    private static final int[][] MOVES_START_BLACK = {{-1, 0}, {-2, 0}};
+    private static final int[][] MOVES_CAPTURE_BLACK = {{-1, -1}, {-1, 0}, {-1, 1}};
+
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> validMoves = new ArrayList<>();
         var row = myPosition.getRow();
         var col = myPosition.getColumn();
 
-        if (myPosition.getRow() != 2 && board.getPiece(myPosition).getTeamColor().equals(ChessGame.TeamColor.WHITE)){
+        //Get valid moves for White Pawn not in start position
+        if (myPosition.getRow() != 2 && board.getPiece(myPosition).getTeamColor().equals(ChessGame.TeamColor.WHITE)) {
             movePiece(board, myPosition, validMoves, row, col, MOVES_WHITE);
         }
-        if (myPosition.getRow() != 7 && board.getPiece(myPosition).getTeamColor().equals(ChessGame.TeamColor.BLACK)){
+        //Get valid moves for Black Pawn not in start position
+        if (myPosition.getRow() != 7 && board.getPiece(myPosition).getTeamColor().equals(ChessGame.TeamColor.BLACK)) {
             movePiece(board, myPosition, validMoves, row, col, MOVES_BLACK);
         }
 
-        if (myPosition.getRow() == 2 && board.getPiece(myPosition).getTeamColor().equals(ChessGame.TeamColor.WHITE)){
+        //Get valid moves for White Pawn in start position
+        if (myPosition.getRow() == 2 && board.getPiece(myPosition).getTeamColor().equals(ChessGame.TeamColor.WHITE)) {
             startMove(board, myPosition, validMoves, row, col, MOVES_START_WHITE);
         }
 
-        if (myPosition.getRow() == 7 && board.getPiece(myPosition).getTeamColor().equals(ChessGame.TeamColor.BLACK)){
+        //Get valid moves for Black Pawn in start position
+        if (myPosition.getRow() == 7 && board.getPiece(myPosition).getTeamColor().equals(ChessGame.TeamColor.BLACK)) {
             startMove(board, myPosition, validMoves, row, col, MOVES_START_BLACK);
         }
-
-
-
 
 
         int[][] captureMoves = !board.getPiece(myPosition).getTeamColor().equals(ChessGame.TeamColor.BLACK) ? MOVES_CAPTURE_WHITE : MOVES_CAPTURE_BLACK;
@@ -61,29 +63,29 @@ public class PawnMovesCalculator implements PieceMovesCalculator{
     }
 
     private void startMove(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> validMoves, int row, int col, int[][] movesStart) {
-        for (int[] move: movesStart){
+        for (int[] move : movesStart) {
             int checkRow = row + move[0];
             int checkCol = col + move[1];
             ChessPosition position = new ChessPosition(checkRow, checkCol);
 
-            if (board.getPiece(position) == null){
+            if (board.getPiece(position) == null) {
                 validMoves.add(new ChessMove(myPosition, position, null));
-            }else {
+            } else {
                 break;
             }
         }
     }
 
     private void movePiece(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> validMoves, int row, int col, int[][] moves) {
-        for (int[] move: moves){
+        for (int[] move : moves) {
             var checkRow = row + move[0];
             var checkCol = col + move[1];
             ChessPosition newPosition = new ChessPosition(checkRow, checkCol);
-            if(inBound(newPosition)){
-                if (board.getPiece(newPosition) == null && !isPromotion(newPosition)){
+            if (inBound(newPosition)) {
+                if (board.getPiece(newPosition) == null && !isPromotion(newPosition)) {
                     validMoves.add(new ChessMove(myPosition, newPosition, null));
                 }
-                if (board.getPiece(newPosition) == null && isPromotion(newPosition)){
+                if (board.getPiece(newPosition) == null && isPromotion(newPosition)) {
                     validMoves.add(new ChessMove(myPosition, newPosition, ChessPiece.PieceType.ROOK));
                     validMoves.add(new ChessMove(myPosition, newPosition, ChessPiece.PieceType.KNIGHT));
                     validMoves.add(new ChessMove(myPosition, newPosition, ChessPiece.PieceType.BISHOP));
@@ -98,7 +100,8 @@ public class PawnMovesCalculator implements PieceMovesCalculator{
     private boolean inBound(ChessPosition position) {
         return (position.getRow() > 0 && position.getRow() < 9) && (position.getColumn() > 0 && position.getColumn() < 9);
     }
-    private boolean isPromotion(ChessPosition position){
+
+    private boolean isPromotion(ChessPosition position) {
         return (position.getRow() == 8) || (position.getRow() == 1);
     }
 }

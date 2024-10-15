@@ -1,4 +1,5 @@
 package chess.MovesCalculator;
+
 import chess.ChessBoard;
 import chess.ChessMove;
 import chess.ChessPosition;
@@ -6,11 +7,11 @@ import chess.ChessPosition;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class KnightMovesCalculator implements PieceMovesCalculator{
+public class KnightMovesCalculator implements PieceMovesCalculator {
     private static final int[][] MOVES = {
             {1, -2}, {2, -1}, {2, 1},
             {1, 2}, {-1, 2}, {-2, 1},
-            {-2, -1},{-1, -2}
+            {-2, -1}, {-1, -2}
     };
 
     @Override
@@ -19,13 +20,13 @@ public class KnightMovesCalculator implements PieceMovesCalculator{
         var row = myPosition.getRow();
         var col = myPosition.getColumn();
 
-        for (int[] move: MOVES){
+        for (int[] move : MOVES) {
             var checkRow = row + move[0];
             var checkCol = col + move[1];
 
             ChessPosition newPosition = new ChessPosition(checkRow, checkCol);
-            if (inBound(checkRow, checkCol)){
-                if (board.getPiece(newPosition)==null || !board.getPiece(newPosition).getTeamColor().equals(board.getPiece(myPosition).getTeamColor())){
+            if (inBound(checkRow, checkCol)) {
+                if (board.getPiece(newPosition) == null || !board.getPiece(newPosition).getTeamColor().equals(board.getPiece(myPosition).getTeamColor())) {
                     validMoves.add(new ChessMove(myPosition, newPosition, null));
                 }
             }

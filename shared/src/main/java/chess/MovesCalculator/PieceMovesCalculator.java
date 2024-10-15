@@ -1,4 +1,5 @@
 package chess.MovesCalculator;
+
 import chess.ChessBoard;
 import chess.ChessMove;
 import chess.ChessPosition;

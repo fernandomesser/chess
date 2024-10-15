@@ -38,9 +38,9 @@ public class GameStatusTests {
                 "Black is not in checkmate but isInCheckmate returned true");
         Assertions.assertFalse(game.isInCheckmate(ChessGame.TeamColor.WHITE),
                 "White is not in checkmate but isInCheckmate returned true");
-        Assertions.assertFalse(game.isInStalemate(ChessGame.TeamColor.BLACK),
+        Assertions.assertFalse(game.isInStaleMate(ChessGame.TeamColor.BLACK),
                 "Black is not in stalemate but isInStalemate returned true");
-        Assertions.assertFalse(game.isInStalemate(ChessGame.TeamColor.WHITE),
+        Assertions.assertFalse(game.isInStaleMate(ChessGame.TeamColor.WHITE),
                 "White is not in stalemate but isInStalemate returned true");
     }
 
@@ -224,9 +224,9 @@ public class GameStatusTests {
                 """));
         game.setTeamTurn(ChessGame.TeamColor.WHITE);
 
-        Assertions.assertTrue(game.isInStalemate(ChessGame.TeamColor.WHITE),
+        Assertions.assertTrue(game.isInStaleMate(ChessGame.TeamColor.WHITE),
                 "White is in a stalemate but isInStalemate returned false");
-        Assertions.assertFalse(game.isInStalemate(ChessGame.TeamColor.BLACK),
+        Assertions.assertFalse(game.isInStaleMate(ChessGame.TeamColor.BLACK),
                 "Black is not in a stalemate but isInStalemate returned true");
     }
 }

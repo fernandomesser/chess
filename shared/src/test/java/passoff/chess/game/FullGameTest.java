@@ -98,9 +98,9 @@ public class FullGameTest {
                 "Black is in checkmate but isInCheckmate returned false");
         Assertions.assertFalse(game.isInCheckmate(ChessGame.TeamColor.WHITE),
                 "White is not in checkmate but isInCheckmate returned true");
-        Assertions.assertFalse(game.isInStalemate(ChessGame.TeamColor.BLACK),
+        Assertions.assertFalse(game.isInStaleMate(ChessGame.TeamColor.BLACK),
                 "Black is not in stalemate but isInStalemate returned true");
-        Assertions.assertFalse(game.isInStalemate(ChessGame.TeamColor.WHITE),
+        Assertions.assertFalse(game.isInStaleMate(ChessGame.TeamColor.WHITE),
                 "White is not in stalemate but isInStalemate returned true");
     }
 }

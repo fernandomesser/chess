@@ -10,6 +10,7 @@ import java.util.Arrays;
  */
 public class ChessBoard {
     private ChessPiece[][] squares = new ChessPiece[8][8];
+
     public ChessBoard() {
 
     }
@@ -21,7 +22,7 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        squares[position.getRow()-1][position.getColumn()-1] = piece;
+        squares[position.getRow() - 1][position.getColumn() - 1] = piece;
     }
 
     /**
@@ -32,7 +33,7 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        return squares[position.getRow()-1][position.getColumn()-1];
+        return squares[position.getRow() - 1][position.getColumn() - 1];
     }
 
     /**
@@ -67,15 +68,15 @@ public class ChessBoard {
         addPiece(new ChessPosition(8, 7), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT));
 
         //Pawn
-        for (int i = 1; i < 9; i++){
+        for (int i = 1; i < 9; i++) {
             addPiece(new ChessPosition(2, i), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
         }
-        for (int i = 1; i < 9; i++){
+        for (int i = 1; i < 9; i++) {
             addPiece(new ChessPosition(7, i), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
         }
 
-        for (int i =2; i<6;i++){
-            for (int j =2; j<6;j++){
+        for (int i = 2; i < 6; i++) {
+            for (int j = 2; j < 6; j++) {
                 squares[i][j] = null;
             }
         }
@@ -94,38 +95,40 @@ public class ChessBoard {
     }
 
     @Override
-        public String toString() {
-            StringBuilder board = new StringBuilder();
-            for (int i=0; i<8; i++){
-                board.append("|");
-                for (int j=0; j<8; j++){
-                    board.append(squares[i][j]+"|");
-                }
-                board.append("\n");
+    public String toString() {
+        StringBuilder board = new StringBuilder();
+        for (int i = 0; i < 8; i++) {
+            board.append("|");
+            for (int j = 0; j < 8; j++) {
+                board.append(squares[i][j]).append("|");
             }
-            return board.toString();
+            board.append("\n");
         }
+        return board.toString();
+    }
 
-    public void removePiece(ChessBoard boardClone, ChessPosition position){
-        boardClone.addPiece(position,null);
+    public void removePiece(ChessBoard boardClone, ChessPosition position) {
+        boardClone.addPiece(position, null);
     }
-    public static void move(ChessBoard brd, ChessMove move, ChessPiece.PieceType promotionType)  {
+
+    public static void move(ChessBoard brd, ChessMove move, ChessPiece.PieceType promotionType) {
         ChessPiece piece = brd.getPiece(move.getStartPosition());
-        if(promotionType!=null){
-            ChessPiece promotionPiece = new ChessPiece(piece.getTeamColor(),promotionType);
+        if (promotionType != null) {
+            ChessPiece promotionPiece = new ChessPiece(piece.getTeamColor(), promotionType);
             brd.addPiece(move.getEndPosition(), promotionPiece);
-            brd.removePiece(brd,move.getStartPosition());
-        }else{
+            brd.removePiece(brd, move.getStartPosition());
+        } else {
             brd.addPiece(move.getEndPosition(), piece);
-            brd.removePiece(brd,move.getStartPosition());
+            brd.removePiece(brd, move.getStartPosition());
         }
     }
+
     public ChessBoard cloneBoard() {
         ChessBoard cloneBoard = new ChessBoard();
 
         for (int i = 1; i < 9; i++) {
             for (int j = 1; j < 9; j++) {
-                cloneBoard.addPiece(new ChessPosition(i, j), getPiece(new ChessPosition(i,j)));
+                cloneBoard.addPiece(new ChessPosition(i, j), getPiece(new ChessPosition(i, j)));
             }
         }
         return cloneBoard;

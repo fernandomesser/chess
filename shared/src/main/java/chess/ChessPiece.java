@@ -12,7 +12,7 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessPiece {
-     private final PieceType type;
+    private final PieceType type;
     private final ChessGame.TeamColor pieceColor;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
@@ -56,7 +56,7 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         PieceType type = getPieceType();
 
-        switch (type){
+        switch (type) {
             case KING -> {
                 KingMovesCalculator king = new KingMovesCalculator();
                 return king.pieceMoves(board, myPosition);
@@ -64,7 +64,6 @@ public class ChessPiece {
             case QUEEN -> {
                 QueenMovesCalculator queen = new QueenMovesCalculator();
                 return queen.pieceMoves(board, myPosition);
-
             }
             case BISHOP -> {
                 BishopMovesCalculator bishop = new BishopMovesCalculator();
@@ -84,8 +83,6 @@ public class ChessPiece {
             }
             default -> throw new IllegalStateException("Unexpected value: " + type);
         }
-
-
     }
 
     @Override
@@ -103,60 +100,28 @@ public class ChessPiece {
 
     @Override
     public String toString() {
-        switch (type){
+        switch (type) {
             case KING -> {
-                if (pieceColor.equals(ChessGame.TeamColor.WHITE)){
-                    return "K";
-                } else if (pieceColor.equals(ChessGame.TeamColor.BLACK)) {
-                    return "k";
-                }
-                break;
+                return pieceColor.equals(ChessGame.TeamColor.WHITE) ? "K" : "k";
             }
             case PAWN -> {
-                if (pieceColor.equals(ChessGame.TeamColor.WHITE)){
-                    return "P";
-                } else if (pieceColor.equals(ChessGame.TeamColor.BLACK)) {
-                    return "p";
-                }
-                break;
+                return pieceColor.equals(ChessGame.TeamColor.WHITE) ? "P" : "p";
             }
             case ROOK -> {
-                if (pieceColor.equals(ChessGame.TeamColor.WHITE)){
-                    return "R";
-                } else if (pieceColor.equals(ChessGame.TeamColor.BLACK)) {
-                    return "r";
-                }
-                break;
+                return pieceColor.equals(ChessGame.TeamColor.WHITE) ? "R" : "r";
             }
             case QUEEN -> {
-                if (pieceColor.equals(ChessGame.TeamColor.WHITE)){
-                    return "Q";
-                } else if (pieceColor.equals(ChessGame.TeamColor.BLACK)) {
-                    return "q";
-                }
-                break;
+                return pieceColor.equals(ChessGame.TeamColor.WHITE) ? "Q" : "q";
             }
             case BISHOP -> {
-                if (pieceColor.equals(ChessGame.TeamColor.WHITE)){
-                    return "B";
-                } else if (pieceColor.equals(ChessGame.TeamColor.BLACK)) {
-                    return "b";
-                }
-                break;
+                return pieceColor.equals(ChessGame.TeamColor.WHITE) ? "B" : "b";
             }
             case KNIGHT -> {
-                if (pieceColor.equals(ChessGame.TeamColor.WHITE)){
-                    return "N";
-                } else if (pieceColor.equals(ChessGame.TeamColor.BLACK)) {
-                    return "n";
-                }
-                break;
+                return pieceColor.equals(ChessGame.TeamColor.WHITE) ? "N" : "n";
             }
             default -> {
                 return null;
             }
-
         }
-        return null;
     }
 }
