@@ -7,9 +7,10 @@ import model.AuthData;
 public class MemoryAuthDAO implements AuthDAO{
     private HashMap<String, AuthData> authData = new HashMap<>();
     @Override
-    public void createAuth(AuthData auth) throws DataAccessException {
-        auth = new AuthData(UUID.randomUUID().toString(), auth.username());
+    public AuthData createAuth(String username) throws DataAccessException {
+        AuthData auth = new AuthData(UUID.randomUUID().toString(), username);
         authData.put(auth.authToken(), auth);
+        return auth;
     }
 
     @Override
