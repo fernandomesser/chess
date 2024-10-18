@@ -2,7 +2,6 @@ package service;
 
 import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
-import dataaccess.MemoryAuthDAO;
 import dataaccess.UserDAO;
 import exception.ResponseException;
 import model.AuthData;
@@ -10,11 +9,20 @@ import model.UserData;
 
 public class UserService {
     private final UserDAO userDataAccess;
-    private final AuthDAO userAuth;
+    private final AuthDAO authDataAccess;
 
-    public UserService(UserDAO userDataAccess, AuthDAO userAuth) {
+    public UserService(UserDAO userDataAccess, AuthDAO authDataAccess) {
         this.userDataAccess = userDataAccess;
-        this.userAuth = userAuth;
+        this.authDataAccess = authDataAccess;
+    }
+
+    public void Clear() throws ResponseException {
+        try {
+            userDataAccess.clearUsers();
+            authDataAccess.clearAuth();
+        }catch (Exception e) {
+            throw new ResponseException(500, "Error: " + e.getMessage());
+        }
     }
 
     public AuthData register(UserData user) throws ResponseException, DataAccessException {
@@ -25,7 +33,7 @@ public class UserService {
         }
         try {
             userDataAccess.insertUser(user);
-            return userAuth.createAuth(user.username());
+            return authDataAccess.createAuth(user.username());
         }catch (Exception e) {
             throw new ResponseException(500, "Error: " + e.getMessage());
         }
@@ -34,20 +42,20 @@ public class UserService {
     public AuthData logIn(UserData user) throws ResponseException, DataAccessException {
         if(userDataAccess.getUser(user.username()) == null){
             throw new ResponseException(401, "Error: unauthorized");
-        }
+        }//Compare Password
         try {
-            return userAuth.createAuth(user.username());
+            return authDataAccess.createAuth(user.username());
         }catch (Exception e) {
             throw new ResponseException(500, "Error: " + e.getMessage());
         }
     }
 
     public void logOut(String auth) throws ResponseException, DataAccessException{
-        if (userAuth.getAuth(auth)==null||auth==null||auth.isEmpty()){
+        if (authDataAccess.getAuth(auth)==null||auth==null||auth.isEmpty()){
             throw new ResponseException(401, "Error: unauthorized");
         }
         try {
-            userAuth.deleteAuth(auth);
+            authDataAccess.deleteAuth(auth);
         }catch (Exception e) {
             throw new ResponseException(500, "Error: " + e.getMessage());
         }

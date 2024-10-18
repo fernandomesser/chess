@@ -2,9 +2,13 @@ package server;
 
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
+import dataaccess.MemoryAuthDAO;
+import dataaccess.MemoryGameDAO;
+import dataaccess.MemoryUserDAO;
 import exception.ResponseException;
 import model.AuthData;
 import model.UserData;
+import service.AuthService;
 import service.GameService;
 import service.UserService;
 import spark.*;
@@ -13,11 +17,17 @@ import java.util.Map;
 
 public class Server {
     private final UserService userService;
+    private final AuthService authService;
     private final GameService gameService;
 
-    public Server(UserService service, GameService gameService) {
-        this.userService = service;
-        this.gameService = gameService;
+    public Server() {
+        MemoryAuthDAO authDAO = new MemoryAuthDAO();
+        MemoryUserDAO userDAO = new MemoryUserDAO();
+        MemoryGameDAO gameDAO = new MemoryGameDAO();
+
+        this.userService = new UserService(userDAO,authDAO);
+        this.authService = new AuthService();
+        this.gameService = new GameService(gameDAO, authDAO);
     }
 
     public int run(int desiredPort) {
@@ -82,7 +92,11 @@ public class Server {
     }
 
     private Object clearApp(Request req, Response res) throws ResponseException {
-        return null;
+        userService.Clear();
+        gameService.Clear();
+        
+        res.status(200);
+        return new Gson().toJson(Map.of());
     }
 
     public void stop() {
