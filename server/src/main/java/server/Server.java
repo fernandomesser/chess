@@ -1,6 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDAO;
@@ -13,6 +14,7 @@ import service.GameService;
 import service.UserService;
 import spark.*;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -78,8 +80,12 @@ public class Server {
         return new Gson().toJson(Map.of());
     }
 
-    private Object listGames(Request req, Response res) throws ResponseException {
-        return null;
+    private Object listGames(Request req, Response res) throws ResponseException, DataAccessException {
+        String auth = req.headers("Authorization");
+        Collection<GameData> gamesList = gameService.listGames(auth);
+        Map<String, Collection<GameData>> response = new HashMap<>();
+        response.put("games", gamesList);
+        return new Gson().toJson(response);
     }
 
     private Object createGame(Request req, Response res) throws ResponseException, DataAccessException {
@@ -91,8 +97,15 @@ public class Server {
         return new Gson().toJson(response);
     }
 
-    private Object joinGame(Request req, Response res) throws ResponseException {
-        return null;
+    private Object joinGame(Request req, Response res) throws ResponseException, DataAccessException {
+        String auth = req.headers("Authorization");
+        JsonObject requestBody = new Gson().fromJson(req.body(), JsonObject.class);
+        String playerColor = requestBody.get("playerColor").getAsString();
+        int gameID = requestBody.get("gameID").getAsInt();
+        gameService.joinGame(gameID,playerColor,auth);
+
+        res.status(200);
+        return new Gson().toJson(Map.of());
     }
 
     private Object clearApp(Request req, Response res) throws ResponseException {

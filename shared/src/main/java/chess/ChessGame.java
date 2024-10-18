@@ -226,4 +226,11 @@ public class ChessGame {
         return mate;
     }
 
+    @Override
+    public String toString() {
+        return "Game{" +
+                "turn=" + turn.toString() +
+                ", board=" + board.toString() +
+                '}';
+    }
 }
