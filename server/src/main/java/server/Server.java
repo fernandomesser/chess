@@ -7,8 +7,8 @@ import dataaccess.MemoryGameDAO;
 import dataaccess.MemoryUserDAO;
 import exception.ResponseException;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
-import service.AuthService;
 import service.GameService;
 import service.UserService;
 import spark.*;
@@ -17,7 +17,6 @@ import java.util.Map;
 
 public class Server {
     private final UserService userService;
-    private final AuthService authService;
     private final GameService gameService;
 
     public Server() {
@@ -26,7 +25,6 @@ public class Server {
         MemoryGameDAO gameDAO = new MemoryGameDAO();
 
         this.userService = new UserService(userDAO,authDAO);
-        this.authService = new AuthService();
         this.gameService = new GameService(gameDAO, authDAO);
     }
 
@@ -60,13 +58,13 @@ public class Server {
     }
 
     private Object register(Request req, Response res) throws ResponseException, DataAccessException {
-        var user = new Gson().fromJson(req.body(), UserData.class);
-       AuthData response = userService.register(user);
+        UserData user = new Gson().fromJson(req.body(), UserData.class);
+        AuthData response = userService.register(user);
         return new Gson().toJson(response);
     }
 
     private Object logIn(Request req, Response res) throws ResponseException, DataAccessException {
-        var user = new Gson().fromJson(req.body(), UserData.class);
+        UserData user = new Gson().fromJson(req.body(), UserData.class);
         AuthData response = userService.logIn(user);
         return new Gson().toJson(response);
     }
@@ -84,6 +82,7 @@ public class Server {
     }
 
     private Object createGame(Request req, Response res) throws ResponseException {
+        GameData game = new Gson().fromJson(req.body(), GameData.class);
         return null;
     }
 
@@ -92,9 +91,9 @@ public class Server {
     }
 
     private Object clearApp(Request req, Response res) throws ResponseException {
-        userService.Clear();
-        gameService.Clear();
-        
+        userService.clear();
+        gameService.clear();
+
         res.status(200);
         return new Gson().toJson(Map.of());
     }

@@ -16,7 +16,7 @@ public class UserService {
         this.authDataAccess = authDataAccess;
     }
 
-    public void Clear() throws ResponseException {
+    public void clear() throws ResponseException {
         try {
             userDataAccess.clearUsers();
             authDataAccess.clearAuth();
@@ -40,9 +40,12 @@ public class UserService {
     }
 
     public AuthData logIn(UserData user) throws ResponseException, DataAccessException {
-        if(userDataAccess.getUser(user.username()) == null){
+        UserData user1 = userDataAccess.getUser(user.username());
+        if(user1 == null){
             throw new ResponseException(401, "Error: unauthorized");
-        }//Compare Password
+        }if (!user1.password().equals(user.password())){
+            throw new ResponseException(401, "Error: unauthorized");
+        }
         try {
             return authDataAccess.createAuth(user.username());
         }catch (Exception e) {

@@ -2,7 +2,6 @@ package service;
 
 import dataaccess.AuthDAO;
 import dataaccess.GameDAO;
-import dataaccess.UserDAO;
 import exception.ResponseException;
 
 public class GameService {
@@ -14,10 +13,10 @@ public class GameService {
         this.gameDataAccess = gameDataAccess;
         this.authDataAccess = authDataAccess;
     }
-    public void Clear() throws ResponseException {
+    public void clear() throws ResponseException {
         try {
             gameDataAccess.clearGames();
-            authDataAccess.clearAuth();
+            
         }catch (Exception e) {
             throw new ResponseException(500, "Error: " + e.getMessage());
         }
