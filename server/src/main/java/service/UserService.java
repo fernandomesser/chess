@@ -2,6 +2,7 @@ package service;
 
 import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
+import dataaccess.MemoryAuthDAO;
 import dataaccess.UserDAO;
 import exception.ResponseException;
 import model.AuthData;
@@ -23,19 +24,34 @@ public class UserService {
             throw new ResponseException(403, "Error: already taken");
         }
         try {
-            userDataAccess.createUser(user);
+            userDataAccess.insertUser(user);
             return userAuth.createAuth(user.username());
         }catch (Exception e) {
             throw new ResponseException(500, "Error: " + e.getMessage());
         }
     }
 
-    public AuthData logIn(UserData user) {
-        return null;
+    public AuthData logIn(UserData user) throws ResponseException, DataAccessException {
+        if(userDataAccess.getUser(user.username()) == null){
+            throw new ResponseException(401, "Error: unauthorized");
+        }
+        try {
+            return userAuth.createAuth(user.username());
+        }catch (Exception e) {
+            throw new ResponseException(500, "Error: " + e.getMessage());
+        }
     }
 
-
-
+    public void logOut(String auth) throws ResponseException, DataAccessException{
+        if (userAuth.getAuth(auth)==null||auth==null||auth.isEmpty()){
+            throw new ResponseException(401, "Error: unauthorized");
+        }
+        try {
+            userAuth.deleteAuth(auth);
+        }catch (Exception e) {
+            throw new ResponseException(500, "Error: " + e.getMessage());
+        }
+    }
 
 
 

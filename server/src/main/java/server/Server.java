@@ -55,14 +55,18 @@ public class Server {
         return new Gson().toJson(response);
     }
 
-    private Object logIn(Request req, Response res) throws ResponseException {
+    private Object logIn(Request req, Response res) throws ResponseException, DataAccessException {
         var user = new Gson().fromJson(req.body(), UserData.class);
         AuthData response = userService.logIn(user);
         return new Gson().toJson(response);
     }
 
-    private Object logOut(Request req, Response res) throws ResponseException {
-        return null;
+    private Object logOut(Request req, Response res) throws ResponseException, DataAccessException {
+        String auth = req.headers("Authorization");
+        userService.logOut(auth);
+
+        res.status(200);
+        return new Gson().toJson(Map.of());
     }
 
     private Object listGames(Request req, Response res) throws ResponseException {
