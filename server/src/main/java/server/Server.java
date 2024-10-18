@@ -9,6 +9,8 @@ import service.GameService;
 import service.UserService;
 import spark.*;
 
+import java.util.Map;
+
 public class Server {
     private final UserService userService;
     private final GameService gameService;
@@ -43,6 +45,8 @@ public class Server {
 
     private <T extends Exception> void exceptionHandler(ResponseException ex, Request req, Response res) {
         res.status(ex.StatusCode());
+        res.body(new Gson().toJson(Map.of("message", ex.getMessage())));
+        ex.printStackTrace(System.out);
     }
 
     private Object register(Request req, Response res) throws ResponseException, DataAccessException {
@@ -52,7 +56,9 @@ public class Server {
     }
 
     private Object logIn(Request req, Response res) throws ResponseException {
-        return null;
+        var user = new Gson().fromJson(req.body(), UserData.class);
+        AuthData response = userService.logIn(user);
+        return new Gson().toJson(response);
     }
 
     private Object logOut(Request req, Response res) throws ResponseException {

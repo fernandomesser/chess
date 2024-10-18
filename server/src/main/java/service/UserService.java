@@ -30,6 +30,12 @@ public class UserService {
         }
     }
 
+    public AuthData logIn(UserData user) {
+        return null;
+    }
+
+
+
 
 
 
@@ -37,4 +43,6 @@ public class UserService {
         return user.username()==null||user.password()==null||user.email()==null
                 || user.username().isEmpty()||user.password().isEmpty()||user.email().isEmpty();
     }
+
+
 }
