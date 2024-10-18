@@ -1,9 +1,17 @@
 package server;
 
+import com.google.gson.Gson;
+import dataaccess.UserDAO;
 import exception.ResponseException;
+import service.UserService;
 import spark.*;
 
 public class Server {
+    private final UserService userService;
+
+    public Server(UserService service) {
+        this.userService = service;
+    }
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
@@ -33,7 +41,9 @@ public class Server {
     }
 
     private Object register(Request req, Response res) throws ResponseException {
-        return null;
+        var user = new Gson().fromJson(req.body(), UserDAO.class);
+        user = userService.register(user);
+        return new Gson().toJson(user);
     }
 
     private Object logIn(Request req, Response res) throws ResponseException {

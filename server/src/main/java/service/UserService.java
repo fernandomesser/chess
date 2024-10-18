@@ -14,7 +14,7 @@ public class UserService {
         this.userDataAccess = userDataAccess;
     }
 
-    public UserData register(UserData user) throws ResponseException {
+    public UserDAO register(UserDAO user) throws ResponseException {
 
 
         return null;
