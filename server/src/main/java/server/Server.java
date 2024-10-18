@@ -13,6 +13,7 @@ import service.GameService;
 import service.UserService;
 import spark.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class Server {
@@ -81,9 +82,13 @@ public class Server {
         return null;
     }
 
-    private Object createGame(Request req, Response res) throws ResponseException {
+    private Object createGame(Request req, Response res) throws ResponseException, DataAccessException {
+        String auth = req.headers("Authorization");
         GameData game = new Gson().fromJson(req.body(), GameData.class);
-        return null;
+        int gameID = gameService.createGame(game, auth);
+        var response = new HashMap<String, Integer>();
+        response.put("gameID", gameID);
+        return new Gson().toJson(response);
     }
 
     private Object joinGame(Request req, Response res) throws ResponseException {

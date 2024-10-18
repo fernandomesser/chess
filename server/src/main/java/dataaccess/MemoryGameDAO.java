@@ -11,10 +11,11 @@ public class MemoryGameDAO implements GameDAO{
     private HashMap<Integer, GameData> games = new HashMap<>();
 
     @Override
-    public void createGame(GameData game) throws DataAccessException {
+    public int createGame(GameData game) throws DataAccessException {
         ChessGame chessGame = new ChessGame();
         game = new GameData(nextId++, game.whiteUsername(), game.blackUsername(), game.gameName(), chessGame);
         games.put(game.gameID(),game);
+        return game.gameID();
     }
 
     @Override
