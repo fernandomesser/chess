@@ -93,6 +93,16 @@ class GameServiceTest {
 
     @Test
     void clearTest() throws ResponseException, DataAccessException {
-
+        AuthData auth = userService.register(new UserData("User", "1234", "test@test.com"));
+        service.createGame(new GameData(0, "", "", "Game1", null), auth.authToken());
+        service.createGame(new GameData(0, "", "", "Game2", null), auth.authToken());
+        service.createGame(new GameData(0, "", "", "Game3", null), auth.authToken());
+        assertNotNull(gameDataAccess.getGame(1));
+        assertNotNull(gameDataAccess.getGame(2));
+        assertNotNull(gameDataAccess.getGame(3));
+        service.clear();
+        assertNull(gameDataAccess.getGame(1));
+        assertNull(gameDataAccess.getGame(2));
+        assertNull(gameDataAccess.getGame(3));
     }
 }
