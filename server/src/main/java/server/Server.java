@@ -100,8 +100,8 @@ public class Server {
     private Object joinGame(Request req, Response res) throws ResponseException, DataAccessException {
         String auth = req.headers("Authorization");
         JsonObject requestBody = new Gson().fromJson(req.body(), JsonObject.class);
-        String playerColor = requestBody.get("playerColor").getAsString();
-        int gameID = requestBody.get("gameID").getAsInt();
+        String playerColor = (requestBody.has("playerColor") && !requestBody.get("playerColor").isJsonNull()) ? requestBody.get("playerColor").getAsString() : "";
+        int gameID = (requestBody.has("gameID") && !requestBody.get("gameID").isJsonNull()) ? requestBody.get("gameID").getAsInt() : -1;
         gameService.joinGame(gameID,playerColor,auth);
 
         res.status(200);

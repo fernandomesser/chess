@@ -66,7 +66,7 @@ public class GameService {
         if (authDataAccess.getAuth(auth) == null || auth == null || auth.isEmpty()) {
             throw new ResponseException(401, "Error: unauthorized");
         }
-        if (game == null) {
+        if (game == null||gameID==-1||playerColor==null||playerColor.isEmpty()) {
             throw new ResponseException(400, "Error: bad request");
         }
         if (playerColor.equalsIgnoreCase("WHITE") && game.whiteUsername() != null) {
@@ -74,8 +74,6 @@ public class GameService {
         }
         if (playerColor.equalsIgnoreCase("BLACK") && game.blackUsername() != null) {
             throw new ResponseException(403, "Error: already taken");
-        }if (gameID==-1) {
-            throw new ResponseException(400, "Error: bad request");
         }
         try {
             if (playerColor.equalsIgnoreCase("WHITE")) {
