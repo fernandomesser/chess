@@ -2,23 +2,37 @@ package java.service;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class GameServiceTest {
 
     @Test
-    void clear() {
+    void positiveClear() {
     }
 
     @Test
-    void createGame() {
+    void negativeClear() {
     }
 
     @Test
-    void listGames() {
+    void positiveCreateGame() {
     }
 
     @Test
-    void joinGame() {
+    void negativeCreateGame() {
+    }
+
+    @Test
+    void positiveListGames() {
+    }
+
+    @Test
+    void negativeListGames() {
+    }
+
+    @Test
+    void positiveJoinGame() {
+    }
+
+    @Test
+    void negativeJoinGame() {
     }
 }

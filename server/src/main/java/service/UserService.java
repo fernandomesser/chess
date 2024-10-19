@@ -40,10 +40,10 @@ public class UserService {
     }
 
     public AuthData logIn(UserData user) throws ResponseException, DataAccessException {
-        UserData user1 = userDataAccess.getUser(user.username());
-        if(user1 == null){
+        UserData userData = userDataAccess.getUser(user.username());
+        if(userData == null){
             throw new ResponseException(401, "Error: unauthorized");
-        }if (!user1.password().equals(user.password())){
+        }if (!userData.password().equals(user.password())){
             throw new ResponseException(401, "Error: unauthorized");
         }
         try {
