@@ -21,23 +21,23 @@ class UserServiceTest {
 
     @Test
     void positiveRegister() throws ResponseException, DataAccessException {
-        UserData user = new UserData("Jhon","1234","jhon@email.com");
+        UserData user = new UserData("Jhon", "1234", "jhon@email.com");
         AuthData authData = service.register(user);
-        assertEquals(user,userDataAccess.getUser("Jhon"));
+        assertEquals(user, userDataAccess.getUser("Jhon"));
         assertNotNull(authData);
     }
 
     @Test
     void negativeRegister() throws ResponseException, DataAccessException {
-        UserData user = new UserData("","1234","jhon@email.com");
+        UserData user = new UserData("", "1234", "jhon@email.com");
         assertThrows(ResponseException.class, () -> {
             service.register(user);
-    });
+        });
     }
 
     @Test
     void positiveLogIn() throws ResponseException, DataAccessException {
-        UserData user = new UserData("Jhon","1234","jhon@email.com");
+        UserData user = new UserData("Jhon", "1234", "jhon@email.com");
         service.register(user);
         AuthData authData = service.logIn(user);
         assertNotNull(authData);
@@ -45,7 +45,7 @@ class UserServiceTest {
 
     @Test
     void negativeLogIn() {
-        UserData user = new UserData("","1234","jhon@email.com");
+        UserData user = new UserData("", "1234", "jhon@email.com");
         assertThrows(ResponseException.class, () -> {
             service.logIn(user);
         });
@@ -53,8 +53,8 @@ class UserServiceTest {
 
     @Test
     void positiveLogOut() throws ResponseException, DataAccessException {
-        AuthData expected = service.register(new UserData("Jhon","1234","jhon@email.com"));
-        assertEquals(authDataAccess.getAuth(expected.authToken()).authToken(),expected.authToken());
+        AuthData expected = service.register(new UserData("Jhon", "1234", "jhon@email.com"));
+        assertEquals(authDataAccess.getAuth(expected.authToken()).authToken(), expected.authToken());
         service.logOut(expected.authToken());
         assertNull(authDataAccess.getAuth(expected.authToken()));
     }
@@ -71,9 +71,9 @@ class UserServiceTest {
 
     @Test
     void clearTest() throws ResponseException, DataAccessException {
-        service.register(new UserData("Jhon","1234","jhon@email.com"));
-        service.register(new UserData("Joe","1234","joe@email.com"));
-        service.register(new UserData("Julia","1234","julia@email.com"));
+        service.register(new UserData("Jhon", "1234", "jhon@email.com"));
+        service.register(new UserData("Joe", "1234", "joe@email.com"));
+        service.register(new UserData("Julia", "1234", "julia@email.com"));
         service.clear();
         assertNull(userDataAccess.getUser("Jhon"));
         assertNull(userDataAccess.getUser("Joe"));

@@ -1,11 +1,13 @@
 package dataaccess;
+
 import java.util.HashMap;
 import java.util.UUID;
 
 import model.AuthData;
 
-public class MemoryAuthDAO implements AuthDAO{
+public class MemoryAuthDAO implements AuthDAO {
     private HashMap<String, AuthData> authData = new HashMap<>();
+
     @Override
     public AuthData createAuth(String username) throws DataAccessException {
         AuthData auth = new AuthData(UUID.randomUUID().toString(), username);

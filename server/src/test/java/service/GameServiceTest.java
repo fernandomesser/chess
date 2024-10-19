@@ -74,9 +74,9 @@ class GameServiceTest {
     @Test
     void positiveJoinGame() throws ResponseException, DataAccessException {
         AuthData auth = userService.register(new UserData("User", "1234", "test@test.com"));
-        GameData game = new GameData(0,null,null,"Game",null);
-        service.createGame(game,auth.authToken());
-        service.joinGame(1,"WHITE", auth.authToken());
+        GameData game = new GameData(0, null, null, "Game", null);
+        service.createGame(game, auth.authToken());
+        service.joinGame(1, "WHITE", auth.authToken());
         assertEquals("User", gameDataAccess.getGame(1).whiteUsername());
 
     }
@@ -84,10 +84,11 @@ class GameServiceTest {
     @Test
     void negativeJoinGame() throws ResponseException, DataAccessException {
         AuthData auth = userService.register(new UserData("User", "1234", "test@test.com"));
-        GameData game = new GameData(0,"Jhon",null,"Game",null);
-        service.createGame(game,auth.authToken());
+        GameData game = new GameData(0, "Jhon", null, "Game", null);
+        service.createGame(game, auth.authToken());
         assertThrows(ResponseException.class, () -> {
-            service.joinGame(1,"WHITE", auth.authToken());;
+            service.joinGame(1, "WHITE", auth.authToken());
+            ;
         });
     }
 

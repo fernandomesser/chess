@@ -6,7 +6,7 @@ import model.GameData;
 import java.util.Collection;
 import java.util.HashMap;
 
-public class MemoryGameDAO implements GameDAO{
+public class MemoryGameDAO implements GameDAO {
     private int nextId = 1;
     private HashMap<Integer, GameData> games = new HashMap<>();
 
@@ -14,7 +14,7 @@ public class MemoryGameDAO implements GameDAO{
     public int createGame(GameData game) throws DataAccessException {
         ChessGame chessGame = new ChessGame();
         game = new GameData(nextId++, game.whiteUsername(), game.blackUsername(), game.gameName(), chessGame);
-        games.put(game.gameID(),game);
+        games.put(game.gameID(), game);
         return game.gameID();
     }
 
@@ -35,6 +35,6 @@ public class MemoryGameDAO implements GameDAO{
 
     @Override
     public void updateGame(int gameID, GameData updateGame) {
-        games.put(gameID,updateGame);
+        games.put(gameID, updateGame);
     }
 }
