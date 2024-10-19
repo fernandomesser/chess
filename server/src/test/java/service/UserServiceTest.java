@@ -8,6 +8,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import service.UserService;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserServiceTest {
@@ -19,12 +22,7 @@ class UserServiceTest {
     void clear() throws ResponseException {
         service.clear();
     }
-
-    @Test
-    void clearUser() throws ResponseException, DataAccessException {
-
-    }
-
+    
     @Test
     void positiveRegister() throws ResponseException, DataAccessException {
         UserData user = new UserData("Jhon","1234","jhon@email.com");
@@ -51,15 +49,42 @@ class UserServiceTest {
 
     @Test
     void negativeLogIn() {
-        
+        UserData user = new UserData("","1234","jhon@email.com");
+        assertThrows(ResponseException.class, () -> {
+            service.logIn(user);
+        });
     }
 
     @Test
-    void positiveLogOut() {
+    void positiveLogOut() throws ResponseException, DataAccessException {
+        AuthData expected = service.register(new UserData("Jhon","1234","jhon@email.com"));
+        assertEquals(authDataAccess.getAuth(expected.authToken()).authToken(),expected.authToken());
+        service.logOut(expected.authToken());
+        assertNull(authDataAccess.getAuth(expected.authToken()));
     }
 
     @Test
     void negativeLogOut() {
+        assertThrows(ResponseException.class, () -> {
+            service.logOut(null);
+        });
+        assertThrows(ResponseException.class, () -> {
+            service.logOut("");
+        });
+    }
+
+    @Test
+    void clearTest() throws ResponseException, DataAccessException {
+        service.register(new UserData("Jhon","1234","jhon@email.com"));
+        service.register(new UserData("Joe","1234","joe@email.com"));
+        service.register(new UserData("Julia","1234","julia@email.com"));
+        service.clear();
+        assertNull(userDataAccess.getUser("Jhon"));
+        assertNull(userDataAccess.getUser("Joe"));
+        assertNull(userDataAccess.getUser("Julia"));
+        assertNull(authDataAccess.getAuth("Jhon"));
+        assertNull(authDataAccess.getAuth("Joe"));
+        assertNull(authDataAccess.getAuth("Julia"));
     }
 
 }
