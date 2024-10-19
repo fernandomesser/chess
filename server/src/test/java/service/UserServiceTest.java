@@ -6,10 +6,6 @@ import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import service.UserService;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,7 +18,7 @@ class UserServiceTest {
     void clear() throws ResponseException {
         service.clear();
     }
-    
+
     @Test
     void positiveRegister() throws ResponseException, DataAccessException {
         UserData user = new UserData("Jhon","1234","jhon@email.com");
