@@ -15,8 +15,8 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
     private static final int[][] M_BLACK = {{-1, 0}};
     private static final int[][] M_START_BLACK = {{-1, 0}, {-2, 0}};
     private static final int[][] M_CAPTURE_BLACK = {{-1, -1}, {-1, 0}, {-1, 1}};
-    private final ChessGame.TeamColor BLACK = ChessGame.TeamColor.BLACK;
-    private final ChessGame.TeamColor WHITE = ChessGame.TeamColor.WHITE;
+    private static final ChessGame.TeamColor BLACK = ChessGame.TeamColor.BLACK;
+    private static final ChessGame.TeamColor WHITE = ChessGame.TeamColor.WHITE;
 
     //Returns a List of all possible moves for the piece
     @Override

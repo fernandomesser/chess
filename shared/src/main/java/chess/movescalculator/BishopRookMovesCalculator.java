@@ -2,24 +2,29 @@ package chess.movescalculator;
 
 import chess.ChessBoard;
 import chess.ChessMove;
+import chess.ChessPiece;
 import chess.ChessPosition;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
 
-public class BishopMovesCalculator implements PieceMovesCalculator {
+public class BishopRookMovesCalculator implements PieceMovesCalculator {
 
     //All Possible Directions
-    private static final int[][] MOVES = {
+    private static final int[][] BISHOP_MOVES = {
             {1, 1}, {-1, -1}, {1, -1}, {-1, 1}
+    };
+    private static final int[][] ROOK_MOVES = {
+            {1, 0}, {-1, 0}, {0, 1}, {0, -1}
     };
 
     //Returns a List of all possible moves for the piece
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> validMoves = new ArrayList<>();
-
+        ChessPiece.PieceType type = board.getPiece(myPosition).getPieceType();
+        int[][] MOVES = type.equals(ChessPiece.PieceType.BISHOP) ? BISHOP_MOVES : ROOK_MOVES;
         for (int[] move : MOVES) {
             var checkRow = myPosition.getRow();
             var checkCol = myPosition.getColumn();

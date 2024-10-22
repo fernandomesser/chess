@@ -165,43 +165,62 @@ public class ChessGame {
 
     //Check if the board is in check
     public static boolean check(ChessBoard board, TeamColor teamColor) {
-        boolean inCheck = false;
-        //Find the King
-        MoveValidation king = new MoveValidation(teamColor, null, new ChessPiece(teamColor, ChessPiece.PieceType.KING));
+        // Find the King position
+        ChessPosition kingPosition = findKingPosition(board, teamColor);
+
+        // If the King is in danger, return true
+        return isKingInCheck(board, kingPosition, teamColor);
+    }
+
+    // Helper method to find the King's position on the board
+    private static ChessPosition findKingPosition(ChessBoard board, TeamColor teamColor) {
         for (int i = 1; i < 9; i++) {
             for (int j = 1; j < 9; j++) {
-                ChessPosition kingPosition = new ChessPosition(i, j);
-                ChessPiece piece = board.getPiece(kingPosition);
-                if (piece != null && piece.getTeamColor().equals(teamColor) && piece.getPieceType().equals(king.getPieceType())) {
-                    king.setPosition(kingPosition);
-                    break;
+                ChessPosition position = new ChessPosition(i, j);
+                ChessPiece piece = board.getPiece(position);
+                if (isKing(piece, teamColor)) {
+                    return position;
                 }
             }
-            if (king.getPosition() != null) {
-                break;
-            }
         }
+        return null;
+    }
 
-        //Check if King is in danger
+    // Helper method to check if the King is in check
+    private static boolean isKingInCheck(ChessBoard board, ChessPosition kingPosition, TeamColor teamColor) {
         for (int i = 1; i < 9; i++) {
             for (int j = 1; j < 9; j++) {
                 ChessPosition opponentPosition = new ChessPosition(i, j);
                 ChessPiece piece = board.getPiece(opponentPosition);
-                if (piece != null && !piece.getTeamColor().equals(teamColor)) {
+                if (isOpponentPiece(piece, teamColor)) {
                     Collection<ChessMove> movesList = piece.pieceMoves(board, opponentPosition);
-                    for (ChessMove moves : movesList) {
-                        if (moves.getEndPosition().equals(king.getPosition())) {
-                            inCheck = true;
-                            break;
-                        }
-                    }
-                    if (inCheck) {
-                        break;
+                    if (isKingUnderAttack(movesList, kingPosition)) {
+                        return true;
                     }
                 }
             }
         }
-        return inCheck;
+        return false;
+    }
+
+    // Helper method to check if a piece is the King of the given team
+    private static boolean isKing(ChessPiece piece, TeamColor teamColor) {
+        return piece != null && piece.getTeamColor().equals(teamColor) && piece.getPieceType().equals(ChessPiece.PieceType.KING);
+    }
+
+    // Helper method to check if a piece belongs to the opponent
+    private static boolean isOpponentPiece(ChessPiece piece, TeamColor teamColor) {
+        return piece != null && !piece.getTeamColor().equals(teamColor);
+    }
+
+    // Helper method to check if the King is under attack
+    private static boolean isKingUnderAttack(Collection<ChessMove> movesList, ChessPosition kingPosition) {
+        for (ChessMove move : movesList) {
+            if (move.getEndPosition().equals(kingPosition)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     //Check if Game over. No valid moves to save King
