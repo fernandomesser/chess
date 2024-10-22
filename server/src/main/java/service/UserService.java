@@ -16,6 +16,7 @@ public class UserService {
         this.authDataAccess = authDataAccess;
     }
 
+    //Clear data
     public void clear() throws ResponseException {
         try {
             userDataAccess.clearUsers();
@@ -25,6 +26,7 @@ public class UserService {
         }
     }
 
+    //Create a new User and handle error
     public AuthData register(UserData user) throws ResponseException, DataAccessException {
         if (empty(user)) {
             throw new ResponseException(400, "Error: bad request");
@@ -40,6 +42,7 @@ public class UserService {
         }
     }
 
+    //Authenticate the user and return AuthData, handle errors
     public AuthData logIn(UserData user) throws ResponseException, DataAccessException {
         UserData userData = userDataAccess.getUser(user.username());
         if (userData == null) {
@@ -55,6 +58,7 @@ public class UserService {
         }
     }
 
+    //Delete AuthData for the user and handle errors
     public void logOut(String auth) throws ResponseException, DataAccessException {
         if (authDataAccess.getAuth(auth) == null || auth == null || auth.isEmpty()) {
             throw new ResponseException(401, "Error: unauthorized");
@@ -67,6 +71,7 @@ public class UserService {
     }
 
 
+    //Check if UserData has any empty fields
     private boolean empty(UserData user) {
         return user.username() == null || user.password() == null || user.email() == null
                 || user.username().isEmpty() || user.password().isEmpty() || user.email().isEmpty();

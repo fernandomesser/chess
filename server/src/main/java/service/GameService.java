@@ -19,6 +19,7 @@ public class GameService {
         this.authDataAccess = authDataAccess;
     }
 
+    //Clear Data
     public void clear() throws ResponseException {
         try {
             gameDataAccess.clearGames();
@@ -29,6 +30,7 @@ public class GameService {
     }
 
 
+    //Create a new game with error handling
     public int createGame(GameData game, String auth) throws ResponseException, DataAccessException {
         if (game.gameName() == null || game.gameName().isEmpty()) {
             throw new ResponseException(400, "Error: bad request");
@@ -43,6 +45,7 @@ public class GameService {
         }
     }
 
+    //List all games and handle errors
     public Collection<GameData> listGames(String auth) throws ResponseException, DataAccessException {
         if (authDataAccess.getAuth(auth) == null || auth == null || auth.isEmpty()) {
             throw new ResponseException(401, "Error: unauthorized");
@@ -61,6 +64,7 @@ public class GameService {
         }
     }
 
+    //updates the game and handle errors
     public void joinGame(int gameID, String playerColor, String auth) throws ResponseException, DataAccessException {
         GameData game = gameDataAccess.getGame(gameID);
         GameData updatedGame;

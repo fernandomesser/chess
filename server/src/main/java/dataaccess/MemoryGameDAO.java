@@ -10,6 +10,7 @@ public class MemoryGameDAO implements GameDAO {
     private int nextId = 1;
     private final HashMap<Integer, GameData> games = new HashMap<>();
 
+    //Creates a new chess game and stores the corresponding GameData.
     @Override
     public int createGame(GameData game) throws DataAccessException {
         ChessGame chessGame = new ChessGame();
@@ -18,21 +19,25 @@ public class MemoryGameDAO implements GameDAO {
         return game.gameID();
     }
 
+    //Retrieves the GameData associated with the specified game ID.
     @Override
     public GameData getGame(int gameID) throws DataAccessException {
         return games.get(gameID);
     }
 
+    // Retrieves a collection of all stored GameData objects.
     @Override
     public Collection<GameData> listGames() throws DataAccessException {
         return games.values();
     }
 
+    //Clears all stored game data.
     @Override
     public void clearGames() throws DataAccessException {
         games.clear();
     }
 
+    //Updates the game given the game ID
     @Override
     public void updateGame(int gameID, GameData updateGame) {
         games.put(gameID, updateGame);

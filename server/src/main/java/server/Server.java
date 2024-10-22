@@ -54,24 +54,28 @@ public class Server {
         return Spark.port();
     }
 
+    //Handles the exceptions
     private <T extends Exception> void exceptionHandler(ResponseException ex, Request req, Response res) {
         res.status(ex.StatusCode());
         res.body(new Gson().toJson(Map.of("message", ex.getMessage())));
         ex.printStackTrace(System.out);
     }
 
+    //Create a new User and return the AuthData
     private Object register(Request req, Response res) throws ResponseException, DataAccessException {
         UserData user = new Gson().fromJson(req.body(), UserData.class);
         AuthData response = userService.register(user);
         return new Gson().toJson(response);
     }
 
+    //Takes a User and returns the AuthData
     private Object logIn(Request req, Response res) throws ResponseException, DataAccessException {
         UserData user = new Gson().fromJson(req.body(), UserData.class);
         AuthData response = userService.logIn(user);
         return new Gson().toJson(response);
     }
 
+    //Remove a user AuthData
     private Object logOut(Request req, Response res) throws ResponseException, DataAccessException {
         String auth = req.headers("Authorization");
         userService.logOut(auth);
@@ -80,6 +84,7 @@ public class Server {
         return new Gson().toJson(Map.of());
     }
 
+    //List all games in the database
     private Object listGames(Request req, Response res) throws ResponseException, DataAccessException {
         String auth = req.headers("Authorization");
         Collection<GameData> gamesList = gameService.listGames(auth);
@@ -88,6 +93,7 @@ public class Server {
         return new Gson().toJson(response);
     }
 
+    //Creates a new game
     private Object createGame(Request req, Response res) throws ResponseException, DataAccessException {
         String auth = req.headers("Authorization");
         GameData game = new Gson().fromJson(req.body(), GameData.class);
@@ -97,6 +103,7 @@ public class Server {
         return new Gson().toJson(response);
     }
 
+    //Updates the game in the database
     private Object joinGame(Request req, Response res) throws ResponseException, DataAccessException {
         String auth = req.headers("Authorization");
         JsonObject requestBody = new Gson().fromJson(req.body(), JsonObject.class);
@@ -108,6 +115,7 @@ public class Server {
         return new Gson().toJson(Map.of());
     }
 
+    //Clear the DataBase
     private Object clearApp(Request req, Response res) throws ResponseException {
         userService.clear();
         gameService.clear();
