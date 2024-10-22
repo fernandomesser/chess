@@ -6,7 +6,7 @@ import java.util.UUID;
 import model.AuthData;
 
 public class MemoryAuthDAO implements AuthDAO {
-    private final HashMap<String, AuthData> authData = new HashMap<>();
+    private HashMap<String, AuthData> authData = new HashMap<>();
 
 
     //Creates a new authentication token for the specified user.

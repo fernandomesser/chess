@@ -1,4 +1,4 @@
-package chess.MovesCalculator;
+package chess.movescalculator;
 
 import chess.*;
 
@@ -8,13 +8,15 @@ import java.util.Collection;
 public class PawnMovesCalculator implements PieceMovesCalculator {
 
     //All possible directions based on conditions
-    private static final int[][] MOVES_WHITE = {{1, 0}};
-    private static final int[][] MOVES_START_WHITE = {{1, 0}, {2, 0}};
-    private static final int[][] MOVES_CAPTURE_WHITE = {{1, -1}, {1, 1}};
+    private static final int[][] M_WHITE = {{1, 0}};
+    private static final int[][] M_START_WHITE = {{1, 0}, {2, 0}};
+    private static final int[][] M_CAPTURE_WHITE = {{1, -1}, {1, 1}};
 
-    private static final int[][] MOVES_BLACK = {{-1, 0}};
-    private static final int[][] MOVES_START_BLACK = {{-1, 0}, {-2, 0}};
-    private static final int[][] MOVES_CAPTURE_BLACK = {{-1, -1}, {-1, 0}, {-1, 1}};
+    private static final int[][] M_BLACK = {{-1, 0}};
+    private static final int[][] M_START_BLACK = {{-1, 0}, {-2, 0}};
+    private static final int[][] M_CAPTURE_BLACK = {{-1, -1}, {-1, 0}, {-1, 1}};
+    private final ChessGame.TeamColor BLACK = ChessGame.TeamColor.BLACK;
+    private final ChessGame.TeamColor WHITE = ChessGame.TeamColor.WHITE;
 
     //Returns a List of all possible moves for the piece
     @Override
@@ -24,27 +26,27 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
         var col = myPosition.getColumn();
 
         //Get valid moves for White Pawn not in start position
-        if (myPosition.getRow() != 2 && board.getPiece(myPosition).getTeamColor().equals(ChessGame.TeamColor.WHITE)) {
-            notStartPosition(board, myPosition, validMoves, row, col, MOVES_WHITE);
+        if (myPosition.getRow() != 2 && board.getPiece(myPosition).getTeamColor().equals(WHITE)) {
+            notStartPosition(board, myPosition, validMoves, row, col, M_WHITE);
         }
         //Get valid moves for Black Pawn not in start position
-        if (myPosition.getRow() != 7 && board.getPiece(myPosition).getTeamColor().equals(ChessGame.TeamColor.BLACK)) {
-            notStartPosition(board, myPosition, validMoves, row, col, MOVES_BLACK);
+        if (myPosition.getRow() != 7 && board.getPiece(myPosition).getTeamColor().equals(BLACK)) {
+            notStartPosition(board, myPosition, validMoves, row, col, M_BLACK);
         }
 
         //Get valid moves for White Pawn in start position
-        if (myPosition.getRow() == 2 && board.getPiece(myPosition).getTeamColor().equals(ChessGame.TeamColor.WHITE)) {
-            startPosition(board, myPosition, validMoves, row, col, MOVES_START_WHITE);
+        if (myPosition.getRow() == 2 && board.getPiece(myPosition).getTeamColor().equals(WHITE)) {
+            startPosition(board, myPosition, validMoves, row, col, M_START_WHITE);
         }
 
         //Get valid moves for Black Pawn in start position
-        if (myPosition.getRow() == 7 && board.getPiece(myPosition).getTeamColor().equals(ChessGame.TeamColor.BLACK)) {
-            startPosition(board, myPosition, validMoves, row, col, MOVES_START_BLACK);
+        if (myPosition.getRow() == 7 && board.getPiece(myPosition).getTeamColor().equals(BLACK)) {
+            startPosition(board, myPosition, validMoves, row, col, M_START_BLACK);
         }
 
 
         //Calculate Capture Moves
-        int[][] captureMoves = !board.getPiece(myPosition).getTeamColor().equals(ChessGame.TeamColor.BLACK) ? MOVES_CAPTURE_WHITE : MOVES_CAPTURE_BLACK;
+        int[][] captureMoves = !board.getPiece(myPosition).getTeamColor().equals(BLACK) ? M_CAPTURE_WHITE : M_CAPTURE_BLACK;
         for (int[] move : captureMoves) {
             int checkRow = row + move[0];
             int checkCol = col + move[1];

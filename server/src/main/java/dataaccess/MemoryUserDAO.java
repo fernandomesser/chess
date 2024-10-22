@@ -6,7 +6,7 @@ import java.util.HashMap;
 
 public class MemoryUserDAO implements UserDAO {
 
-    private final HashMap<String, UserData> users = new HashMap<>();
+    private HashMap<String, UserData> users = new HashMap<>();
 
     //Inserts a new user into the data storage.
     @Override
@@ -15,7 +15,7 @@ public class MemoryUserDAO implements UserDAO {
         users.put(user.username(), user);
     }
 
-    //Retrieves an user based on username
+    //Retrieves a user based on username
     @Override
     public UserData getUser(String username) throws DataAccessException {
         return users.get(username);

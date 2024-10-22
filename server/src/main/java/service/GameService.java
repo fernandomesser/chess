@@ -11,8 +11,8 @@ import java.util.stream.Collectors;
 
 public class GameService {
 
-    private final GameDAO gameDataAccess;
-    private final AuthDAO authDataAccess;
+    private GameDAO gameDataAccess;
+    private AuthDAO authDataAccess;
 
     public GameService(GameDAO gameDataAccess, AuthDAO authDataAccess) {
         this.gameDataAccess = gameDataAccess;

@@ -19,8 +19,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Server {
-    private final UserService userService;
-    private final GameService gameService;
+    private UserService userService;
+    private GameService gameService;
 
     public Server() {
         MemoryAuthDAO authDAO = new MemoryAuthDAO();
@@ -56,7 +56,7 @@ public class Server {
 
     //Handles the exceptions
     private <T extends Exception> void exceptionHandler(ResponseException ex, Request req, Response res) {
-        res.status(ex.StatusCode());
+        res.status(ex.statusCode());
         res.body(new Gson().toJson(Map.of("message", ex.getMessage())));
         ex.printStackTrace(System.out);
     }
@@ -106,10 +106,10 @@ public class Server {
     //Updates the game in the database
     private Object joinGame(Request req, Response res) throws ResponseException, DataAccessException {
         String auth = req.headers("Authorization");
-        JsonObject requestBody = new Gson().fromJson(req.body(), JsonObject.class);
-        String playerColor = (requestBody.has("playerColor") && !requestBody.get("playerColor").isJsonNull()) ? requestBody.get("playerColor").getAsString() : "";
-        int gameID = (requestBody.has("gameID") && !requestBody.get("gameID").isJsonNull()) ? requestBody.get("gameID").getAsInt() : -1;
-        gameService.joinGame(gameID, playerColor, auth);
+        JsonObject rqBdy = new Gson().fromJson(req.body(), JsonObject.class);
+        String plyrC = (rqBdy.has("playerColor") && !rqBdy.get("playerColor").isJsonNull()) ? rqBdy.get("playerColor").getAsString() : "";
+        int gID = (rqBdy.has("gameID") && !rqBdy.get("gameID").isJsonNull()) ? rqBdy.get("gameID").getAsInt() : -1;
+        gameService.joinGame(gID, plyrC, auth);
 
         res.status(200);
         return new Gson().toJson(Map.of());

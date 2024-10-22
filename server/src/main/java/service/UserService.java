@@ -8,8 +8,8 @@ import model.AuthData;
 import model.UserData;
 
 public class UserService {
-    private final UserDAO userDataAccess;
-    private final AuthDAO authDataAccess;
+    private UserDAO userDataAccess;
+    private AuthDAO authDataAccess;
 
     public UserService(UserDAO userDataAccess, AuthDAO authDataAccess) {
         this.userDataAccess = userDataAccess;

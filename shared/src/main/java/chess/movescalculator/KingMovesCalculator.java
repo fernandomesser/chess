@@ -1,6 +1,7 @@
-package chess.MovesCalculator;
+package chess.movescalculator;
 
 import chess.ChessBoard;
+import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPosition;
 
@@ -30,8 +31,9 @@ public class KingMovesCalculator implements PieceMovesCalculator {
             int checkCol = col + move[1];
 
             ChessPosition newPosition = new ChessPosition(checkRow, checkCol);
+            ChessGame.TeamColor color = board.getPiece(myPosition).getTeamColor();
             if (inBound(newPosition.getRow(), newPosition.getColumn())) {
-                if (board.getPiece(newPosition) == null || !board.getPiece(newPosition).getTeamColor().equals(board.getPiece(myPosition).getTeamColor())) {
+                if (board.getPiece(newPosition) == null || !board.getPiece(newPosition).getTeamColor().equals(color)) {
                     validMoves.add(new ChessMove(myPosition, newPosition, null));
                 }
             }
