@@ -232,14 +232,8 @@ public class ChessGame {
                 ChessPiece piece = board.getPiece(position);
                 if (piece != null && piece.getTeamColor().equals(teamColor)) {
                     Collection<ChessMove> pieceMoves = piece.pieceMoves(board, position);
-                    for (ChessMove pieceMove : pieceMoves) {
-                        ChessBoard cloneBoard = board.cloneBoard();
-                        ChessBoard.movePiece(cloneBoard, pieceMove, null);
-                        if (!check(cloneBoard, teamColor)) {
-                            mate = false;
-                            break;
-                        }
-                    }
+                    mate = avoidCheck(board, pieceMoves, teamColor);
+                    break;
                 }
             }
             if (!mate) {
@@ -247,6 +241,18 @@ public class ChessGame {
             }
         }
         return mate;
+    }
+
+    //Check if Check can be avoided
+    private static boolean avoidCheck(ChessBoard board, Collection<ChessMove> pieceMoves, TeamColor teamColor) {
+        for (ChessMove pieceMove : pieceMoves) {
+            ChessBoard cloneBoard = board.cloneBoard();
+            ChessBoard.movePiece(cloneBoard, pieceMove, null);
+            if (!check(cloneBoard, teamColor)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
