@@ -57,9 +57,9 @@ public class ChessPiece {
         PieceType type = getPieceType();
 
         switch (type) {
-            case KING -> {
-                KingMovesCalculator king = new KingMovesCalculator();
-                return king.pieceMoves(board, myPosition);
+            case KING, KNIGHT -> {
+                KingKnightMovesCalculator kingKnight = new KingKnightMovesCalculator();
+                return kingKnight.pieceMoves(board, myPosition);
             }
             case QUEEN -> {
                 QueenMovesCalculator queen = new QueenMovesCalculator();
@@ -68,10 +68,6 @@ public class ChessPiece {
             case BISHOP, ROOK -> {
                 BishopRookMovesCalculator bishopRook = new BishopRookMovesCalculator();
                 return bishopRook.pieceMoves(board, myPosition);
-            }
-            case KNIGHT -> {
-                KnightMovesCalculator knight = new KnightMovesCalculator();
-                return knight.pieceMoves(board, myPosition);
             }
             case PAWN -> {
                 PawnMovesCalculator pawn = new PawnMovesCalculator();

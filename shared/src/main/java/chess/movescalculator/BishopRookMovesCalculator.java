@@ -24,8 +24,8 @@ public class BishopRookMovesCalculator implements PieceMovesCalculator {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> validMoves = new ArrayList<>();
         ChessPiece.PieceType type = board.getPiece(myPosition).getPieceType();
-        int[][] MOVES = type.equals(ChessPiece.PieceType.BISHOP) ? BISHOP_MOVES : ROOK_MOVES;
-        for (int[] move : MOVES) {
+        int[][] moves = type.equals(ChessPiece.PieceType.BISHOP) ? BISHOP_MOVES : ROOK_MOVES;
+        for (int[] move : moves) {
             var checkRow = myPosition.getRow();
             var checkCol = myPosition.getColumn();
 
