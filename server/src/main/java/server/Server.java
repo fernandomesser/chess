@@ -27,7 +27,7 @@ public class Server {
         MemoryUserDAO userDAO = new MemoryUserDAO();
         MemoryGameDAO gameDAO = new MemoryGameDAO();
 
-        this.userService = new UserService(userDAO,authDAO);
+        this.userService = new UserService(userDAO, authDAO);
         this.gameService = new GameService(gameDAO, authDAO);
     }
 
@@ -37,13 +37,13 @@ public class Server {
         Spark.staticFiles.location("web");
 
         // Register your endpoints and handle exceptions here.
-        Spark.post("/user",this::register);
-        Spark.post("/session",this::logIn);
-        Spark.delete("/session",this::logOut);
+        Spark.post("/user", this::register);
+        Spark.post("/session", this::logIn);
+        Spark.delete("/session", this::logOut);
         Spark.get("/game", this::listGames);
-        Spark.post("/game",this::createGame);
-        Spark.put("/game",this::joinGame);
-        Spark.delete("/db",this::clearApp);
+        Spark.post("/game", this::createGame);
+        Spark.put("/game", this::joinGame);
+        Spark.delete("/db", this::clearApp);
         Spark.exception(ResponseException.class, this::exceptionHandler);
 
 
@@ -102,7 +102,7 @@ public class Server {
         JsonObject requestBody = new Gson().fromJson(req.body(), JsonObject.class);
         String playerColor = (requestBody.has("playerColor") && !requestBody.get("playerColor").isJsonNull()) ? requestBody.get("playerColor").getAsString() : "";
         int gameID = (requestBody.has("gameID") && !requestBody.get("gameID").isJsonNull()) ? requestBody.get("gameID").getAsInt() : -1;
-        gameService.joinGame(gameID,playerColor,auth);
+        gameService.joinGame(gameID, playerColor, auth);
 
         res.status(200);
         return new Gson().toJson(Map.of());
