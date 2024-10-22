@@ -1,6 +1,5 @@
 package service;
 
-import chess.ChessGame;
 import dataaccess.*;
 import exception.ResponseException;
 import model.AuthData;
@@ -11,20 +10,21 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class GameServiceTest {
-    private static final GameDAO gameDataAccess = new MemoryGameDAO();
-    private static final UserDAO userDataAccess = new MemoryUserDAO();
-    private static final AuthDAO authDataAccess = new MemoryAuthDAO();
-    static final GameService service = new GameService(gameDataAccess, authDataAccess);
-    static final UserService userService = new UserService(userDataAccess, authDataAccess);
+    private final GameDAO gameDataAccess = new MemoryGameDAO();
+    private final UserDAO userDataAccess = new MemoryUserDAO();
+    private final AuthDAO authDataAccess = new MemoryAuthDAO();
+    GameService service = new GameService(gameDataAccess, authDataAccess);
+    UserService userService = new UserService(userDataAccess, authDataAccess);
 
     @BeforeEach
-    void clear() throws ResponseException {
-        service.clear();
+    void reset() throws ResponseException, DataAccessException {
+        userDataAccess.clearUsers();
+        authDataAccess.clearAuth();
+        gameDataAccess.clearGames();
     }
 
 
@@ -94,9 +94,9 @@ class GameServiceTest {
     @Test
     void clearTest() throws ResponseException, DataAccessException {
         AuthData auth = userService.register(new UserData("User", "1234", "test@test.com"));
-        service.createGame(new GameData(0, "", "", "Game1", null), auth.authToken());
-        service.createGame(new GameData(0, "", "", "Game2", null), auth.authToken());
-        service.createGame(new GameData(0, "", "", "Game3", null), auth.authToken());
+        service.createGame(new GameData(0, null, null, "Game1", null), auth.authToken());
+        service.createGame(new GameData(0, null, null, "Game2", null), auth.authToken());
+        service.createGame(new GameData(0, null, null, "Game3", null), auth.authToken());
         assertNotNull(gameDataAccess.getGame(1));
         assertNotNull(gameDataAccess.getGame(2));
         assertNotNull(gameDataAccess.getGame(3));

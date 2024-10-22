@@ -22,6 +22,7 @@ public class GameService {
     public void clear() throws ResponseException {
         try {
             gameDataAccess.clearGames();
+            authDataAccess.clearAuth();
         } catch (Exception e) {
             throw new ResponseException(500, "Error: " + e.getMessage());
         }
