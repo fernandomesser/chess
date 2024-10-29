@@ -54,7 +54,7 @@ public class SqlUserDAO extends BaseSqlDAO implements UserDAO {
 
     @Override
     public void clearUsers() throws ResponseException {
-        var statement = "TRUNCATE users";
+        var statement = "DELETE FROM users";
         executeUpdate(statement);
     }
 
