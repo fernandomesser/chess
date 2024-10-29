@@ -2,10 +2,7 @@ package server;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import dataaccess.DataAccessException;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryGameDAO;
-import dataaccess.MemoryUserDAO;
+import dataaccess.*;
 import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
@@ -23,15 +20,18 @@ public class Server {
     private GameService gameService;
 
     public Server() {
-        MemoryAuthDAO authDAO = new MemoryAuthDAO();
-        MemoryUserDAO userDAO = new MemoryUserDAO();
-        MemoryGameDAO gameDAO = new MemoryGameDAO();
+        AuthDAO authDAO = new MemoryAuthDAO();
+        UserDAO userDAO = new SqlUserDAO();
+        GameDAO gameDAO = new MemoryGameDAO();
+
+
 
         this.userService = new UserService(userDAO, authDAO);
         this.gameService = new GameService(gameDAO, authDAO);
     }
 
     public int run(int desiredPort) {
+
         Spark.port(desiredPort);
 
         Spark.staticFiles.location("web");
