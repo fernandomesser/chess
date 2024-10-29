@@ -49,8 +49,9 @@ public class SqlUserDAO implements UserDAO {
     }
 
     @Override
-    public void clearUsers() throws DataAccessException {
-
+    public void clearUsers() throws ResponseException {
+        var statement = "TRUNCATE users";
+        executeUpdate(statement);
     }
 
     private int executeUpdate(String statement, Object... params) throws ResponseException {
