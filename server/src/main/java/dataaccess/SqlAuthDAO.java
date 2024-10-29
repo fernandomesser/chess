@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import java.util.UUID;
 import exception.ResponseException;
 import model.AuthData;
-import model.UserData;
 
 public class SqlAuthDAO extends BaseSqlDAO implements AuthDAO{
 
