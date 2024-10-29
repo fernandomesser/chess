@@ -7,13 +7,18 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class SqlUserDAO extends BaseSqlDAO implements UserDAO {
+    private static final String[] CREATE_STATEMENTS = {
+            """
+            CREATE TABLE IF NOT EXISTS  users (
+               username VARCHAR(256) NOT NULL PRIMARY KEY,
+               password VARCHAR(256) NOT NULL,
+               email VARCHAR(256)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+            """
+    };
 
     public SqlUserDAO() {
-        try {
-            configureDatabase(createStatements);
-        } catch (ResponseException | DataAccessException e) {
-            throw new RuntimeException("Failed to initialize SqlUserDAO: " + e.getMessage(), e);
-        }
+        super(CREATE_STATEMENTS);
     }
 
     @Override
@@ -53,13 +58,4 @@ public class SqlUserDAO extends BaseSqlDAO implements UserDAO {
         executeUpdate(statement);
     }
 
-    private final String[] createStatements = {
-            """
-            CREATE TABLE IF NOT EXISTS  users (
-               username VARCHAR(256) NOT NULL PRIMARY KEY,
-               password VARCHAR(256) NOT NULL,
-               email VARCHAR(256)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
-            """
-    };
 }
