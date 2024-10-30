@@ -22,7 +22,7 @@ public class Server {
     public Server() {
         AuthDAO authDAO = new SqlAuthDAO();
         UserDAO userDAO = new SqlUserDAO();
-        GameDAO gameDAO = new MemoryGameDAO();
+        GameDAO gameDAO = new SqlGameDAO();
 
         this.userService = new UserService(userDAO, authDAO);
         this.gameService = new GameService(gameDAO, authDAO);

@@ -1,7 +1,11 @@
 package dataaccess;
 
+import exception.ResponseException;
+import model.AuthData;
 import model.GameData;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Collection;
 
 public class SqlGameDAO extends BaseSqlDAO implements GameDAO{
@@ -24,13 +28,19 @@ public class SqlGameDAO extends BaseSqlDAO implements GameDAO{
     }
 
     @Override
-    public int createGame(GameData game) throws DataAccessException {
-        return 0;
+    public int createGame(GameData game) throws DataAccessException, ResponseException {
+        String statement = "INSERT INTO games (whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?)";
+        return executeUpdate(statement, game.whiteUsername(), game.blackUsername(), game.gameName(), game.game());
     }
 
     @Override
     public GameData getGame(int gameID) throws DataAccessException {
         return null;
+    }
+    private GameData readGame(ResultSet rs) throws SQLException {
+        String authToken = rs.getString("authToken");
+        String username = rs.getString("username");
+        return new GameData(authToken ,username);
     }
 
     @Override
