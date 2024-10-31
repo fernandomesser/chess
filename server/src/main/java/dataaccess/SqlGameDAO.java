@@ -7,6 +7,7 @@ import model.GameData;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 
 public class SqlGameDAO extends BaseSqlDAO implements GameDAO{
@@ -37,7 +38,7 @@ public class SqlGameDAO extends BaseSqlDAO implements GameDAO{
     @Override
     public GameData getGame(int gameID) throws DataAccessException, ResponseException {
         try (var conn = DatabaseManager.getConnection()) {
-            String statement = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM auth WHERE gameID=?";
+            String statement = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM games WHERE gameID=?";
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setInt(1, gameID);
                 try (var rs = ps.executeQuery()) {
@@ -61,8 +62,21 @@ public class SqlGameDAO extends BaseSqlDAO implements GameDAO{
     }
 
     @Override
-    public Collection<GameData> listGames() throws DataAccessException {
-        return null;
+    public Collection<GameData> listGames() throws DataAccessException, ResponseException {
+        var result = new ArrayList<GameData>();
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM games";
+            try (var ps = conn.prepareStatement(statement)) {
+                try (var rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        result.add(readGame(rs));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new ResponseException(500, String.format("Unable to read data: %s", e.getMessage()));
+        }
+        return result;
     }
 
     @Override
