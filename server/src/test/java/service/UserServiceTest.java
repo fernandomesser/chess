@@ -6,6 +6,7 @@ import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.SQLException;
 
@@ -23,9 +24,13 @@ class UserServiceTest {
 
     @Test
     void positiveRegister() throws ResponseException, DataAccessException, SQLException {
-        UserData user = new UserData("Jhon", "1234", "jhon@email.com");
+        UserData user = new UserData("John", "1234", "john@email.com");
         AuthData authData = service.register(user);
-        assertEquals(user, userDataAccess.getUser("Jhon"));
+        UserData userResult = userDataAccess.getUser("John");
+        assertNotNull(userResult);
+        assertEquals(user.username(), userResult.username());
+        assertTrue(BCrypt.checkpw(user.password(), userResult.password()));
+        assertEquals(user.email(), userResult.email());
         assertNotNull(authData);
     }
 
