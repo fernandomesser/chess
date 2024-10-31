@@ -1,5 +1,6 @@
 package dataaccess;
 
+import chess.ChessGame;
 import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
@@ -34,13 +35,29 @@ public class SqlGameDAO extends BaseSqlDAO implements GameDAO{
     }
 
     @Override
-    public GameData getGame(int gameID) throws DataAccessException {
+    public GameData getGame(int gameID) throws DataAccessException, ResponseException {
+        try (var conn = DatabaseManager.getConnection()) {
+            String statement = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM auth WHERE gameID=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setInt(1, gameID);
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return readGame(rs);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new ResponseException(500, String.format("Unable to read user data: %s", e.getMessage()));
+        }
         return null;
     }
     private GameData readGame(ResultSet rs) throws SQLException {
-        String authToken = rs.getString("authToken");
-        String username = rs.getString("username");
-        return new GameData(authToken ,username);
+        int gameID = rs.getInt("gameID");
+        String whiteUsername = rs.getString("whiteUsername");
+        String blackUsername = rs.getString("blackUsername");
+        String gameName = rs.getString("gameName");
+        ChessGame game = (ChessGame) rs.getObject("game");
+        return new GameData(gameID, whiteUsername, blackUsername, gameName, null);
     }
 
     @Override
