@@ -61,14 +61,14 @@ public class Server {
     }
 
     //Create a new User and return the AuthData
-    private Object register(Request req, Response res) throws ResponseException, DataAccessException {
+    private Object register(Request req, Response res) throws ResponseException, DataAccessException, SQLException {
         UserData user = new Gson().fromJson(req.body(), UserData.class);
         AuthData response = userService.register(user);
         return new Gson().toJson(response);
     }
 
     //Takes a User and returns the AuthData
-    private Object logIn(Request req, Response res) throws ResponseException, DataAccessException {
+    private Object logIn(Request req, Response res) throws ResponseException, DataAccessException, SQLException {
         UserData user = new Gson().fromJson(req.body(), UserData.class);
         AuthData response = userService.logIn(user);
         return new Gson().toJson(response);

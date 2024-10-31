@@ -2,7 +2,10 @@ package dataaccess;
 
 import exception.ResponseException;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -21,12 +24,12 @@ public class SqlUserDAO extends BaseSqlDAO implements UserDAO {
 
     @Override
     public void insertUser(UserData user) throws ResponseException {
+
         String statement = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
         executeUpdate(statement, user.username(), user.password(), user.email());
     }
 
-    @Override
-    public UserData getUser(String username) throws ResponseException {
+    public UserData getPassword(String username) throws ResponseException {
         try (var conn = DatabaseManager.getConnection()) {
             String statement = "SELECT username, password, email FROM users WHERE username=?";
             try (var ps = conn.prepareStatement(statement)) {
@@ -39,6 +42,19 @@ public class SqlUserDAO extends BaseSqlDAO implements UserDAO {
             }
         } catch (Exception e) {
             throw new ResponseException(500, String.format("Unable to read user data: %s", e.getMessage()));
+        }
+        return null;
+    }
+
+    @Override
+    public UserData getUser(String username) throws ResponseException, SQLException, DataAccessException {
+        var conn = DatabaseManager.getConnection();
+        String statement = "SELECT username, password, email FROM users WHERE username=?";
+        var ps = conn.prepareStatement(statement);
+        ps.setString(1, username);
+        var rs = ps.executeQuery();
+        if (rs.next()) {
+            return readUser(rs);
         }
         return null;
     }

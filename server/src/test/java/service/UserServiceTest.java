@@ -22,7 +22,7 @@ class UserServiceTest {
     }
 
     @Test
-    void positiveRegister() throws ResponseException, DataAccessException {
+    void positiveRegister() throws ResponseException, DataAccessException, SQLException {
         UserData user = new UserData("Jhon", "1234", "jhon@email.com");
         AuthData authData = service.register(user);
         assertEquals(user, userDataAccess.getUser("Jhon"));
@@ -38,7 +38,7 @@ class UserServiceTest {
     }
 
     @Test
-    void positiveLogIn() throws ResponseException, DataAccessException {
+    void positiveLogIn() throws ResponseException, DataAccessException, SQLException {
         UserData user = new UserData("Jhon", "1234", "jhon@email.com");
         service.register(user);
         AuthData authData = service.logIn(user);

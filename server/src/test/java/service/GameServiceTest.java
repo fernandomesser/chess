@@ -40,7 +40,7 @@ class GameServiceTest {
     }
 
     @Test
-    void negativeCreateGame() throws ResponseException, DataAccessException {
+    void negativeCreateGame() throws ResponseException, DataAccessException, SQLException {
         AuthData auth = userService.register(new UserData("User", "1234", "test@test.com"));
         GameData game = new GameData(0, null, null, "", null);
         assertThrows(ResponseException.class, () -> {

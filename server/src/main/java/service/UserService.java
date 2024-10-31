@@ -6,6 +6,7 @@ import dataaccess.UserDAO;
 import exception.ResponseException;
 import model.AuthData;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.SQLException;
 
@@ -29,7 +30,7 @@ public class UserService {
     }
 
     //Create a new User and handle error
-    public AuthData register(UserData user) throws ResponseException, DataAccessException {
+    public AuthData register(UserData user) throws ResponseException, DataAccessException, SQLException {
         if (empty(user)) {
             throw new ResponseException(400, "Error: bad request");
         }
@@ -37,7 +38,8 @@ public class UserService {
             throw new ResponseException(403, "Error: already taken");
         }
         try {
-            userDataAccess.insertUser(user);
+            String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
+            userDataAccess.insertUser(new UserData(user.username(), hashedPassword, user.email()));
             return authDataAccess.createAuth(user.username());
         } catch (Exception e) {
             throw new ResponseException(500, "Error: " + e.getMessage());
@@ -45,12 +47,14 @@ public class UserService {
     }
 
     //Authenticate the user and return AuthData, handle errors
-    public AuthData logIn(UserData user) throws ResponseException, DataAccessException {
+    public AuthData logIn(UserData user) throws ResponseException, DataAccessException, SQLException {
         UserData userData = userDataAccess.getUser(user.username());
+
         if (userData == null) {
             throw new ResponseException(401, "Error: unauthorized");
         }
-        if (!userData.password().equals(user.password())) {
+        String hashedPassword = userData.password();
+        if (!BCrypt.checkpw(user.password(), hashedPassword)) {
             throw new ResponseException(401, "Error: unauthorized");
         }
         try {
