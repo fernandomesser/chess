@@ -57,7 +57,7 @@ public class SqlGameDAO extends BaseSqlDAO implements GameDAO{
         String blackUsername = rs.getString("blackUsername");
         String gameName = rs.getString("gameName");
         ChessGame game = (ChessGame) rs.getObject("game");
-        return new GameData(gameID, whiteUsername, blackUsername, gameName, null);
+        return new GameData(gameID, whiteUsername, blackUsername, gameName, game);
     }
 
     @Override
@@ -66,8 +66,9 @@ public class SqlGameDAO extends BaseSqlDAO implements GameDAO{
     }
 
     @Override
-    public void clearGames() throws DataAccessException {
-
+    public void clearGames() throws DataAccessException, ResponseException {
+        var statement = "DELETE FROM games";
+        executeUpdate(statement);
     }
 
     @Override
