@@ -14,5 +14,5 @@ public interface GameDAO {
 
     void clearGames() throws DataAccessException, ResponseException;
 
-    void updateGame(int gameID, GameData updatedGame) throws DataAccessException;
+    void updateGame(int gameID, GameData updatedGame) throws DataAccessException, ResponseException;
 }
