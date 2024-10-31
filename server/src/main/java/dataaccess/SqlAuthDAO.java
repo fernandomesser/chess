@@ -3,10 +3,11 @@ package dataaccess;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
+
 import exception.ResponseException;
 import model.AuthData;
 
-public class SqlAuthDAO extends BaseSqlDAO implements AuthDAO{
+public class SqlAuthDAO extends BaseSqlDAO implements AuthDAO {
 
     private static final String[] CREATE_STATEMENTS = {
             """
@@ -16,9 +17,11 @@ public class SqlAuthDAO extends BaseSqlDAO implements AuthDAO{
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
             """
     };
-    public SqlAuthDAO(){
+
+    public SqlAuthDAO() {
         super(CREATE_STATEMENTS);
     }
+
     @Override
     public AuthData createAuth(String username) throws ResponseException {
         String authToken = UUID.randomUUID().toString();
@@ -28,28 +31,23 @@ public class SqlAuthDAO extends BaseSqlDAO implements AuthDAO{
     }
 
     @Override
-    public AuthData getAuth(String authToken) throws DataAccessException, ResponseException {
-            try (var conn = DatabaseManager.getConnection()) {
-                String statement = "SELECT authToken, username FROM auth WHERE authToken=?";
-                try (var ps = conn.prepareStatement(statement)) {
-                    ps.setString(1, authToken);
-                    try (var rs = ps.executeQuery()) {
-                        if (rs.next()) {
-                            return readAuth(rs);
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                throw new ResponseException(500, String.format("Unable to read user data: %s", e.getMessage()));
-            }
-            return null;
+    public AuthData getAuth(String authToken) throws DataAccessException, SQLException {
+        var conn = DatabaseManager.getConnection();
+        String statement = "SELECT authToken, username FROM auth WHERE authToken = ?";
+        var ps = conn.prepareStatement(statement);
+        ps.setString(1, authToken);
+        var rs = ps.executeQuery();
+        if (rs.next()) {
+            return readAuth(rs);
+        }
+        return null;
     }
 
 
     private AuthData readAuth(ResultSet rs) throws SQLException {
         String authToken = rs.getString("authToken");
         String username = rs.getString("username");
-        return new AuthData(authToken ,username);
+        return new AuthData(authToken, username);
     }
 
     @Override

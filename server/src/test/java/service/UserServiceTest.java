@@ -7,6 +7,8 @@ import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.sql.SQLException;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserServiceTest {
@@ -52,7 +54,7 @@ class UserServiceTest {
     }
 
     @Test
-    void positiveLogOut() throws ResponseException, DataAccessException {
+    void positiveLogOut() throws ResponseException, DataAccessException, SQLException {
         AuthData expected = service.register(new UserData("Jhon", "1234", "jhon@email.com"));
         assertEquals(authDataAccess.getAuth(expected.authToken()).authToken(), expected.authToken());
         service.logOut(expected.authToken());
@@ -70,7 +72,7 @@ class UserServiceTest {
     }
 
     @Test
-    void clearTest() throws ResponseException, DataAccessException {
+    void clearTest() throws ResponseException, DataAccessException, SQLException {
         service.register(new UserData("Jhon", "1234", "jhon@email.com"));
         service.register(new UserData("Joe", "1234", "joe@email.com"));
         service.register(new UserData("Julia", "1234", "julia@email.com"));

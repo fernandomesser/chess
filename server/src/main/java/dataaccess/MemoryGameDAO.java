@@ -38,8 +38,8 @@ public class MemoryGameDAO implements GameDAO {
     }
 
     //Updates the game given the game ID
-        @Override
-        public void updateGame(int gameID, GameData updatedGame) {
-            games.put(gameID, updatedGame);
-        }
+    @Override
+    public void updateGame(int gameID, GameData updatedGame) {
+        games.put(gameID, updatedGame);
+    }
 }

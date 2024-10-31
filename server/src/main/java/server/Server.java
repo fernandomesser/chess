@@ -11,6 +11,7 @@ import service.GameService;
 import service.UserService;
 import spark.*;
 
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -74,7 +75,7 @@ public class Server {
     }
 
     //Remove a user AuthData
-    private Object logOut(Request req, Response res) throws ResponseException, DataAccessException {
+    private Object logOut(Request req, Response res) throws ResponseException, DataAccessException, SQLException {
         String auth = req.headers("Authorization");
         userService.logOut(auth);
 
@@ -83,7 +84,7 @@ public class Server {
     }
 
     //List all games in the database
-    private Object listGames(Request req, Response res) throws ResponseException, DataAccessException {
+    private Object listGames(Request req, Response res) throws ResponseException, DataAccessException, SQLException {
         String auth = req.headers("Authorization");
         Collection<GameData> gamesList = gameService.listGames(auth);
         Map<String, Collection<GameData>> response = new HashMap<>();
@@ -92,7 +93,7 @@ public class Server {
     }
 
     //Creates a new game
-    private Object createGame(Request req, Response res) throws ResponseException, DataAccessException {
+    private Object createGame(Request req, Response res) throws ResponseException, DataAccessException, SQLException {
         String auth = req.headers("Authorization");
         GameData game = new Gson().fromJson(req.body(), GameData.class);
         int gameID = gameService.createGame(game, auth);
@@ -102,7 +103,7 @@ public class Server {
     }
 
     //Updates the game in the database
-    private Object joinGame(Request req, Response res) throws ResponseException, DataAccessException {
+    private Object joinGame(Request req, Response res) throws ResponseException, DataAccessException, SQLException {
         String auth = req.headers("Authorization");
         JsonObject rqBdy = new Gson().fromJson(req.body(), JsonObject.class);
         String plyrC = (rqBdy.has("playerColor") && !rqBdy.get("playerColor").isJsonNull()) ? rqBdy.get("playerColor").getAsString() : "";

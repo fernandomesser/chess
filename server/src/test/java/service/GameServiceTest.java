@@ -8,6 +8,7 @@ import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -29,7 +30,7 @@ class GameServiceTest {
 
 
     @Test
-    void positiveCreateGame() throws ResponseException, DataAccessException {
+    void positiveCreateGame() throws ResponseException, DataAccessException, SQLException {
         AuthData auth = userService.register(new UserData("User", "1234", "test@test.com"));
         GameData game = new GameData(0, null, null, "Game", null);
         service.createGame(game, auth.authToken());
@@ -48,7 +49,7 @@ class GameServiceTest {
     }
 
     @Test
-    void positiveListGames() throws ResponseException, DataAccessException {
+    void positiveListGames() throws ResponseException, DataAccessException, SQLException {
         AuthData auth = userService.register(new UserData("User", "1234", "test@test.com"));
         Collection<GameData> expected = new ArrayList<>();
         GameData game1 = new GameData(1, "", "", "Game1", null);
@@ -72,7 +73,7 @@ class GameServiceTest {
     }
 
     @Test
-    void positiveJoinGame() throws ResponseException, DataAccessException {
+    void positiveJoinGame() throws ResponseException, DataAccessException, SQLException {
         AuthData auth = userService.register(new UserData("User", "1234", "test@test.com"));
         GameData game = new GameData(0, null, null, "Game", null);
         service.createGame(game, auth.authToken());
@@ -82,7 +83,7 @@ class GameServiceTest {
     }
 
     @Test
-    void negativeJoinGame() throws ResponseException, DataAccessException {
+    void negativeJoinGame() throws ResponseException, DataAccessException, SQLException {
         AuthData auth = userService.register(new UserData("User", "1234", "test@test.com"));
         GameData game = new GameData(0, "Jhon", null, "Game", null);
         service.createGame(game, auth.authToken());
@@ -93,7 +94,7 @@ class GameServiceTest {
     }
 
     @Test
-    void clearTest() throws ResponseException, DataAccessException {
+    void clearTest() throws ResponseException, DataAccessException, SQLException {
         AuthData auth = userService.register(new UserData("User", "1234", "test@test.com"));
         service.createGame(new GameData(0, null, null, "Game1", null), auth.authToken());
         service.createGame(new GameData(0, null, null, "Game2", null), auth.authToken());

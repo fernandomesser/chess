@@ -6,6 +6,7 @@ import dataaccess.GameDAO;
 import exception.ResponseException;
 import model.GameData;
 
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
@@ -31,7 +32,7 @@ public class GameService {
 
 
     //Create a new game with error handling
-    public int createGame(GameData game, String auth) throws ResponseException, DataAccessException {
+    public int createGame(GameData game, String auth) throws ResponseException, DataAccessException, SQLException {
         if (game.gameName() == null || game.gameName().isEmpty()) {
             throw new ResponseException(400, "Error: bad request");
         }
@@ -46,7 +47,7 @@ public class GameService {
     }
 
     //List all games and handle errors
-    public Collection<GameData> listGames(String auth) throws ResponseException, DataAccessException {
+    public Collection<GameData> listGames(String auth) throws ResponseException, DataAccessException, SQLException {
         if (authDataAccess.getAuth(auth) == null || auth == null || auth.isEmpty()) {
             throw new ResponseException(401, "Error: unauthorized");
         }
@@ -65,7 +66,7 @@ public class GameService {
     }
 
     //updates the game and handle errors
-    public void joinGame(int gameID, String playerColor, String auth) throws ResponseException, DataAccessException {
+    public void joinGame(int gameID, String playerColor, String auth) throws ResponseException, DataAccessException, SQLException {
         GameData game = gameDataAccess.getGame(gameID);
         GameData updatedGame;
         if (authDataAccess.getAuth(auth) == null || auth == null || auth.isEmpty()) {

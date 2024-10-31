@@ -7,6 +7,8 @@ import exception.ResponseException;
 import model.AuthData;
 import model.UserData;
 
+import java.sql.SQLException;
+
 public class UserService {
     private UserDAO userDataAccess;
     private AuthDAO authDataAccess;
@@ -59,7 +61,7 @@ public class UserService {
     }
 
     //Delete AuthData for the user and handle errors
-    public void logOut(String auth) throws ResponseException, DataAccessException {
+    public void logOut(String auth) throws ResponseException, DataAccessException, SQLException {
         if (authDataAccess.getAuth(auth) == null || auth == null || auth.isEmpty()) {
             throw new ResponseException(401, "Error: unauthorized");
         }

@@ -2,18 +2,19 @@ package dataaccess;
 
 import chess.ChessGame;
 import exception.ResponseException;
-import model.AuthData;
 import model.GameData;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class SqlGameDAO extends BaseSqlDAO implements GameDAO{
+public class SqlGameDAO extends BaseSqlDAO implements GameDAO {
 
-        private static final String[] CREATE_STATEMENTS = {
-                """
+    private static final String[] CREATE_STATEMENTS = {
+            """
                 CREATE TABLE IF NOT EXISTS games (
                     gameID INT NOT NULL AUTO_INCREMENT,
                     whiteUsername VARCHAR(256),
@@ -25,7 +26,7 @@ public class SqlGameDAO extends BaseSqlDAO implements GameDAO{
                  """
     };
 
-    public SqlGameDAO(){
+    public SqlGameDAO() {
         super(CREATE_STATEMENTS);
     }
 
@@ -36,22 +37,20 @@ public class SqlGameDAO extends BaseSqlDAO implements GameDAO{
     }
 
     @Override
-    public GameData getGame(int gameID) throws DataAccessException, ResponseException {
-        try (var conn = DatabaseManager.getConnection()) {
-            String statement = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM games WHERE gameID=?";
-            try (var ps = conn.prepareStatement(statement)) {
-                ps.setInt(1, gameID);
-                try (var rs = ps.executeQuery()) {
-                    if (rs.next()) {
-                        return readGame(rs);
-                    }
-                }
-            }
-        } catch (Exception e) {
-            throw new ResponseException(500, String.format("Unable to read user data: %s", e.getMessage()));
+    public GameData getGame(int gameID) throws DataAccessException, SQLException {
+        var conn = DatabaseManager.getConnection();
+        String statement = "SELECT * FROM games WHERE gameID = ?";
+        var ps = conn.prepareStatement(statement);
+        ps.setInt(1, gameID);
+        var rs = ps.executeQuery();
+        if (rs.next()) {
+            return readGame(rs);
         }
+
+
         return null;
     }
+
     private GameData readGame(ResultSet rs) throws SQLException {
         int gameID = rs.getInt("gameID");
         String whiteUsername = rs.getString("whiteUsername");
@@ -62,19 +61,14 @@ public class SqlGameDAO extends BaseSqlDAO implements GameDAO{
     }
 
     @Override
-    public Collection<GameData> listGames() throws DataAccessException, ResponseException {
+    public Collection<GameData> listGames() throws DataAccessException, SQLException {
         var result = new ArrayList<GameData>();
-        try (var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM games";
-            try (var ps = conn.prepareStatement(statement)) {
-                try (var rs = ps.executeQuery()) {
-                    while (rs.next()) {
-                        result.add(readGame(rs));
-                    }
-                }
-            }
-        } catch (Exception e) {
-            throw new ResponseException(500, String.format("Unable to read data: %s", e.getMessage()));
+        var conn = DatabaseManager.getConnection();
+        var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM games";
+        var ps = conn.prepareStatement(statement);
+        var rs = ps.executeQuery();
+        while (rs.next()) {
+            result.add(readGame(rs));
         }
         return result;
     }
@@ -86,8 +80,18 @@ public class SqlGameDAO extends BaseSqlDAO implements GameDAO{
     }
 
     @Override
-    public void updateGame(int gameID, GameData updatedGame) throws DataAccessException, ResponseException {
-        String statement = "UPDATE games SET whiteUsername = ?, blackUsername = ?, gameName = ?, game = ? WHERE gameID = ?";
-        executeUpdate(statement, updatedGame.gameID(),updatedGame.whiteUsername(), updatedGame.blackUsername(), updatedGame.gameName(), updatedGame.game());
+    public void updateGame(int gameID, GameData updatedGame) throws DataAccessException, ResponseException, SQLException {
+        String sql = "UPDATE games SET whiteUsername = ?, blackUsername = ?, gameName = ?, game = ? WHERE gameID = ?";
+
+        Connection conn = DatabaseManager.getConnection();
+        PreparedStatement stmt = conn.prepareStatement(sql);
+
+        stmt.setString(1, updatedGame.whiteUsername());
+        stmt.setString(2, updatedGame.blackUsername());
+        stmt.setString(3, updatedGame.gameName());
+        stmt.setObject(4, updatedGame.game());
+        stmt.setInt(5, gameID);
+
+        stmt.executeUpdate();
     }
 }

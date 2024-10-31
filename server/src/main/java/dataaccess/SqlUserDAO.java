@@ -7,15 +7,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class SqlUserDAO extends BaseSqlDAO implements UserDAO {
-    private static final String[] CREATE_STATEMENTS = {
-            """
+    private static final String[] CREATE_STATEMENTS = {"""
             CREATE TABLE IF NOT EXISTS  users (
                username VARCHAR(256) NOT NULL PRIMARY KEY,
                password VARCHAR(256) NOT NULL,
                email VARCHAR(256)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
-            """
-    };
+            """};
 
     public SqlUserDAO() {
         super(CREATE_STATEMENTS);
