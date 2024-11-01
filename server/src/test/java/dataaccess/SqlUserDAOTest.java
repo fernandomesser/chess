@@ -39,9 +39,14 @@ class SqlUserDAOTest {
         UserData user = new UserData("John", "1234", "john@email.com");
         userDataAccess.insertUser(user);
         UserData userResult = userDataAccess.getUser("John");
+        assertNotNull(userResult);
+        assertEquals(user.username(), userResult.username());
+        assertEquals(user.password(), userResult.password());
+        assertEquals(user.email(), userResult.email());
     }
     @Test
-    void negativeGetUser() {
+    void negativeGetUser() throws SQLException, DataAccessException {
+        assertNull(userDataAccess.getUser("John"));
     }
 
     @Test
