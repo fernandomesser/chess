@@ -30,7 +30,4 @@ class SqlAuthDAOTest {
     @Test
     void clearAuth() {
     }
-    @Test
-    void negativeClearAuth() {
-    }
 }

@@ -30,9 +30,6 @@ class SqlGameDAOTest {
     @Test
     void clearGames() {
     }
-    @Test
-    void negativeClearGames() {
-    }
 
     @Test
     void updateGame() {
