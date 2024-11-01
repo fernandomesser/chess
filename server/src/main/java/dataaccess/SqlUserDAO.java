@@ -1,11 +1,7 @@
 package dataaccess;
 
-import exception.ResponseException;
 import model.UserData;
-import org.mindrot.jbcrypt.BCrypt;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -23,14 +19,13 @@ public class SqlUserDAO extends BaseSqlDAO implements UserDAO {
     }
 
     @Override
-    public void insertUser(UserData user) throws ResponseException {
-
+    public void insertUser(UserData user) throws DataAccessException {
         String statement = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
         executeUpdate(statement, user.username(), user.password(), user.email());
     }
 
     @Override
-    public UserData getUser(String username) throws ResponseException, SQLException, DataAccessException {
+    public UserData getUser(String username) throws SQLException, DataAccessException {
         var conn = DatabaseManager.getConnection();
         String statement = "SELECT username, password, email FROM users WHERE username=?";
         var ps = conn.prepareStatement(statement);
@@ -50,7 +45,7 @@ public class SqlUserDAO extends BaseSqlDAO implements UserDAO {
     }
 
     @Override
-    public void clearUsers() throws ResponseException {
+    public void clearUsers() throws DataAccessException {
         var statement = "DELETE FROM users";
         executeUpdate(statement);
     }

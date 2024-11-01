@@ -1,14 +1,13 @@
 package dataaccess;
 
-import exception.ResponseException;
 import model.UserData;
 
 import java.sql.SQLException;
 
 public interface UserDAO {
-    void insertUser(UserData user) throws DataAccessException, ResponseException;
+    void insertUser(UserData user) throws DataAccessException;
 
-    UserData getUser(String username) throws DataAccessException, ResponseException, SQLException;
+    UserData getUser(String username) throws DataAccessException, SQLException;
 
-    void clearUsers() throws DataAccessException, ResponseException;
+    void clearUsers() throws DataAccessException;
 }

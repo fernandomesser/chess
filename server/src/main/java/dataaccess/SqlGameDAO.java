@@ -1,11 +1,8 @@
 package dataaccess;
 
 import chess.ChessGame;
-import exception.ResponseException;
 import model.GameData;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -31,7 +28,7 @@ public class SqlGameDAO extends BaseSqlDAO implements GameDAO {
     }
 
     @Override
-    public int createGame(GameData game) throws DataAccessException, ResponseException {
+    public int createGame(GameData game) throws DataAccessException {
         String statement = "INSERT INTO games (whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?)";
         return executeUpdate(statement, game.whiteUsername(), game.blackUsername(), game.gameName(), game.game());
     }
@@ -46,8 +43,6 @@ public class SqlGameDAO extends BaseSqlDAO implements GameDAO {
         if (rs.next()) {
             return readGame(rs);
         }
-
-
         return null;
     }
 
@@ -74,24 +69,14 @@ public class SqlGameDAO extends BaseSqlDAO implements GameDAO {
     }
 
     @Override
-    public void clearGames() throws DataAccessException, ResponseException {
+    public void clearGames() throws DataAccessException {
         var statement = "DELETE FROM games";
         executeUpdate(statement);
     }
 
     @Override
-    public void updateGame(int gameID, GameData updatedGame) throws DataAccessException, ResponseException, SQLException {
-        String sql = "UPDATE games SET whiteUsername = ?, blackUsername = ?, gameName = ?, game = ? WHERE gameID = ?";
-
-        Connection conn = DatabaseManager.getConnection();
-        PreparedStatement stmt = conn.prepareStatement(sql);
-
-        stmt.setString(1, updatedGame.whiteUsername());
-        stmt.setString(2, updatedGame.blackUsername());
-        stmt.setString(3, updatedGame.gameName());
-        stmt.setObject(4, updatedGame.game());
-        stmt.setInt(5, gameID);
-
-        stmt.executeUpdate();
+    public void updateGame(int gameID, GameData updatedGame) throws DataAccessException {
+        String statement = "UPDATE games SET whiteUsername = ?, blackUsername = ?, gameName = ?, game = ? WHERE gameID = ?";
+        executeUpdate(statement, updatedGame.whiteUsername(), updatedGame.blackUsername(), updatedGame.gameName(), updatedGame.game(), updatedGame.gameID());
     }
 }

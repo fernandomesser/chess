@@ -1,9 +1,6 @@
 package dataaccess;
 
-import exception.ResponseException;
-import model.AuthData;
-import model.GameData;
-import model.UserData;
+import chess.ChessGame;
 
 import java.sql.SQLException;
 
@@ -15,21 +12,19 @@ public abstract class BaseSqlDAO {
     protected BaseSqlDAO(String[] createStatements) {
         try {
             configureDatabase(createStatements);
-        } catch (ResponseException | DataAccessException e) {
+        } catch (DataAccessException e) {
             throw new RuntimeException("Failed to initialize DAO: " + e.getMessage(), e);
         }
     }
 
-    protected int executeUpdate(String statement, Object... params) throws ResponseException {
+    protected int executeUpdate(String statement, Object... params) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             try (var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
                 for (var i = 0; i < params.length; i++) {
                     var param = params[i];
                     if (param instanceof String p) ps.setString(i + 1, p);
                     else if (param instanceof Integer p) ps.setInt(i + 1, p);
-                    else if (param instanceof GameData p) ps.setString(i + 1, p.toString());
-                    else if (param instanceof AuthData p) ps.setString(i + 1, p.toString());
-                    else if (param instanceof UserData p) ps.setString(i + 1, p.toString());
+                    else if (param instanceof ChessGame p) ps.setObject(i + 1, p);
                     else if (param == null) ps.setNull(i + 1, NULL);
                 }
                 ps.executeUpdate();
@@ -42,11 +37,11 @@ public abstract class BaseSqlDAO {
                 return 0;
             }
         } catch (SQLException | DataAccessException e) {
-            throw new ResponseException(500, String.format("unable to update database: %s, %s", statement, e.getMessage()));
+            throw new DataAccessException(String.format("unable to update database: %s, %s", statement, e.getMessage()));
         }
     }
 
-    protected void configureDatabase(String[] createStatements) throws ResponseException, DataAccessException {
+    protected void configureDatabase(String[] createStatements) throws DataAccessException {
         DatabaseManager.createDatabase();
         try (var conn = DatabaseManager.getConnection()) {
             for (var statement : createStatements) {
@@ -54,8 +49,8 @@ public abstract class BaseSqlDAO {
                     preparedStatement.executeUpdate();
                 }
             }
-        } catch (SQLException ex) {
-            throw new ResponseException(500, String.format("Unable to configure database: %s", ex.getMessage()));
+        } catch (SQLException | DataAccessException ex) {
+            throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()));
         }
     }
 }

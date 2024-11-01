@@ -4,7 +4,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
 
-import exception.ResponseException;
 import model.AuthData;
 
 public class SqlAuthDAO extends BaseSqlDAO implements AuthDAO {
@@ -23,7 +22,7 @@ public class SqlAuthDAO extends BaseSqlDAO implements AuthDAO {
     }
 
     @Override
-    public AuthData createAuth(String username) throws ResponseException {
+    public AuthData createAuth(String username) throws DataAccessException {
         String authToken = UUID.randomUUID().toString();
         String statement = "INSERT INTO auth (authToken, username) VALUES (?, ?)";
         executeUpdate(statement, authToken, username);
@@ -51,13 +50,13 @@ public class SqlAuthDAO extends BaseSqlDAO implements AuthDAO {
     }
 
     @Override
-    public void deleteAuth(String authToken) throws DataAccessException, ResponseException {
+    public void deleteAuth(String authToken) throws DataAccessException {
         String statement = "DELETE FROM auth WHERE authToken = ?";
         executeUpdate(statement, authToken);
     }
 
     @Override
-    public void clearAuth() throws DataAccessException, ResponseException {
+    public void clearAuth() throws DataAccessException {
         var statement = "DELETE FROM auth";
         executeUpdate(statement);
     }
