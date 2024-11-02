@@ -28,12 +28,14 @@ public class SqlGameDAO extends BaseSqlDAO implements GameDAO {
         super(CREATE_STATEMENTS);
     }
 
+    //Store a game in the database
     @Override
     public int createGame(GameData game) throws DataAccessException {
         String statement = "INSERT INTO games (whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?)";
         return executeUpdate(statement, game.whiteUsername(), game.blackUsername(), game.gameName(), game.game());
     }
 
+    //Retrieve a game from the database
     @Override
     public GameData getGame(int gameID) throws DataAccessException, SQLException {
         var conn = DatabaseManager.getConnection();
@@ -47,6 +49,7 @@ public class SqlGameDAO extends BaseSqlDAO implements GameDAO {
         return null;
     }
 
+
     private GameData readGame(ResultSet rs) throws SQLException {
         int gameID = rs.getInt("gameID");
         String whiteUsername = rs.getString("whiteUsername");
@@ -56,6 +59,7 @@ public class SqlGameDAO extends BaseSqlDAO implements GameDAO {
         return new GameData(gameID, whiteUsername, blackUsername, gameName, game);
     }
 
+    //List all games from the database
     @Override
     public Collection<GameData> listGames() throws DataAccessException, SQLException {
         var result = new ArrayList<GameData>();
@@ -69,12 +73,14 @@ public class SqlGameDAO extends BaseSqlDAO implements GameDAO {
         return result;
     }
 
+    //Clear games table
     @Override
     public void clearGames() throws DataAccessException {
         var statement = "DELETE FROM games";
         executeUpdate(statement);
     }
 
+    //Updates a game in the database
     @Override
     public void updateGame(int gameID, GameData updatedGame) throws DataAccessException {
         String statement = "UPDATE games SET whiteUsername = ?, blackUsername = ?, gameName = ?, game = ? WHERE gameID = ?";

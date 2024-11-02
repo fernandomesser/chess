@@ -18,12 +18,14 @@ public class SqlUserDAO extends BaseSqlDAO implements UserDAO {
         super(CREATE_STATEMENTS);
     }
 
+    //inserts a user in the database
     @Override
     public void insertUser(UserData user) throws DataAccessException {
         String statement = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
         executeUpdate(statement, user.username(), user.password(), user.email());
     }
 
+    //Retrieves a user from the database
     @Override
     public UserData getUser(String username) throws SQLException, DataAccessException {
         var conn = DatabaseManager.getConnection();
@@ -44,6 +46,7 @@ public class SqlUserDAO extends BaseSqlDAO implements UserDAO {
         return new UserData(username, password, email);
     }
 
+    //Clear users table
     @Override
     public void clearUsers() throws DataAccessException {
         var statement = "DELETE FROM users";

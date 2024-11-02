@@ -21,6 +21,7 @@ public class SqlAuthDAO extends BaseSqlDAO implements AuthDAO {
         super(CREATE_STATEMENTS);
     }
 
+    //Create a authToken and store in the database
     @Override
     public AuthData createAuth(String username) throws DataAccessException {
         String authToken = UUID.randomUUID().toString();
@@ -29,6 +30,7 @@ public class SqlAuthDAO extends BaseSqlDAO implements AuthDAO {
         return new AuthData(authToken, username);
     }
 
+    //get an authToken from the database
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException, SQLException {
         var conn = DatabaseManager.getConnection();
@@ -42,19 +44,20 @@ public class SqlAuthDAO extends BaseSqlDAO implements AuthDAO {
         return null;
     }
 
-
     private AuthData readAuth(ResultSet rs) throws SQLException {
         String authToken = rs.getString("authToken");
         String username = rs.getString("username");
         return new AuthData(authToken, username);
     }
 
+    //deletes an authToken from the database
     @Override
     public void deleteAuth(String authToken) throws DataAccessException {
         String statement = "DELETE FROM auth WHERE authToken = ?";
         executeUpdate(statement, authToken);
     }
 
+    //Deletes auth table
     @Override
     public void clearAuth() throws DataAccessException {
         var statement = "DELETE FROM auth";
