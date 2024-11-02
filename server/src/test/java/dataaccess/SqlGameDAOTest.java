@@ -6,6 +6,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -47,10 +49,28 @@ class SqlGameDAOTest {
     }
 
     @Test
-    void listGames() {
+    void listGames() throws DataAccessException, SQLException {
+        Collection<GameData> expected = new ArrayList<>();
+        GameData game1 = new GameData(1, "", "", "Game1", null);
+        GameData game2 = new GameData(2, "", "", "Game2", null);
+        GameData game3 = new GameData(3, "", "", "Game3", null);
+        int id1 = dataAccess.createGame(game1);
+        int id2 = dataAccess.createGame(game2);
+        int id3 = dataAccess.createGame(game3);
+        expected.add(dataAccess.getGame(id1));
+        expected.add(dataAccess.getGame(id2));
+        expected.add(dataAccess.getGame(id3));
+        Collection<GameData> listGames = dataAccess.listGames();
+        assertIterableEquals(expected, listGames);
     }
+
     @Test
-    void negativeListGames() {
+    void negativeListGames() throws SQLException, DataAccessException {
+        Collection<GameData> listGames = dataAccess.listGames();
+        assertDoesNotThrow(() -> {
+            dataAccess.listGames();
+        });
+        assertEquals(0,listGames.size());
     }
 
     @Test
