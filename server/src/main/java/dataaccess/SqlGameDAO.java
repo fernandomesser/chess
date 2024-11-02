@@ -16,7 +16,7 @@ public class SqlGameDAO extends BaseSqlDAO implements GameDAO {
                     gameID INT NOT NULL AUTO_INCREMENT,
                     whiteUsername VARCHAR(256),
                     blackUsername VARCHAR(256),
-                    gameName VARCHAR(256),
+                    gameName VARCHAR(256) NOT NULL,
                     game TEXT,
                     PRIMARY KEY (gameID)
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
