@@ -1,6 +1,7 @@
 package dataaccess;
 
 import chess.ChessGame;
+import com.google.gson.Gson;
 import model.GameData;
 
 import java.sql.ResultSet;
@@ -77,6 +78,6 @@ public class SqlGameDAO extends BaseSqlDAO implements GameDAO {
     @Override
     public void updateGame(int gameID, GameData updatedGame) throws DataAccessException {
         String statement = "UPDATE games SET whiteUsername = ?, blackUsername = ?, gameName = ?, game = ? WHERE gameID = ?";
-        executeUpdate(statement, updatedGame.whiteUsername(), updatedGame.blackUsername(), updatedGame.gameName(), updatedGame.game(), updatedGame.gameID());
+        executeUpdate(statement, updatedGame.whiteUsername(), updatedGame.blackUsername(), updatedGame.gameName(), updatedGame.game(), gameID);
     }
 }

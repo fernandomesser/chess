@@ -1,5 +1,6 @@
 package dataaccess;
 
+import chess.ChessGame;
 import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
@@ -86,9 +87,21 @@ class SqlGameDAOTest {
     }
 
     @Test
-    void updateGame() {
+    void updateGame() throws DataAccessException, SQLException {
+        int id = dataAccess.createGame(new GameData(0,null,null,"Game",null));
+        GameData updatedGame = new GameData(id,"White","Black","Game1",null);
+        dataAccess.updateGame(id, updatedGame);
+        assertEquals("White", dataAccess.getGame(id).whiteUsername());
+        assertEquals("Black", dataAccess.getGame(id).blackUsername());
+        assertEquals("Game1", dataAccess.getGame(id).gameName());
     }
     @Test
-    void negativeUpdateGame() {
+    void negativeUpdateGame() throws DataAccessException, SQLException {
+        int id = dataAccess.createGame(new GameData(0,null,null,"Game",null));
+        GameData updatedGame = new GameData(id,"White","Black","Game1",null);
+        dataAccess.updateGame(0, updatedGame);
+        assertNotEquals("White", dataAccess.getGame(id).whiteUsername());
+        assertNotEquals("Black", dataAccess.getGame(id).blackUsername());
+        assertNotEquals("Game1", dataAccess.getGame(id).gameName());
     }
 }
