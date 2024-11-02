@@ -1,5 +1,6 @@
 package dataaccess;
 
+import model.AuthData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -13,10 +14,14 @@ class SqlAuthDAOTest {
     }
 
     @Test
-    void createAuth() {
+    void createAuth() throws DataAccessException {
+        AuthData auth = dataAccess.createAuth("John");
+        assertNotNull(auth);
     }
     @Test
-    void negativeCreateAuth() {
+    void negativeCreateAuth() throws DataAccessException {
+        AuthData auth = dataAccess.createAuth("");
+        assertNotNull(auth);
     }
 
     @Test

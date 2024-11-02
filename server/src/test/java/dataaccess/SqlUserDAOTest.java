@@ -34,9 +34,9 @@ class SqlUserDAOTest {
 
     @Test
     void getUser() throws DataAccessException, SQLException {
-        UserData user = new UserData("John", "1234", "john@email.com");
+        UserData user = new UserData("Joe", "1234", "joe@email.com");
         dataAccess.insertUser(user);
-        UserData userResult = dataAccess.getUser("John");
+        UserData userResult = dataAccess.getUser("joe");
         assertNotNull(userResult);
         assertEquals(user.username(), userResult.username());
         assertEquals(user.password(), userResult.password());
