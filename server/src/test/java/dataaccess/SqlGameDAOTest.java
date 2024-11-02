@@ -38,11 +38,11 @@ class SqlGameDAOTest {
 
     @Test
     void getGame() throws DataAccessException, SQLException {
-        GameData game = new GameData(0, null, null, "Game", null);
-        int id = dataAccess.createGame(game);
-        GameData gameResult = dataAccess.getGame(id);
+        GameData game = new GameData(0, null, null, "Game1", null);
+        int id1 = dataAccess.createGame(game);
+        GameData gameResult = dataAccess.getGame(id1);
         assertNotNull(gameResult);
-        assertEquals(dataAccess.getGame(id).gameName(), "Game");
+        assertEquals(dataAccess.getGame(id1).gameName(), "Game1");
     }
     @Test
     void negativeGetGame() throws SQLException, DataAccessException {
