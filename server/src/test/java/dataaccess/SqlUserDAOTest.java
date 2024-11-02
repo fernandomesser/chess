@@ -1,26 +1,24 @@
 package dataaccess;
 
-import exception.ResponseException;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class SqlUserDAOTest {
-    private UserDAO userDataAccess = new SqlUserDAO();
+    private UserDAO dataAccess = new SqlUserDAO();
     @BeforeEach
     void clear() throws DataAccessException {
-        userDataAccess.clearUsers();
+        dataAccess.clearUsers();
     }
     @Test
     void insertUser() throws DataAccessException, SQLException {
         UserData user = new UserData("John", "1234", "john@email.com");
-        userDataAccess.insertUser(user);
-        UserData userResult = userDataAccess.getUser("John");
+        dataAccess.insertUser(user);
+        UserData userResult = dataAccess.getUser("John");
         assertNotNull(userResult);
         assertEquals(user.username(), userResult.username());
         assertEquals(user.password(), userResult.password());
@@ -30,15 +28,15 @@ class SqlUserDAOTest {
     void negativeInsertUser() {
         UserData user = new UserData(null,null,null);
         assertThrows(DataAccessException.class, () -> {
-            userDataAccess.insertUser(user);
+            dataAccess.insertUser(user);
         });
     }
 
     @Test
     void getUser() throws DataAccessException, SQLException {
         UserData user = new UserData("John", "1234", "john@email.com");
-        userDataAccess.insertUser(user);
-        UserData userResult = userDataAccess.getUser("John");
+        dataAccess.insertUser(user);
+        UserData userResult = dataAccess.getUser("John");
         assertNotNull(userResult);
         assertEquals(user.username(), userResult.username());
         assertEquals(user.password(), userResult.password());
@@ -46,10 +44,17 @@ class SqlUserDAOTest {
     }
     @Test
     void negativeGetUser() throws SQLException, DataAccessException {
-        assertNull(userDataAccess.getUser("John"));
+        assertNull(dataAccess.getUser("John"));
     }
 
     @Test
-    void clearUsers() {
+    void clearUsers() throws DataAccessException, SQLException {
+        dataAccess.insertUser(new UserData("Jhon", "1234", "jhon@email.com"));
+        dataAccess.insertUser(new UserData("Joe", "1234", "joe@email.com"));
+        dataAccess.insertUser(new UserData("Julia", "1234", "julia@email.com"));
+        dataAccess.clearUsers();
+        assertNull(dataAccess.getUser("Jhon"));
+        assertNull(dataAccess.getUser("Joe"));
+        assertNull(dataAccess.getUser("Julia"));
     }
 }
