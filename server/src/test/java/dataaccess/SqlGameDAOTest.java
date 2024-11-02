@@ -74,7 +74,15 @@ class SqlGameDAOTest {
     }
 
     @Test
-    void clearGames() {
+    void clearGames() throws DataAccessException, SQLException {
+        int id1 = dataAccess.createGame(new GameData(0,null,null,"Game1",null));
+        int id2 = dataAccess.createGame(new GameData(0,null,null,"Game2",null));
+        int id3 = dataAccess.createGame(new GameData(0,null,null,"Game3",null));
+        dataAccess.clearGames();
+        assertNull(dataAccess.getGame(id1));
+        assertNull(dataAccess.getGame(id2));
+        assertNull(dataAccess.getGame(id3));
+
     }
 
     @Test
