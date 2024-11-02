@@ -4,6 +4,8 @@ import model.AuthData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.sql.SQLException;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class SqlAuthDAOTest {
@@ -25,10 +27,16 @@ class SqlAuthDAOTest {
     }
 
     @Test
-    void getAuth() {
+    void getAuth() throws DataAccessException, SQLException {
+        AuthData auth = dataAccess.createAuth("John");
+        AuthData authResult = dataAccess.getAuth(auth.authToken());
+        assertNotNull(authResult);
+        assertEquals(auth.authToken(),authResult.authToken());
+        assertEquals(auth.username(),authResult.username());
     }
     @Test
-    void negativeGetAuth() {
+    void negativeGetAuth() throws SQLException, DataAccessException {
+        assertNull(dataAccess.getAuth(""));
     }
 
     @Test
