@@ -40,13 +40,29 @@ class SqlAuthDAOTest {
     }
 
     @Test
-    void deleteAuth() {
+    void deleteAuth() throws DataAccessException, SQLException {
+        AuthData auth = dataAccess.createAuth("John");
+        assertNotNull(auth);
+        dataAccess.deleteAuth(auth.authToken());
+        assertNull(dataAccess.getAuth(auth.authToken()));
     }
     @Test
-    void negativeDeleteAuth() {
+    void negativeDeleteAuth() throws DataAccessException {
+        AuthData auth = dataAccess.createAuth("John");
+        assertDoesNotThrow(() -> {
+            dataAccess.deleteAuth("Joe");
+        });
+        assertNotNull(auth);
     }
 
     @Test
-    void clearAuth() {
+    void clearAuth() throws DataAccessException, SQLException {
+        AuthData auth1 = dataAccess.createAuth("John");
+        AuthData auth2 = dataAccess.createAuth("Joe");
+        AuthData auth3 = dataAccess.createAuth("Luke");
+        dataAccess.clearAuth();
+        assertNull(dataAccess.getAuth(auth1.authToken()));
+        assertNull(dataAccess.getAuth(auth2.authToken()));
+        assertNull(dataAccess.getAuth(auth3.authToken()));
     }
 }
