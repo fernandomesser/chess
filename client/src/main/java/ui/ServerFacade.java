@@ -24,6 +24,11 @@ public class ServerFacade {
         var path = "/session";
         return makeRequest("POST", path, user, AuthData.class);
     }
+    public void logOut(String auth) throws ResponseException{
+        var path = String.format("/session/%s",auth);
+        makeRequest("DELETE", path, null, null);
+    }
+    
 
     //add methods
 
