@@ -2,6 +2,7 @@ package ui;
 
 import com.google.gson.Gson;
 import exception.ResponseException;
+import model.UserData;
 
 import java.io.*;
 import java.net.*;
@@ -14,8 +15,14 @@ public class ServerFacade {
         serverUrl = url;
     }
 
-    //add methods
+    public UserData register(UserData user) throws ResponseException{
+        var path = "/user";
+        return makeRequest("POST", path, user, UserData.class);
+    }
     
+
+    //add methods
+
 
 
 
