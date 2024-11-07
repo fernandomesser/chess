@@ -3,10 +3,12 @@ package ui;
 import com.google.gson.Gson;
 import exception.ResponseException;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 
 import java.io.*;
 import java.net.*;
+import java.util.Collection;
 
 public class ServerFacade {
 
@@ -28,7 +30,17 @@ public class ServerFacade {
         var path = String.format("/session/%s",auth);
         makeRequest("DELETE", path, null, null);
     }
-    
+    public Collection<GameData> listGames(String auth) throws ResponseException{
+        var path = String.format("/game/%s",auth);
+        record listGameResponse(Collection<GameData> game) {
+        }
+        var response = this.makeRequest("GET", path, null, listGameResponse.class);
+        return response.game();
+    }
+    public int createGame(GameData game, String auth) throws ResponseException{
+        var path = String.format("/game/%s", auth);
+        return this.makeRequest("POST", path, auth, Integer.class);
+    }
 
     //add methods
 
