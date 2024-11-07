@@ -50,6 +50,11 @@ public class ServerFacade {
         this.makeRequest("PUT", path, request, null);
     }
 
+    public void clearApp() throws ResponseException{
+        var path = "/db";
+        this.makeRequest("DELETE", path, null, null);
+    }
+
     //add methods
 
 
