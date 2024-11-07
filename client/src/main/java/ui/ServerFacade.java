@@ -9,6 +9,7 @@ import model.UserData;
 import java.io.*;
 import java.net.*;
 import java.util.Collection;
+import java.util.HashMap;
 
 public class ServerFacade {
 
@@ -40,6 +41,13 @@ public class ServerFacade {
     public int createGame(GameData game, String auth) throws ResponseException{
         var path = String.format("/game/%s", auth);
         return this.makeRequest("POST", path, auth, Integer.class);
+    }
+    public void joinGame(int gameID, String playerColor, String auth) throws ResponseException{
+        var path = String.format("/game/%s", auth);
+        var request = new HashMap<String, Object>();
+        request.put("gameID", gameID);
+        request.put("playerColor", playerColor);
+        this.makeRequest("PUT", path, request, null);
     }
 
     //add methods
