@@ -19,30 +19,35 @@ public class ServerFacade {
         serverUrl = url;
     }
 
-    public UserData register(UserData user) throws ResponseException{
+    public UserData register(UserData user) throws ResponseException {
         var path = "/user";
         return makeRequest("POST", path, user, UserData.class);
     }
-    public AuthData logIn(UserData user) throws ResponseException{
+
+    public AuthData logIn(UserData user) throws ResponseException {
         var path = "/session";
         return makeRequest("POST", path, user, AuthData.class);
     }
-    public void logOut(String auth) throws ResponseException{
-        var path = String.format("/session/%s",auth);
+
+    public void logOut(String auth) throws ResponseException {
+        var path = String.format("/session/%s", auth);
         makeRequest("DELETE", path, null, null);
     }
-    public Collection<GameData> listGames(String auth) throws ResponseException{
-        var path = String.format("/game/%s",auth);
+
+    public Collection<GameData> listGames(String auth) throws ResponseException {
+        var path = String.format("/game/%s", auth);
         record listGameResponse(Collection<GameData> game) {
         }
         var response = this.makeRequest("GET", path, null, listGameResponse.class);
         return response.game();
     }
-    public int createGame(GameData game, String auth) throws ResponseException{
+
+    public int createGame(GameData game, String auth) throws ResponseException {
         var path = String.format("/game/%s", auth);
         return this.makeRequest("POST", path, auth, Integer.class);
     }
-    public void joinGame(int gameID, String playerColor, String auth) throws ResponseException{
+
+    public void joinGame(int gameID, String playerColor, String auth) throws ResponseException {
         var path = String.format("/game/%s", auth);
         var request = new HashMap<String, Object>();
         request.put("gameID", gameID);
@@ -50,14 +55,12 @@ public class ServerFacade {
         this.makeRequest("PUT", path, request, null);
     }
 
-    public void clearApp() throws ResponseException{
+    public void clearApp() throws ResponseException {
         var path = "/db";
         this.makeRequest("DELETE", path, null, null);
     }
 
     //add methods
-
-
 
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {

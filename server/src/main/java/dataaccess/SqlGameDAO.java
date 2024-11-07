@@ -55,7 +55,8 @@ public class SqlGameDAO extends BaseSqlDAO implements GameDAO {
         String whiteUsername = rs.getString("whiteUsername");
         String blackUsername = rs.getString("blackUsername");
         String gameName = rs.getString("gameName");
-        ChessGame game = (ChessGame) rs.getObject("game");
+        String gameString = rs.getString("game");
+        ChessGame game = new Gson().fromJson(gameString, ChessGame.class);
         return new GameData(gameID, whiteUsername, blackUsername, gameName, game);
     }
 

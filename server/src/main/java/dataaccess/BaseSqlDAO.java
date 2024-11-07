@@ -1,6 +1,7 @@
 package dataaccess;
 
 import chess.ChessGame;
+import com.google.gson.Gson;
 
 import java.sql.SQLException;
 
@@ -27,7 +28,8 @@ public abstract class BaseSqlDAO {
                     } else if (param instanceof Integer p) {
                         ps.setInt(i + 1, p);
                     } else if (param instanceof ChessGame p) {
-                        ps.setObject(i + 1, p);
+                        var json = new Gson().toJson(p);
+                        ps.setString(i + 1, json);
                     } else if (param == null) {
                         ps.setNull(i + 1, NULL);
                     }

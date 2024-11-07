@@ -38,7 +38,7 @@ class SqlGameDAOTest {
 
     @Test
     void getGame() throws DataAccessException, SQLException {
-        GameData game = new GameData(0, null, null, "Game1", null);
+        GameData game = new GameData(0, null, null, "Game1", new ChessGame());
         int id1 = dataAccess.createGame(game);
         GameData gameResult = dataAccess.getGame(id1);
         assertNotNull(gameResult);
