@@ -2,6 +2,7 @@ package ui;
 
 import com.google.gson.Gson;
 import exception.ResponseException;
+import model.AuthData;
 import model.UserData;
 
 import java.io.*;
@@ -19,7 +20,10 @@ public class ServerFacade {
         var path = "/user";
         return makeRequest("POST", path, user, UserData.class);
     }
-    
+    public AuthData logIn(UserData user) throws ResponseException{
+        var path = "/session";
+        return makeRequest("POST", path, user, AuthData.class);
+    }
 
     //add methods
 
