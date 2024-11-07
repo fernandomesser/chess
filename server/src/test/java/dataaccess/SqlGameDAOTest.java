@@ -88,8 +88,8 @@ class SqlGameDAOTest {
 
     @Test
     void updateGame() throws DataAccessException, SQLException {
-        int id = dataAccess.createGame(new GameData(0,null,null,"Game",null));
-        GameData updatedGame = new GameData(id,"White","Black","Game1",null);
+        int id = dataAccess.createGame(new GameData(0,null,null,"Game",new ChessGame()));
+        GameData updatedGame = new GameData(id,"White","Black","Game1",new ChessGame());
         dataAccess.updateGame(id, updatedGame);
         assertEquals("White", dataAccess.getGame(id).whiteUsername());
         assertEquals("Black", dataAccess.getGame(id).blackUsername());
