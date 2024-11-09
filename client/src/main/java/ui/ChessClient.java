@@ -1,8 +1,10 @@
 package ui;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import exception.ResponseException;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 
 import java.util.Arrays;
@@ -43,7 +45,7 @@ public class ChessClient {
     private String register(String... params) throws ResponseException {
         if (params.length >= 1) {
             state = State.SIGNEDIN;
-            user = server.register(new UserData(params[1],params[2],params[3]));
+            user = server.register(new UserData(params[1], params[2], params[3]));
             return String.format("You have been registered as %s.", user.username());
         }
         throw new ResponseException(400, "Expected: <yourname>");
@@ -78,13 +80,17 @@ public class ChessClient {
 
     private String createGame(String... params) throws ResponseException {
         assertSignedIn();
-        return null;
+        server.createGame(new GameData(0, null, null, params[1], new ChessGame()), auth);
+        return String.format("Game %s created", params[1]);
     }
 
     private String joinGame(String... params) throws ResponseException {
         assertSignedIn();
-        return null;
-    }
+        int id = Integer.parseInt(params[1]);
+        String color = params[2].toUpperCase();
+        server.joinGame(id, color, auth);
+        return String.format("Joined %s team", color);
+    } 
 
     private String observeGame(String... params) throws ResponseException {
         assertSignedIn();
