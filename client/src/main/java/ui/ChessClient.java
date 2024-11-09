@@ -1,12 +1,14 @@
 package ui;
 
 import exception.ResponseException;
+import model.AuthData;
 import model.UserData;
 
 import java.util.Arrays;
 
 public class ChessClient {
     private UserData user = null;
+    private AuthData auth = null;
     private final ServerFacade server;
     private final String serverUrl;
     private State state = State.SIGNEDOUT;
@@ -41,13 +43,18 @@ public class ChessClient {
         if (params.length >= 1) {
             state = State.SIGNEDIN;
             user = server.register(new UserData(params[1],params[2],params[3]));
-            return String.format("You signed in as %s.", user.username());
+            return String.format("You have been registered as %s.", user.username());
         }
         throw new ResponseException(400, "Expected: <yourname>");
     }
 
-    private String logIn(String... params) {
-        return null;
+    private String logIn(String... params) throws ResponseException {
+        if (params.length >= 1) {
+            state = State.SIGNEDIN;
+            auth = server.logIn(user);
+            return String.format("You signed in as %s.", user.username());
+        }
+        throw new ResponseException(400, "Expected: <username> <password>");
     }
 
     private String logOut() throws ResponseException {
