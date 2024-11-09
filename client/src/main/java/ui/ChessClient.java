@@ -45,23 +45,28 @@ public class ChessClient {
         return null;
     }
 
-    private String logOut() {
+    private String logOut() throws ResponseException {
+        assertSignedIn();
         return null;
     }
 
-    private String listGames() {
+    private String listGames() throws ResponseException {
+        assertSignedIn();
         return null;
     }
 
-    private String createGame() {
+    private String createGame() throws ResponseException {
+        assertSignedIn();
         return null;
     }
 
-    private String joinGame() {
+    private String joinGame() throws ResponseException {
+        assertSignedIn();
         return null;
     }
 
-    private String observeGame() {
+    private String observeGame() throws ResponseException {
+        assertSignedIn();
         return null;
     }
 
@@ -69,5 +74,9 @@ public class ChessClient {
         return null;
     }
 
-
+    private void assertSignedIn() throws ResponseException {
+        if (state == State.SIGNEDOUT) {
+            throw new ResponseException(400, "You must sign in");
+        }
+    }
 }
