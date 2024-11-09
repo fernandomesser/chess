@@ -1,5 +1,6 @@
 package ui;
 
+import com.google.gson.Gson;
 import exception.ResponseException;
 import model.AuthData;
 import model.UserData;
@@ -66,7 +67,13 @@ public class ChessClient {
 
     private String listGames() throws ResponseException {
         assertSignedIn();
-        return null;
+        var games = server.listGames(auth);
+        var result = new StringBuilder();
+        var gson = new Gson();
+        for (var game : games) {
+            result.append(gson.toJson(game)).append('\n');
+        }
+        return result.toString();
     }
 
     private String createGame(String... params) throws ResponseException {
