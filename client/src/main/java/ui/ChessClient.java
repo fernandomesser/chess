@@ -90,7 +90,7 @@ public class ChessClient {
         String color = params[2].toUpperCase();
         server.joinGame(id, color, auth);
         return String.format("Joined %s team", color);
-    } 
+    }
 
     private String observeGame(String... params) throws ResponseException {
         assertSignedIn();
@@ -98,7 +98,25 @@ public class ChessClient {
     }
 
     private String help() {
-        return null;
+        if (state == State.SIGNEDOUT) {
+            return """
+                    Options:
+                    - Log in as an existing user: "l", "login" <USERNAME> <PASSWORD>
+                    - Register a new user: "r", "register"
+                    - Exit the program: "q", "quit"
+                    - Print this message: "h", "help"
+                    """;
+        }
+        return """
+                Options:
+                - List current games: "l", "list" 
+                - Create a new game: "c", "create" <GAME NAME>
+                - Join a game: "j", "join" <GAME ID> <COLOR>
+                - Watch a game: "w", "watch" <GAME ID>
+                - Logout: "logout"
+                - Exit the program: "q", "quit"
+                - Print this message: "h", "help"
+                """;
     }
 
     private void assertSignedIn() throws ResponseException {
