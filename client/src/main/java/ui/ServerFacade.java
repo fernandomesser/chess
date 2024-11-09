@@ -1,6 +1,7 @@
 package ui;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
@@ -10,10 +11,9 @@ import java.io.*;
 import java.net.*;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 
 public class ServerFacade {
-
-    private String visitor;
 
     private final String serverUrl;
 
@@ -23,30 +23,33 @@ public class ServerFacade {
 
     public UserData register(UserData user) throws ResponseException {
         var path = "/user";
-        return makeRequest("POST", path, user, UserData.class);
+        return makeRequest("POST", path, user, UserData.class,null);
     }
 
     public AuthData logIn(UserData user) throws ResponseException {
         var path = "/session";
-        return makeRequest("POST", path, user, AuthData.class);
+        return makeRequest("POST", path, user, AuthData.class,null);
     }
 
     public void logOut(String auth) throws ResponseException {
         var path = String.format("/session/%s", auth);
-        makeRequest("DELETE", path, null, null);
+        makeRequest("DELETE", path, null, null,null);
     }
 
     public Collection<GameData> listGames(String auth) throws ResponseException {
         var path = String.format("/game/%s", auth);
         record listGameResponse(Collection<GameData> game) {
         }
-        var response = this.makeRequest("GET", path, null, listGameResponse.class);
+        var response = this.makeRequest("GET", path, null, listGameResponse.class,null);
         return response.game();
     }
 
-    public int createGame(GameData game, String auth) throws ResponseException {
-        var path = String.format("/game/%s", auth);
-        return this.makeRequest("POST", path, auth, Integer.class);
+    public String createGame(GameData game, String auth) throws ResponseException {
+        var path = "/game";
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Authorization", auth);
+        JsonElement response = this.makeRequest("POST", path, game, JsonElement.class, headers);
+        return new Gson().toJson(response);
     }
 
     public void joinGame(int gameID, String playerColor, String auth) throws ResponseException {
@@ -54,23 +57,29 @@ public class ServerFacade {
         var request = new HashMap<String, Object>();
         request.put("gameID", gameID);
         request.put("playerColor", playerColor);
-        this.makeRequest("PUT", path, request, null);
+        this.makeRequest("PUT", path, request, null,null);
     }
 
     public void clearApp() throws ResponseException {
         var path = "/db";
-        this.makeRequest("DELETE", path, null, null);
+        this.makeRequest("DELETE", path, null, null,null);
     }
 
     //add methods
 
 
-    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
+    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, Map<String, String> headers) throws ResponseException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
+
+            if (headers != null) {
+                for (Map.Entry<String, String> header : headers.entrySet()) {
+                    http.setRequestProperty(header.getKey(), header.getValue());
+                }
+            }
 
             writeBody(request, http);
             http.connect();

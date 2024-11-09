@@ -13,7 +13,7 @@ public class Repl {
     }
 
     public void run() {
-        System.out.println(BLACK_QUEEN + "Welcome to Chess. Sign in to start." + BLACK_QUEEN);
+        System.out.println(BLACK_QUEEN + "Welcome to Chess. Sign in to start. ♕" + BLACK_QUEEN);
         System.out.print(client.help());
 
         Scanner scanner = new Scanner(System.in);
