@@ -8,7 +8,7 @@ import java.util.Arrays;
 
 public class ChessClient {
     private UserData user = null;
-    private AuthData auth = null;
+    private String auth = null;
     private final ServerFacade server;
     private final String serverUrl;
     private State state = State.SIGNEDOUT;
@@ -51,7 +51,7 @@ public class ChessClient {
     private String logIn(String... params) throws ResponseException {
         if (params.length >= 1) {
             state = State.SIGNEDIN;
-            auth = server.logIn(user);
+            auth = server.logIn(user).authToken();
             return String.format("You signed in as %s.", user.username());
         }
         throw new ResponseException(400, "Expected: <username> <password>");
@@ -59,7 +59,9 @@ public class ChessClient {
 
     private String logOut() throws ResponseException {
         assertSignedIn();
-        return null;
+        server.logOut(auth);
+        state = State.SIGNEDOUT;
+        return String.format("%s signed out", user.username());
     }
 
     private String listGames() throws ResponseException {
