@@ -6,7 +6,7 @@ import model.UserData;
 import java.util.Arrays;
 
 public class ChessClient {
-    private String visitorName = null;
+    private UserData user = null;
     private final ServerFacade server;
     private final String serverUrl;
     private State state = State.SIGNEDOUT;
@@ -22,13 +22,13 @@ public class ChessClient {
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
-                case "register" -> register();
-                case "login" -> logIn();
+                case "register" -> register(params);
+                case "login" -> logIn(params);
                 case "logout" -> logOut();
                 case "list" -> listGames();
-                case "create" -> createGame();
-                case "join" -> joinGame();
-                case "observe" -> observeGame();
+                case "create" -> createGame(params);
+                case "join" -> joinGame(params);
+                case "observe" -> observeGame(params);
                 case "quit" -> "quit";
                 default -> help();
             };
@@ -37,11 +37,16 @@ public class ChessClient {
         }
     }
 
-    private String register() {
-        return null;
+    private String register(String... params) throws ResponseException {
+        if (params.length >= 1) {
+            state = State.SIGNEDIN;
+            user = server.register(new UserData(params[1],params[2],params[3]));
+            return String.format("You signed in as %s.", user.username());
+        }
+        throw new ResponseException(400, "Expected: <yourname>");
     }
 
-    private String logIn() {
+    private String logIn(String... params) {
         return null;
     }
 
@@ -55,17 +60,17 @@ public class ChessClient {
         return null;
     }
 
-    private String createGame() throws ResponseException {
+    private String createGame(String... params) throws ResponseException {
         assertSignedIn();
         return null;
     }
 
-    private String joinGame() throws ResponseException {
+    private String joinGame(String... params) throws ResponseException {
         assertSignedIn();
         return null;
     }
 
-    private String observeGame() throws ResponseException {
+    private String observeGame(String... params) throws ResponseException {
         assertSignedIn();
         return null;
     }

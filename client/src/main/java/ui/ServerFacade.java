@@ -13,6 +13,8 @@ import java.util.HashMap;
 
 public class ServerFacade {
 
+    private String visitor;
+
     private final String serverUrl;
 
     public ServerFacade(String url) {
