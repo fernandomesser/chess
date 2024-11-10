@@ -86,7 +86,8 @@ public class ChessClient {
     public String createGame(String... params) throws ResponseException {
         assertSignedIn();
         String id = server.createGame(new GameData(0, null, null, params[0], null), auth.authToken());
-        return String.format("Game %s created. Game Id: %s", params[0], id);
+        String numbers = id.replaceAll("[^0-9]", "");
+        return String.format("Game %s created. Game Id: %s", params[0], numbers);
     }
 
     public String joinGame(String... params) throws ResponseException {
