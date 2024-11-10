@@ -21,9 +21,9 @@ public class ServerFacade {
         serverUrl = url;
     }
 
-    public UserData register(UserData user) throws ResponseException {
+    public AuthData register(UserData user) throws ResponseException {
         var path = "/user";
-        return makeRequest("POST", path, user, UserData.class,null);
+        return makeRequest("POST", path, user, AuthData.class,null);
     }
 
     public AuthData logIn(UserData user) throws ResponseException {
@@ -48,7 +48,7 @@ public class ServerFacade {
         var path = "/game";
         Map<String, String> headers = new HashMap<>();
         headers.put("Authorization", auth);
-        JsonElement response = this.makeRequest("POST", path, game, JsonElement.class, headers);
+        JsonElement response = this.makeRequest("POST", path, game, JsonElement.class, auth);
         return new Gson().toJson(response);
     }
 
@@ -68,17 +68,15 @@ public class ServerFacade {
     //add methods
 
 
-    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, Map<String, String> headers) throws ResponseException {
+    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String auth) throws ResponseException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
 
-            if (headers != null) {
-                for (Map.Entry<String, String> header : headers.entrySet()) {
-                    http.setRequestProperty(header.getKey(), header.getValue());
-                }
+            if (auth != null) {
+                    http.setRequestProperty("Authorization", auth);
             }
             writeBody(request, http);
             http.connect();
