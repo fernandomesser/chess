@@ -32,16 +32,16 @@ public class ServerFacade {
     }
 
     public void logOut(String auth) throws ResponseException {
-        var path = String.format("/session/%s", auth);
-        makeRequest("DELETE", path, null, null,null);
+        var path = "/session";
+        makeRequest("DELETE", path, null, null,auth);
     }
 
     public Collection<GameData> listGames(String auth) throws ResponseException {
-        var path = String.format("/game/%s", auth);
-        record listGameResponse(Collection<GameData> game) {
+        var path = "/game";
+        record listGameResponse(Collection<GameData> games) {
         }
-        var response = this.makeRequest("GET", path, null, listGameResponse.class,null);
-        return response.game();
+        var response = this.makeRequest("GET", path, null, listGameResponse.class,auth);
+        return response.games();
     }
 
     public String createGame(GameData game, String auth) throws ResponseException {
@@ -53,11 +53,11 @@ public class ServerFacade {
     }
 
     public void joinGame(int gameID, String playerColor, String auth) throws ResponseException {
-        var path = String.format("/game/%s", auth);
+        var path = "/game";
         var request = new HashMap<String, Object>();
         request.put("gameID", gameID);
         request.put("playerColor", playerColor);
-        this.makeRequest("PUT", path, request, null,null);
+        this.makeRequest("PUT", path, request, null,auth);
     }
 
     public void clearApp() throws ResponseException {
