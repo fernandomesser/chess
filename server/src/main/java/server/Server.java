@@ -40,7 +40,7 @@ public class Server {
         Spark.post("/session", this::logIn);
         Spark.delete("/session", this::logOut);
         Spark.get("/game", this::listGames);
-        Spark.post("/game:auth", this::createGame);
+        Spark.post("/game", this::createGame);
         Spark.put("/game", this::joinGame);
         Spark.delete("/db", this::clearApp);
         Spark.exception(ResponseException.class, this::exceptionHandler);
@@ -95,7 +95,6 @@ public class Server {
     //Creates a new game
     private Object createGame(Request req, Response res) throws ResponseException, DataAccessException, SQLException {
         String auth = req.headers("Authorization");
-
         GameData game = new Gson().fromJson(req.body(), GameData.class);
         int gameID = gameService.createGame(game, auth);
         var response = new HashMap<String, Integer>();

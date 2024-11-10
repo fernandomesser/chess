@@ -31,7 +31,7 @@ public class ChessClient {
                 case "login", "l" -> logIn(params);
                 case "logout" -> logOut();
                 case "list" -> listGames();
-                case "create" -> createGame(params);
+                case "create", "c" -> createGame(params);
                 case "join" -> joinGame(params);
                 case "observe" -> observeGame(params);
                 case "quit" -> "quit";

@@ -80,7 +80,6 @@ public class ServerFacade {
                     http.setRequestProperty(header.getKey(), header.getValue());
                 }
             }
-
             writeBody(request, http);
             http.connect();
             throwIfNotSuccessful(http);
