@@ -59,7 +59,7 @@ public class ChessClient {
     public String logIn(String... params) throws ResponseException {
         if (params.length >= 1) {
             state = State.SIGNEDIN;
-            auth = server.logIn(new UserData(params[0],params[1],null ));
+            auth = server.logIn(new UserData(params[0], params[1], null));
             return String.format("You signed in as %s.", params[0]);
         }
         throw new ResponseException(400, "Expected: <username> <password>");
@@ -76,9 +76,11 @@ public class ChessClient {
         assertSignedIn();
         var games = server.listGames(auth.authToken());
         var result = new StringBuilder();
-        var gson = new Gson();
         for (var game : games) {
-            result.append(gson.toJson(game)).append('\n');
+            result.append(String.format("ID: %s   Game Name: %s   White: %s   Black: %s\n", game.gameID(),
+                    game.gameName(),
+                    (game.whiteUsername() != null) ? game.whiteUsername() : "none",
+                    (game.blackUsername() != null) ? game.blackUsername() : "none"));
         }
         return result.toString();
     }
