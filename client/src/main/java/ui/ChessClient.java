@@ -1,7 +1,5 @@
 package ui;
 
-import chess.ChessGame;
-import com.google.gson.Gson;
 import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
@@ -48,21 +46,27 @@ public class ChessClient {
     }
 
     public String register(String... params) throws ResponseException {
-        if (params.length >= 1) {
+        if (params.length > 2) {
             state = State.SIGNEDIN;
             auth = server.register(new UserData(params[0], params[1], params[2]));
             return String.format("You have been registered as %s.", params[0]);
         }
-        throw new ResponseException(400, "Expected: <yourname>");
+        return "Expected: <username> <password> <email>";
     }
 
     public String logIn(String... params) throws ResponseException {
-        if (params.length >= 1) {
-            state = State.SIGNEDIN;
-            auth = server.logIn(new UserData(params[0], params[1], null));
-            return String.format("You signed in as %s.", params[0]);
+        try {
+            if (params.length > 1) {
+                state = State.SIGNEDIN;
+                auth = server.logIn(new UserData(params[0], params[1], null));
+                return String.format("You signed in as %s.", params[0]);
+            }
+            System.out.println("Expected: <username> <password>");
+        }catch (ResponseException e){
+            System.out.println("test");
+            getErrorMessage(e);
         }
-        throw new ResponseException(400, "Expected: <username> <password>");
+        return "";
     }
 
     public String logOut() throws ResponseException {
@@ -93,11 +97,16 @@ public class ChessClient {
     }
 
     public String joinGame(String... params) throws ResponseException {
-        assertSignedIn();
-        int id = Integer.parseInt(params[0]);
-        String color = params[1].toUpperCase();
-        server.joinGame(id, color, auth.authToken());
-        return String.format("Joined %s team", color);
+        try {
+            assertSignedIn();
+            int id = Integer.parseInt(params[0]);
+            String color = params[1].toUpperCase();
+            server.joinGame(id, color, auth.authToken());
+            return String.format("Joined %s team", color);
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+        return null;
     }
 
     public String observeGame(String... params) throws ResponseException {
@@ -131,5 +140,15 @@ public class ChessClient {
         if (state == State.SIGNEDOUT) {
             throw new ResponseException(400, "You must sign in");
         }
+    }
+
+    private void getErrorMessage(ResponseException e) {
+        switch (e.statusCode()) {
+            case 401 -> System.out.println("Unauthorized");
+            case 403 -> System.out.println("Already Taken");
+            case 404 -> System.out.println("The requested resource was not found");
+            case 500 -> System.out.println("Internal server error: " + e.getMessage());
+            default -> System.out.println("Error");
+        };
     }
 }
