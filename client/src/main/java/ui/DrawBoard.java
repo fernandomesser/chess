@@ -113,9 +113,17 @@ public class DrawBoard {
     }
 
     private static void drawHeaders(PrintStream out, int i, int j) {
-        if ((i == 0 || i == 9)||(j==0||j==9)) {
-            out.print(SET_BG_COLOR_DARK_GREEN);
-            System.out.print(EMPTY);
+        String[] horizontal = {"a", "b", "c", "d", "e", "f", "g", "h"};
+        String[] vertical = {"1", "2", "3", "4", "5", "6", "7", "8"};
+        out.print(SET_BG_COLOR_DARK_GREEN);
+        if ((i == 0 || i == 9) || (j == 0 || j == 9)) {
+            if ((j == 0 || j == 9) && i > 0 && i < 9) {
+                System.out.print("\u2007" + "\u2006" + vertical[i - 1] + "\u2007" + "\u2004");
+            } else if ((i == 0 || i == 9) && j > 0 && j < 9) {
+                System.out.print("\u2007" + "\u2006" + horizontal[j - 1] + "\u2007" + "\u2004");
+            } else {
+                System.out.print(EMPTY);
+            }
             out.print(RESET_BG_COLOR);
         }
 
