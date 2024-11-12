@@ -169,4 +169,12 @@ public class ChessClient {
         }
     }
 
+    private void displayBoardWhiteSide() {
+
+    }
+
+    private void displayBoardBlackSide() {
+
+    }
+
 }
