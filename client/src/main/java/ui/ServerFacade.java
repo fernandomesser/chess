@@ -23,24 +23,24 @@ public class ServerFacade {
 
     public AuthData register(UserData user) throws ResponseException {
         var path = "/user";
-        return makeRequest("POST", path, user, AuthData.class,null);
+        return makeRequest("POST", path, user, AuthData.class, null);
     }
 
     public AuthData logIn(UserData user) throws ResponseException {
         var path = "/session";
-        return makeRequest("POST", path, user, AuthData.class,null);
+        return makeRequest("POST", path, user, AuthData.class, null);
     }
 
     public void logOut(String auth) throws ResponseException {
         var path = "/session";
-        makeRequest("DELETE", path, null, null,auth);
+        makeRequest("DELETE", path, null, null, auth);
     }
 
     public Collection<GameData> listGames(String auth) throws ResponseException {
         var path = "/game";
         record listGameResponse(Collection<GameData> games) {
         }
-        var response = this.makeRequest("GET", path, null, listGameResponse.class,auth);
+        var response = this.makeRequest("GET", path, null, listGameResponse.class, auth);
         return response.games();
     }
 
@@ -57,12 +57,12 @@ public class ServerFacade {
         var request = new HashMap<String, Object>();
         request.put("gameID", gameID);
         request.put("playerColor", playerColor);
-        this.makeRequest("PUT", path, request, null,auth);
+        this.makeRequest("PUT", path, request, null, auth);
     }
 
     public void clearApp() throws ResponseException {
         var path = "/db";
-        this.makeRequest("DELETE", path, null, null,null);
+        this.makeRequest("DELETE", path, null, null, null);
     }
 
     //add methods
@@ -76,7 +76,7 @@ public class ServerFacade {
             http.setDoOutput(true);
 
             if (auth != null) {
-                    http.setRequestProperty("Authorization", auth);
+                http.setRequestProperty("Authorization", auth);
             }
             writeBody(request, http);
             http.connect();
