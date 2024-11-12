@@ -104,7 +104,11 @@ public class ChessBoard {
         for (int i = 0; i < 8; i++) {
             board.append("|");
             for (int j = 0; j < 8; j++) {
-                board.append(squares[i][j]).append("|");
+                if (squares[i][j]==null){
+                    board.append(" ").append("|");
+                }else {
+                    board.append(squares[i][j]).append("|");
+                }
             }
             board.append("\n");
         }
