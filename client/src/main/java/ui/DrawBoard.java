@@ -9,6 +9,7 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 
 import static ui.EscapeSequences.*;
+import static ui.EscapeSequences.setColor;
 
 public class DrawBoard {
     private static final ChessGame game = new ChessGame();
@@ -26,55 +27,67 @@ public class DrawBoard {
     }
 
     private static void printBoard(PrintStream out) {
-        for (int i = 0; i < 10; i++) {
-            for (int j = 0; j < 10; j++) {
-                drawHeaders(out, i, j);
-                drawBoard(out, i, j);
+        if (view.equals("WHITE")) {
+            for (int i = 0; i < 10; i++) {
+                for (int j = 0; j < 10; j++) {
+                    drawHeaders(out, i, j);
+                    drawBoard(out, i, j);
+                }
+                out.println();
             }
-            out.println();
+        } else {
+            for (int i = 9; i >= 0; i--) {
+                for (int j = 9; j >= 0; j--) {
+                    drawHeaders(out, i, j);
+                    drawBoard(out, i, j);
+                }
+                out.println();
+            }
         }
+
     }
 
 
     private static void printPiece(int i, int j, PrintStream out) {
-        String textColor = view.equals("WHITE") ? SET_TEXT_COLOR_WHITE : SET_TEXT_COLOR_BLACK;
+        String whitePiece = setColor(true,85, 90, 105);
+        String blackPiece = setColor(true,0, 0, 0);
         String piece = getPiece(i, j);
         switch (piece) {
             case "P" -> {
-                pieceColor(out, BLACK_PAWN, SET_TEXT_COLOR_BLACK);
+                pieceColor(out, BLACK_PAWN, blackPiece);
             }
             case "R" -> {
-                pieceColor(out, BLACK_ROOK, SET_TEXT_COLOR_BLACK);
+                pieceColor(out, BLACK_ROOK, blackPiece);
             }
             case "K" -> {
-                pieceColor(out, BLACK_KING, SET_TEXT_COLOR_BLACK);
+                pieceColor(out, BLACK_KING, blackPiece);
             }
             case "Q" -> {
-                pieceColor(out, BLACK_QUEEN, SET_TEXT_COLOR_BLACK);
+                pieceColor(out, BLACK_QUEEN, blackPiece);
             }
             case "B" -> {
-                pieceColor(out, BLACK_BISHOP, SET_TEXT_COLOR_BLACK);
+                pieceColor(out, BLACK_BISHOP, blackPiece);
             }
             case "N" -> {
-                pieceColor(out, BLACK_KNIGHT, SET_TEXT_COLOR_BLACK);
+                pieceColor(out, BLACK_KNIGHT, blackPiece);
             }
             case "p" -> {
-                pieceColor(out, BLACK_PAWN, SET_TEXT_COLOR_WHITE);
+                pieceColor(out, BLACK_PAWN, whitePiece);
             }
             case "r" -> {
-                pieceColor(out, BLACK_ROOK, SET_TEXT_COLOR_WHITE);
+                pieceColor(out, BLACK_ROOK, whitePiece);
             }
             case "k" -> {
-                pieceColor(out, BLACK_KING, SET_TEXT_COLOR_WHITE);
+                pieceColor(out, BLACK_KING, whitePiece);
             }
             case "q" -> {
-                pieceColor(out, BLACK_QUEEN, SET_TEXT_COLOR_WHITE);
+                pieceColor(out, BLACK_QUEEN, whitePiece);
             }
             case "b" -> {
-                pieceColor(out, BLACK_BISHOP, SET_TEXT_COLOR_WHITE);
+                pieceColor(out, BLACK_BISHOP, whitePiece);
             }
             case "n" -> {
-                pieceColor(out, BLACK_KNIGHT, SET_TEXT_COLOR_WHITE);
+                pieceColor(out, BLACK_KNIGHT, whitePiece);
             }
             default -> {
                 System.out.print(EMPTY);
@@ -100,12 +113,12 @@ public class DrawBoard {
         int i1 = i % 2 == 0 ? 0 : 1;
         if (i < 9 && j < 9 && i > 0 && j > 0) {
             if (j % 2 == i0) {
-                out.print(SET_BG_COLOR_RED);
+                out.print(setColor(false,85,0,21));
                 printPiece(i, j, out);
                 out.print(RESET_BG_COLOR);
             }
             if (j % 2 == i1) {
-                out.print(SET_BG_COLOR_LIGHT_GREY);
+                out.print(setColor(false,255, 255, 255));
                 printPiece(i, j, out);
                 out.print(RESET_BG_COLOR);
             }
@@ -114,8 +127,10 @@ public class DrawBoard {
 
     private static void drawHeaders(PrintStream out, int i, int j) {
         String[] horizontal = {"a", "b", "c", "d", "e", "f", "g", "h"};
-        String[] vertical = {"1", "2", "3", "4", "5", "6", "7", "8"};
-        out.print(SET_BG_COLOR_DARK_GREEN);
+        String[] vertical = {"8", "7", "6", "5", "4", "3", "2", "1"};
+        out.print(setColor(false,95, 94, 98));
+        out.print(setColor(true,0, 0, 0));
+
         if ((i == 0 || i == 9) || (j == 0 || j == 9)) {
             if ((j == 0 || j == 9) && i > 0 && i < 9) {
                 System.out.print("\u2007" + "\u2006" + vertical[i - 1] + "\u2007" + "\u2004");
@@ -125,6 +140,7 @@ public class DrawBoard {
                 System.out.print(EMPTY);
             }
             out.print(RESET_BG_COLOR);
+            out.print(RESET_TEXT_COLOR);
         }
 
     }
