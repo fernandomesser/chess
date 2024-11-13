@@ -6,7 +6,11 @@ import model.AuthData;
 import model.GameData;
 import model.UserData;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 public class ChessClient {
     private AuthData auth = null;
@@ -82,10 +86,11 @@ public class ChessClient {
     public String listGames() throws ResponseException {
         assertSignedIn();
         try {
-            var games = server.listGames(auth.authToken());
+            Collection<GameData> games = server.listGames(auth.authToken());
             var result = new StringBuilder();
+            int i = 1;
             for (var game : games) {
-                result.append(String.format("ID: %s   Game Name: %s   White: %s   Black: %s\n", game.gameID(),
+                result.append(String.format("%d.   Game Name: %s   White: %s   Black: %s\n", i++,
                         game.gameName(),
                         (game.whiteUsername() != null) ? game.whiteUsername() : "none",
                         (game.blackUsername() != null) ? game.blackUsername() : "none"));
@@ -103,9 +108,8 @@ public class ChessClient {
     public String createGame(String... params) throws ResponseException {
         assertSignedIn();
         try {
-            String id = server.createGame(new GameData(0, null, null, params[0], null), auth.authToken());
-            String numbers = id.replaceAll("[^0-9]", "");
-            return String.format("Game '%s' created. Game Id: %s", params[0], numbers);
+            server.createGame(new GameData(0, null, null, params[0], new ChessGame()), auth.authToken());
+            return String.format("Game '%s' created.", params[0]);
         } catch (Exception e) {
             return "Expected: <GAME NAME>";
         }
@@ -116,7 +120,9 @@ public class ChessClient {
         assertSignedIn();
         try {
             if (params.length > 1) {
-                int id = Integer.parseInt(params[0]);
+                List<GameData> games = (List<GameData>) server.listGames(auth.authToken());
+                GameData game = games.get(Integer.parseInt(params[0])-1);
+                int id = game.gameID();
                 String color = params[1].toUpperCase();
                 if (color.equalsIgnoreCase("white") || color.equalsIgnoreCase("black")) {
                     server.joinGame(id, color, auth.authToken());
@@ -127,15 +133,16 @@ public class ChessClient {
                     return "Please enter a valid color <WHITE|BLACK>";
                 }
             }
-            return "Expected: <GAME ID> <COLOR>";
+            return "Expected: <GAME INDEX> <COLOR>";
         } catch (ResponseException e) {
             if (e.getMessage().equals("failure: 403")) {
                 return "Already taken";
             } else if (e.getMessage().equals("failure: 400")) {
                 return "Game " + params[0] + " does not exist";
             }
-            System.out.println(e.getMessage());
             return "Error";
+        }catch (NumberFormatException | IndexOutOfBoundsException ex){
+            return "Please provide a valid number";
         }
 
     }
@@ -160,8 +167,8 @@ public class ChessClient {
                 Options:
                 - List current games: "list" 
                 - Create a new game: "create" <GAME NAME>
-                - Join a game: "join" <GAME ID> <COLOR>
-                - Watch a game: "watch" <GAME ID>
+                - Join a game: "join" <GAME INDEX> <COLOR>
+                - Watch a game: "watch" <GAME INDEX>
                 - Logout: "logout"
                 - Exit the program: "quit"
                 - Print this message: "help"
@@ -175,11 +182,11 @@ public class ChessClient {
     }
 
     private void displayBoardWhiteSide() {
-        DrawBoard drawBoard = new DrawBoard(new ChessGame(), "WHITE");
+        new DrawBoard(new ChessGame(), "WHITE");
     }
 
     private void displayBoardBlackSide() {
-        DrawBoard drawBoard = new DrawBoard(new ChessGame(), "BLACK");
+        new DrawBoard(new ChessGame(), "BLACK");
     }
 
 }
