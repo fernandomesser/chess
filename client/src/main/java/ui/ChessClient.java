@@ -1,5 +1,6 @@
 package ui;
 
+import chess.ChessGame;
 import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
@@ -119,6 +120,8 @@ public class ChessClient {
                 String color = params[1].toUpperCase();
                 if (color.equalsIgnoreCase("white") || color.equalsIgnoreCase("black")) {
                     server.joinGame(id, color, auth.authToken());
+                    displayBoardWhiteSide();
+                    displayBoardBlackSide();
                     return String.format("Joined %s team", color);
                 } else {
                     return "Please enter a valid color <WHITE|BLACK>";
@@ -134,11 +137,13 @@ public class ChessClient {
             System.out.println(e.getMessage());
             return "Error";
         }
+
     }
 
     public String observeGame(String... params) throws ResponseException {
         assertSignedIn();
-        return null;
+        displayBoardWhiteSide();
+        return "";
     }
 
     public String help() {
@@ -170,11 +175,11 @@ public class ChessClient {
     }
 
     private void displayBoardWhiteSide() {
-
+        DrawBoard drawBoard = new DrawBoard(new ChessGame(), "WHITE");
     }
 
     private void displayBoardBlackSide() {
-
+        DrawBoard drawBoard = new DrawBoard(new ChessGame(), "BLACK");
     }
 
 }

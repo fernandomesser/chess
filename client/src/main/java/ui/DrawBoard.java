@@ -12,21 +12,24 @@ import static ui.EscapeSequences.*;
 import static ui.EscapeSequences.setColor;
 
 public class DrawBoard {
-    private static final ChessGame game = new ChessGame();
-    private static final String view = "WHITE";
+    private final ChessGame game;
+    private final String view;
 
-//    public DrawBoard(ChessGame game) {
-//        this.game = game;
-//    }
+    public DrawBoard(ChessGame game, String view) {
+        this.game = game;
+        this.view = view;
+        draw();
+        System.out.println();
+    }
 
-    public static void main(String[] args) {
+    public void draw() {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         out.print(ERASE_SCREEN);
         printBoard(out);
 
     }
 
-    private static void printBoard(PrintStream out) {
+    private void printBoard(PrintStream out) {
         if (view.equals("WHITE")) {
             for (int i = 0; i < 10; i++) {
                 for (int j = 0; j < 10; j++) {
@@ -48,9 +51,9 @@ public class DrawBoard {
     }
 
 
-    private static void printPiece(int i, int j, PrintStream out) {
-        String whitePiece = setColor(true,85, 90, 105);
-        String blackPiece = setColor(true,0, 0, 0);
+    private void printPiece(int i, int j, PrintStream out) {
+        String whitePiece = setColor(true, 85, 90, 105);
+        String blackPiece = setColor(true, 0, 0, 0);
         String piece = getPiece(i, j);
         switch (piece) {
             case "P" -> {
@@ -95,41 +98,41 @@ public class DrawBoard {
         }
     }
 
-    private static String getPiece(int i, int j) {
+    private String getPiece(int i, int j) {
         ChessBoard board = game.getBoard();
         ChessPiece piece = board.getPiece(new ChessPosition(i, j));
         return piece == null ? " " : piece.toString();
     }
 
-    private static void pieceColor(PrintStream out, String piece, String color) {
+    private void pieceColor(PrintStream out, String piece, String color) {
         out.print(color);
         System.out.print(piece);
         out.print(RESET_TEXT_COLOR);
     }
 
 
-    private static void drawBoard(PrintStream out, int i, int j) {
+    private void drawBoard(PrintStream out, int i, int j) {
         int i0 = i % 2 == 0 ? 1 : 0;
         int i1 = i % 2 == 0 ? 0 : 1;
         if (i < 9 && j < 9 && i > 0 && j > 0) {
             if (j % 2 == i0) {
-                out.print(setColor(false,85,0,21));
+                out.print(setColor(false, 85, 0, 21));
                 printPiece(i, j, out);
                 out.print(RESET_BG_COLOR);
             }
             if (j % 2 == i1) {
-                out.print(setColor(false,255, 255, 255));
+                out.print(setColor(false, 255, 255, 255));
                 printPiece(i, j, out);
                 out.print(RESET_BG_COLOR);
             }
         }
     }
 
-    private static void drawHeaders(PrintStream out, int i, int j) {
+    private void drawHeaders(PrintStream out, int i, int j) {
         String[] horizontal = {"a", "b", "c", "d", "e", "f", "g", "h"};
         String[] vertical = {"8", "7", "6", "5", "4", "3", "2", "1"};
-        out.print(setColor(false,95, 94, 98));
-        out.print(setColor(true,0, 0, 0));
+        out.print(setColor(false, 95, 94, 98));
+        out.print(setColor(true, 0, 0, 0));
 
         if ((i == 0 || i == 9) || (j == 0 || j == 9)) {
             if ((j == 0 || j == 9) && i > 0 && i < 9) {
