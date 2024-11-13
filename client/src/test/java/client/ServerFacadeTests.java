@@ -157,17 +157,17 @@ public class ServerFacadeTests {
     @Test
     void clearTest() throws ResponseException, DataAccessException, SQLException {
         AuthData auth = service.register(new UserData("User", "1234", "test@test.com"));
-        int Id1 = Integer.parseInt(service.createGame(new GameData(0, "", "", "G1", new ChessGame()), auth.authToken()).replaceAll("[^0-9]", ""));
-        int Id2 = Integer.parseInt(service.createGame(new GameData(0, "", "", "G2", new ChessGame()), auth.authToken()).replaceAll("[^0-9]", ""));
-        int Id3 = Integer.parseInt(service.createGame(new GameData(0, "", "", "G3", new ChessGame()), auth.authToken()).replaceAll("[^0-9]", ""));
+        int id1 = Integer.parseInt(service.createGame(new GameData(0, "", "", "G1", new ChessGame()), auth.authToken()).replaceAll("[^0-9]", ""));
+        int id2 = Integer.parseInt(service.createGame(new GameData(0, "", "", "G2", new ChessGame()), auth.authToken()).replaceAll("[^0-9]", ""));
+        int id3 = Integer.parseInt(service.createGame(new GameData(0, "", "", "G3", new ChessGame()), auth.authToken()).replaceAll("[^0-9]", ""));
 
-        assertNotNull(gameDataAccess.getGame(Id1));
-        assertNotNull(gameDataAccess.getGame(Id2));
-        assertNotNull(gameDataAccess.getGame(Id3));
+        assertNotNull(gameDataAccess.getGame(id1));
+        assertNotNull(gameDataAccess.getGame(id2));
+        assertNotNull(gameDataAccess.getGame(id3));
         service.clearApp();
-        assertNull(gameDataAccess.getGame(Id1));
-        assertNull(gameDataAccess.getGame(Id2));
-        assertNull(gameDataAccess.getGame(Id3));
+        assertNull(gameDataAccess.getGame(id1));
+        assertNull(gameDataAccess.getGame(id2));
+        assertNull(gameDataAccess.getGame(id3));
     }
 
 }
