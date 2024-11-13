@@ -6,8 +6,6 @@ import model.AuthData;
 import model.GameData;
 import model.UserData;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -36,7 +34,9 @@ public class ChessClient {
                 case "create", "c" -> createGame(params);
                 case "join" -> joinGame(params);
                 case "observe" -> observeGame(params);
-                case "quit" -> "quit";
+                case "quit", "exit" -> {System.out.println("Chess Program Closed");
+                System.exit(0);
+                yield "";}
                 case "clear" -> clearApp();
                 default -> help();
             };
@@ -52,7 +52,7 @@ public class ChessClient {
 
     public String register(String... params) throws ResponseException {
         try {
-            if (params.length > 2) {
+            if (params.length == 3) {
                 state = State.SIGNEDIN;
                 auth = server.register(new UserData(params[0], params[1], params[2]));
                 return String.format("You have been registered as '%s'.", params[0]);
@@ -65,7 +65,7 @@ public class ChessClient {
 
     public String logIn(String... params) throws ResponseException {
         try {
-            if (params.length > 1) {
+            if (params.length == 2) {
                 state = State.SIGNEDIN;
                 auth = server.logIn(new UserData(params[0], params[1], null));
                 return String.format("You signed in as '%s'", params[0]);
@@ -108,8 +108,11 @@ public class ChessClient {
     public String createGame(String... params) throws ResponseException {
         assertSignedIn();
         try {
-            server.createGame(new GameData(0, null, null, params[0], new ChessGame()), auth.authToken());
-            return String.format("Game '%s' created.", params[0]);
+            if (params.length == 1) {
+                server.createGame(new GameData(0, null, null, params[0], new ChessGame()), auth.authToken());
+                return String.format("Game '%s' created.", params[0]);
+            }
+            return "Expected: <GAME NAME>";
         } catch (Exception e) {
             return "Expected: <GAME NAME>";
         }
@@ -119,7 +122,7 @@ public class ChessClient {
     public String joinGame(String... params) throws ResponseException {
         assertSignedIn();
         try {
-            if (params.length > 1) {
+            if (params.length == 2) {
                 List<GameData> games = (List<GameData>) server.listGames(auth.authToken());
                 GameData game = games.get(Integer.parseInt(params[0])-1);
                 int id = game.gameID();
