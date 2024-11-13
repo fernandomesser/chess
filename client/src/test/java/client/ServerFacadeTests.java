@@ -43,13 +43,13 @@ public class ServerFacadeTests {
 
     @Test
     public void register() throws SQLException, DataAccessException, ResponseException {
-        UserData user = new UserData("John", "1234", "john@email.com");
+        UserData user = new UserData("Julia", "123", "jjj@email.com");
         AuthData authData = service.register(user);
-        UserData userResult = userDataAccess.getUser("John");
-        assertNotNull(userResult);
-        assertEquals(user.username(), userResult.username());
-        assertTrue(BCrypt.checkpw(user.password(), userResult.password()));
-        assertEquals(user.email(), userResult.email());
+        UserData result = userDataAccess.getUser("Julia");
+        assertNotNull(result);
+        assertEquals(user.username(), result.username());
+        assertTrue(BCrypt.checkpw(user.password(), result.password()));
+        assertEquals(user.email(), result.email());
         assertNotNull(authData);
     }
     @Test
@@ -99,7 +99,7 @@ public class ServerFacadeTests {
     }
     @Test
     void negativeCreateGame() throws ResponseException, DataAccessException, SQLException {
-        AuthData auth = service.register(new UserData("User5", "123", "test2@test.com"));
+        AuthData auth = service.register(new UserData("User5", "123", "test2    @test.com"));
         GameData game = new GameData(0, "Joe", null, "", null);
         assertThrows(ResponseException.class, () -> {
             service.createGame(game, auth.authToken());
