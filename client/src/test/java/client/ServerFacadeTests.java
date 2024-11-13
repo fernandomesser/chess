@@ -99,8 +99,8 @@ public class ServerFacadeTests {
     }
     @Test
     void negativeCreateGame() throws ResponseException, DataAccessException, SQLException {
-        AuthData auth = service.register(new UserData("User", "1234", "test@test.com"));
-        GameData game = new GameData(0, null, null, "", null);
+        AuthData auth = service.register(new UserData("User5", "123", "test2@test.com"));
+        GameData game = new GameData(0, "Joe", null, "", null);
         assertThrows(ResponseException.class, () -> {
             service.createGame(game, auth.authToken());
         });
