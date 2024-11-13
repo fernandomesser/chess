@@ -12,6 +12,7 @@ import server.Server;
 import ui.ServerFacade;
 
 import java.sql.SQLException;
+import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -27,10 +28,11 @@ public class ServerFacadeTests {
     @BeforeAll
     public static void init() throws ResponseException {
         server = new Server();
-        service = new ServerFacade("http://localhost:8080");
-        var port = server.run(8080);
+        var port = server.run(0);
+        service = new ServerFacade("http://localhost:" + port);
         System.out.println("Started test HTTP server on " + port);
     }
+
     @BeforeEach
     public void clear() throws ResponseException {
         service.clearApp();
@@ -52,6 +54,7 @@ public class ServerFacadeTests {
         assertEquals(user.email(), result.email());
         assertNotNull(authData);
     }
+
     @Test
     void negativeRegister() throws ResponseException, DataAccessException {
         UserData user = new UserData("", "1234", "jhon@email.com");
@@ -59,6 +62,7 @@ public class ServerFacadeTests {
             service.register(user);
         });
     }
+
     @Test
     void logIn() throws ResponseException, DataAccessException, SQLException {
         UserData user = new UserData("Jhon", "1234", "jhon@email.com");
@@ -66,6 +70,7 @@ public class ServerFacadeTests {
         AuthData authData = service.logIn(user);
         assertNotNull(authData);
     }
+
     @Test
     void negativeLogIn() {
         UserData user = new UserData("", "123", "luke@email.com");
@@ -73,6 +78,7 @@ public class ServerFacadeTests {
             service.logIn(user);
         });
     }
+
     @Test
     void logOut() throws ResponseException, DataAccessException, SQLException {
         AuthData expected = service.register(new UserData("Luke", "1234", "jhon@email.com"));
@@ -80,14 +86,34 @@ public class ServerFacadeTests {
         service.logOut(expected.authToken());
         assertNull(authDataAccess.getAuth(expected.authToken()));
     }
+
     @Test
     void negativeLogOut() {
         assertThrows(ResponseException.class, () -> {
             service.logOut(null);
         });
     }
+
     @Test
-    public void listGames(){}
+    void positiveListGames() throws ResponseException, DataAccessException, SQLException {
+        AuthData auth = service.register(new UserData("User", "1234", "test@test.com"));
+        GameData game1 = new GameData(1, "", "", "Game1", null);
+        GameData game2 = new GameData(2, "", "", "Game2", null);
+        GameData game3 = new GameData(3, "", "", "Game3", null);
+        service.createGame(game1, auth.authToken());
+        service.createGame(game2, auth.authToken());
+        service.createGame(game3, auth.authToken());
+        Collection<GameData> listGames = service.listGames(auth.authToken());
+        assertEquals(3, listGames.size());
+    }
+
+    @Test
+    void negativeListGames() throws ResponseException, DataAccessException {
+        assertThrows(ResponseException.class, () -> {
+            service.listGames(null);
+        });
+    }
+
     @Test
     void createGame() throws ResponseException, DataAccessException, SQLException {
         AuthData auth = service.register(new UserData("User", "1234", "test@test.com"));
@@ -97,6 +123,7 @@ public class ServerFacadeTests {
         assertNotNull(gameDataAccess.getGame(game.gameID()));
         assertEquals(gameDataAccess.getGame(gameId).gameName(), "Game");
     }
+
     @Test
     void negativeCreateGame() throws ResponseException, DataAccessException, SQLException {
         AuthData auth = service.register(new UserData("User5", "123", "test2    @test.com"));
@@ -105,6 +132,7 @@ public class ServerFacadeTests {
             service.createGame(game, auth.authToken());
         });
     }
+
     @Test
     void joinGame() throws ResponseException, DataAccessException, SQLException {
         AuthData auth = service.register(new UserData("User", "1234", "test@test.com"));
@@ -114,6 +142,7 @@ public class ServerFacadeTests {
         assertEquals("User", gameDataAccess.getGame(gameId).whiteUsername());
 
     }
+
     @Test
     void negativeJoinGame() throws ResponseException, DataAccessException, SQLException {
         AuthData auth = service.register(new UserData("User", "1234", "test@test.com"));
@@ -124,12 +153,13 @@ public class ServerFacadeTests {
             ;
         });
     }
+
     @Test
     void clearTest() throws ResponseException, DataAccessException, SQLException {
         AuthData auth = service.register(new UserData("User", "1234", "test@test.com"));
-        int gameId1 = Integer.parseInt(service.createGame(new GameData(0,"","","Game1",new ChessGame()), auth.authToken()).replaceAll("[^0-9]", ""));
-        int gameId2 = Integer.parseInt(service.createGame(new GameData(0,"","","Game2",new ChessGame()), auth.authToken()).replaceAll("[^0-9]", ""));
-        int gameId3 = Integer.parseInt(service.createGame(new GameData(0,"","","Game3",new ChessGame()), auth.authToken()).replaceAll("[^0-9]", ""));
+        int gameId1 = Integer.parseInt(service.createGame(new GameData(0, "", "", "Game1", new ChessGame()), auth.authToken()).replaceAll("[^0-9]", ""));
+        int gameId2 = Integer.parseInt(service.createGame(new GameData(0, "", "", "Game2", new ChessGame()), auth.authToken()).replaceAll("[^0-9]", ""));
+        int gameId3 = Integer.parseInt(service.createGame(new GameData(0, "", "", "Game3", new ChessGame()), auth.authToken()).replaceAll("[^0-9]", ""));
 
         assertNotNull(gameDataAccess.getGame(gameId1));
         assertNotNull(gameDataAccess.getGame(gameId2));
