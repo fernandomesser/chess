@@ -152,8 +152,21 @@ public class ChessClient {
 
     public String observeGame(String... params) throws ResponseException {
         assertSignedIn();
-        displayBoardWhiteSide();
-        return "";
+        try {
+            if (params.length == 1) {
+                List<GameData> games = (List<GameData>) server.listGames(auth.authToken());
+                GameData game = games.get(Integer.parseInt(params[0])-1);
+                int id = game.gameID();
+                    displayBoardWhiteSide();
+                    return "";
+            }
+            return "Expected: <GAME INDEX>";
+        } catch (ResponseException e) {
+            return "Error";
+        }catch (NumberFormatException | IndexOutOfBoundsException ex){
+            return "Please provide a valid number";
+        }
+
     }
 
     public String help() {
@@ -171,7 +184,7 @@ public class ChessClient {
                 - List current games: "list" 
                 - Create a new game: "create" <GAME NAME>
                 - Join a game: "join" <GAME INDEX> <COLOR>
-                - Watch a game: "watch" <GAME INDEX>
+                - Observe a game: "observe" <GAME INDEX>
                 - Logout: "logout"
                 - Exit the program: "quit"
                 - Print this message: "help"
