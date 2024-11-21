@@ -136,9 +136,9 @@ public class DrawBoard {
 
         if ((i == 0 || i == 9) || (j == 0 || j == 9)) {
             if ((j == 0 || j == 9) && i > 0 && i < 9) {
-                System.out.print("\u2007" + "\u2006" + vertical[i - 1] + "\u2007" + "\u2004");
+                System.out.print("\u2007\u2006" + vertical[i - 1] + "\u2007\u2004");
             } else if ((i == 0 || i == 9) && j > 0 && j < 9) {
-                System.out.print("\u2007" + "\u2006" + horizontal[j - 1] + "\u2007" + "\u2004");
+                System.out.print("\u2007\u2006" + horizontal[j - 1] + "\u2007\u2004");
             } else {
                 System.out.print(EMPTY);
             }
