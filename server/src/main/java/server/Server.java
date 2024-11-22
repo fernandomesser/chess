@@ -19,7 +19,7 @@ import java.util.Map;
 public class Server {
     private UserService userService;
     private GameService gameService;
-    private final WebSocketHandler webSocketHandler;
+    
 
     public Server() {
         AuthDAO authDAO = new SqlAuthDAO();
