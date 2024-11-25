@@ -34,6 +34,11 @@ public class ChessClient {
                 case "create", "c" -> createGame(params);
                 case "join" -> joinGame(params);
                 case "observe" -> observeGame(params);
+                case "highlight" -> highlight(params);
+                case "resign" -> resign();
+                case "move" -> makeMove(params);
+                case "leave" -> leaveGame();
+                case "redraw" -> redraw();
                 case "quit", "exit" -> {
                     System.out.println("Chess Program Closed");
                     System.exit(0);
@@ -45,6 +50,26 @@ public class ChessClient {
         } catch (ResponseException ex) {
             return ex.getMessage();
         }
+    }
+
+    private String redraw() {
+        return "";
+    }
+
+    private String leaveGame() {
+        return "";
+    }
+
+    private String makeMove(String[] params) {
+        return "";
+    }
+
+    private String resign() {
+        return "";
+    }
+
+    private String highlight(String[] params) {
+        return "";
     }
 
     private String clearApp() throws ResponseException {
