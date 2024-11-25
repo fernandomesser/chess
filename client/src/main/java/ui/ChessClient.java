@@ -34,9 +34,11 @@ public class ChessClient {
                 case "create", "c" -> createGame(params);
                 case "join" -> joinGame(params);
                 case "observe" -> observeGame(params);
-                case "quit", "exit" -> {System.out.println("Chess Program Closed");
-                System.exit(0);
-                yield "";}
+                case "quit", "exit" -> {
+                    System.out.println("Chess Program Closed");
+                    System.exit(0);
+                    yield "";
+                }
                 case "clear" -> clearApp();
                 default -> help();
             };
@@ -124,7 +126,7 @@ public class ChessClient {
         try {
             if (params.length == 2) {
                 List<GameData> games = (List<GameData>) server.listGames(auth.authToken());
-                GameData game = games.get(Integer.parseInt(params[0])-1);
+                GameData game = games.get(Integer.parseInt(params[0]) - 1);
                 int id = game.gameID();
                 String color = params[1].toUpperCase();
                 if (color.equalsIgnoreCase("white") || color.equalsIgnoreCase("black")) {
@@ -144,7 +146,7 @@ public class ChessClient {
                 return "Game " + params[0] + " does not exist";
             }
             return "Error";
-        }catch (NumberFormatException | IndexOutOfBoundsException ex){
+        } catch (NumberFormatException | IndexOutOfBoundsException ex) {
             return "Please provide a valid number";
         }
 
@@ -155,15 +157,15 @@ public class ChessClient {
         try {
             if (params.length == 1) {
                 List<GameData> games = (List<GameData>) server.listGames(auth.authToken());
-                GameData game = games.get(Integer.parseInt(params[0])-1);
+                GameData game = games.get(Integer.parseInt(params[0]) - 1);
                 int id = game.gameID();
-                    displayBoardWhiteSide();
-                    return "";
+                displayBoardWhiteSide();
+                return "";
             }
             return "Expected: <GAME INDEX>";
         } catch (ResponseException e) {
             return "Error";
-        }catch (NumberFormatException | IndexOutOfBoundsException ex){
+        } catch (NumberFormatException | IndexOutOfBoundsException ex) {
             return "Please provide a valid number";
         }
 
@@ -178,17 +180,29 @@ public class ChessClient {
                     - Exit the program: "quit"
                     - Print this message: "help"
                     """;
+        } else if (state == State.SIGNEDIN) {
+            return """
+                    Options:
+                    - List current games: "list" 
+                    - Create a new game: "create" <GAME NAME>
+                    - Join a game: "join" <GAME INDEX> <COLOR>
+                    - Observe a game: "observe" <GAME INDEX>
+                    - Logout: "logout"
+                    - Exit the program: "quit"
+                    - Print this message: "help"
+                    """;
+        } else {
+            return """
+                    Options:
+                    - Redraw Chess Board: "redraw" 
+                    - Leave game: "leave"
+                    - Make Move: "move" <START POSITION> <END POSITION>
+                    - Resign: "resign"
+                    - Highlight Legal Moves: "highlight" <POSITION>
+                    - Print this message: "help"
+                    """;
         }
-        return """
-                Options:
-                - List current games: "list" 
-                - Create a new game: "create" <GAME NAME>
-                - Join a game: "join" <GAME INDEX> <COLOR>
-                - Observe a game: "observe" <GAME INDEX>
-                - Logout: "logout"
-                - Exit the program: "quit"
-                - Print this message: "help"
-                """;
+
     }
 
     private void assertSignedIn() throws ResponseException {

@@ -18,14 +18,17 @@ public class WebSocketHandler {
   private final ConnectionManager connections = new ConnectionManager();
 
   @OnWebSocketMessage
-  public void onMessage(Session session, String message) throws IOException {
+  public void onMessage(Session session, String message) throws IOException, ResponseException {
     UserGameCommand action = new Gson().fromJson(message, UserGameCommand.class);
     switch (action.getCommandType()) {
       case CONNECT -> enter(action.getAuthToken(), session);
-      case MAKE_MOVE -> exit(action.getAuthToken());
-      case LEAVE -> exit(action.getAuthToken());
-      case RESIGN -> exit(action.getAuthToken());
+      case MAKE_MOVE -> makeMove(action.getAuthToken(), "T");
+      case LEAVE -> leave(action.getAuthToken());
+      case RESIGN -> resign(action.getAuthToken());
     }
+  }
+
+  private void resign(String authToken) {
   }
 
   private void enter(String visitorName, Session session) throws IOException {
@@ -35,14 +38,14 @@ public class WebSocketHandler {
     connections.broadcast(visitorName, notification);
   }
 
-  private void exit(String visitorName) throws IOException {
+  private void leave(String visitorName) throws IOException {
     connections.remove(visitorName);
     var message = String.format("%s left the shop", visitorName);
     var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
     connections.broadcast(visitorName, notification);
   }
 
-  public void makeNoise(String petName, String sound) throws ResponseException {
+  public void makeMove(String petName, String sound) throws ResponseException {
     try {
       var message = String.format("%s says %s", petName, sound);
       var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
