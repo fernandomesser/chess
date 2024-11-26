@@ -5,6 +5,8 @@ import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
+import ui.websocket.NotificationHandler;
+import ui.websocket.WebSocketFacade;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -14,11 +16,14 @@ public class ChessClient {
     private AuthData auth = null;
     private final ServerFacade server;
     private final String serverUrl;
+    private final NotificationHandler notificationHandler;
+    private WebSocketFacade ws;
     private State state = State.SIGNEDOUT;
 
-    public ChessClient(String serverUrl) {
+    public ChessClient(String serverUrl, NotificationHandler notificationHandler) {
         this.server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
+        this.notificationHandler = notificationHandler;
     }
 
     public String eval(String input) {
@@ -60,7 +65,7 @@ public class ChessClient {
         return "";
     }
 
-    private String makeMove(String[] params) {
+    private String makeMove(String... params) {
         return "";
     }
 
@@ -68,7 +73,7 @@ public class ChessClient {
         return "";
     }
 
-    private String highlight(String[] params) {
+    private String highlight(String... params) {
         return "";
     }
 
@@ -156,8 +161,8 @@ public class ChessClient {
                 String color = params[1].toUpperCase();
                 if (color.equalsIgnoreCase("white") || color.equalsIgnoreCase("black")) {
                     server.joinGame(id, color, auth.authToken());
-                    displayBoardWhiteSide();
-                    displayBoardBlackSide();
+                    displayBoardWhiteSide(new ChessGame());
+                    displayBoardBlackSide(new ChessGame());
                     return String.format("Joined %s team", color);
                 } else {
                     return "Please enter a valid color <WHITE|BLACK>";
@@ -184,7 +189,8 @@ public class ChessClient {
                 List<GameData> games = (List<GameData>) server.listGames(auth.authToken());
                 GameData game = games.get(Integer.parseInt(params[0]) - 1);
                 int id = game.gameID();
-                displayBoardWhiteSide();
+                ChessGame board = game.game();
+                displayBoardWhiteSide(board);
                 return "";
             }
             return "Expected: <GAME INDEX>";
@@ -236,12 +242,12 @@ public class ChessClient {
         }
     }
 
-    private void displayBoardWhiteSide() {
-        new DrawBoard(new ChessGame(), "WHITE");
+    private void displayBoardWhiteSide(ChessGame game) {
+        new DrawBoard(game, "WHITE");
     }
 
-    private void displayBoardBlackSide() {
-        new DrawBoard(new ChessGame(), "BLACK");
+    private void displayBoardBlackSide(ChessGame game) {
+        new DrawBoard(game, "BLACK");
     }
 
 }
