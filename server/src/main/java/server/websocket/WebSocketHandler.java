@@ -13,6 +13,7 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import websocket.commands.MakeMoveCommand;
 import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 import websocket.commands.UserGameCommand;
 
@@ -22,56 +23,60 @@ import java.sql.SQLException;
 
 @WebSocket
 public class WebSocketHandler {
-  SqlAuthDAO authDAO = new SqlAuthDAO();
-  SqlGameDAO gameDAO = new SqlGameDAO();
+    SqlAuthDAO authDAO = new SqlAuthDAO();
+    SqlGameDAO gameDAO = new SqlGameDAO();
 
 
-  private final ConnectionManager connections = new ConnectionManager();
+    private final ConnectionManager connections = new ConnectionManager();
 
-  @OnWebSocketMessage
-  public void onMessage(Session session, String message) throws IOException, ResponseException, SQLException, DataAccessException {
-    UserGameCommand action = new Gson().fromJson(message, UserGameCommand.class);
-    switch (action.getCommandType()) {
-      case CONNECT -> {
-        connect(action.getAuthToken(), action.getGameID(), session);
-      }
-      case MAKE_MOVE -> {
-        MakeMoveCommand makeMoveCommand = new Gson().fromJson(message, MakeMoveCommand.class);
-        makeMove(makeMoveCommand.getGameID(), makeMoveCommand.getAuthToken(), makeMoveCommand.getMove());
-      }
-      case LEAVE -> leave(action.getGameID(), action.getAuthToken());
-      case RESIGN -> resign(action.getAuthToken());
+    @OnWebSocketMessage
+    public void onMessage(Session session, String message) throws IOException, ResponseException, SQLException, DataAccessException {
+        UserGameCommand action = new Gson().fromJson(message, UserGameCommand.class);
+        switch (action.getCommandType()) {
+            case CONNECT -> {
+                connect(action.getAuthToken(), action.getGameID(), session);
+            }
+            case MAKE_MOVE -> {
+                MakeMoveCommand makeMoveCommand = new Gson().fromJson(message, MakeMoveCommand.class);
+                makeMove(makeMoveCommand.getGameID(), makeMoveCommand.getAuthToken(), makeMoveCommand.getMove());
+            }
+            case LEAVE -> leave(action.getGameID(), action.getAuthToken());
+            case RESIGN -> resign(action.getAuthToken());
+        }
     }
-  }
 
-  private void connect(String auth, int gameID, Session session) throws IOException, SQLException, DataAccessException {
-    connections.add(gameID, auth, session);
-    AuthData authData = authDAO.getAuth(auth);
-    GameData gameData = gameDAO.getGame(gameID);
-    var message = String.format("%s joined the game", authData.username());
-    var notification = new LoadGameMessage(auth, gameData.game(), message);
-    connections.broadcast(gameID, auth, notification);
-  }
-
-  public void makeMove(int gameID, String auth, ChessMove move) throws ResponseException {
-    try {
-      var message = String.format("");
-      var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
-      connections.broadcast(gameID, auth, notification);
-    } catch (Exception ex) {
-      throw new ResponseException(500, ex.getMessage());
+    private void connect(String auth, int gameID, Session session) throws IOException, SQLException, DataAccessException {
+        connections.add(gameID, auth, session);
+        AuthData authData = authDAO.getAuth(auth);
+        GameData gameData = gameDAO.getGame(gameID);
+        connections.add(gameID, auth, session);
+        //use auth to get username and check teams
+        var message = String.format("%s joined the game", authData.username());
+        var loadGameMessage = new LoadGameMessage(auth, gameData, message);
+        session.getRemote().sendString(new Gson().toJson(loadGameMessage));
+        var notification = new NotificationMessage(message);
+        connections.broadcast(gameID, auth, notification);
     }
-  }
 
-  private void leave(int gameID, String auth) throws IOException {
-    connections.remove(gameID, auth);
-    var message = String.format("%s left the shop", auth);
-    var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
-    connections.broadcast(gameID, auth, notification);
-  }
+    public void makeMove(int gameID, String auth, ChessMove move) throws ResponseException {
+        try {
+            var message = String.format("");
+            var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
+            connections.broadcast(gameID, auth, notification);
+        } catch (Exception ex) {
+            throw new ResponseException(500, ex.getMessage());
+        }
+    }
 
-  private void resign(String authToken) {
-  }
+    private void leave(int gameID, String auth) throws IOException {
+        connections.remove(gameID, auth);
+        var message = String.format("%s left the shop", auth);
+        var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
+        connections.broadcast(gameID, auth, notification);
+    }
+
+    private void resign(String authToken) {
+    }
 
 
 }

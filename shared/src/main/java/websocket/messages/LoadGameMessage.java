@@ -3,19 +3,20 @@ package websocket.messages;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import model.GameData;
 
 public class LoadGameMessage extends ServerMessage{
     String auth;
-    String game;
+    GameData game;
     String message;
-    public LoadGameMessage(String auth, ChessGame game, String message) {
+    public LoadGameMessage(String auth, GameData game, String message) {
         super(ServerMessageType.LOAD_GAME);
         this.auth = auth;
-        this.game = new Gson().toJson(game);
+        this.game = game;
         this.message = message;
     }
 
-    public String getGame(){
+    public GameData getGame(){
         return game;
     }
     public String getMessage(){
