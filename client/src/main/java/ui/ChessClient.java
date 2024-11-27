@@ -162,7 +162,7 @@ public class ChessClient {
                 if (color.equalsIgnoreCase("white") || color.equalsIgnoreCase("black")) {
                     server.joinGame(id, color, auth.authToken());
                     ws = new WebSocketFacade(serverUrl, notificationHandler);
-                    ws.connect(auth, id);
+                    ws.connect(auth.authToken(), id);
 
                     displayBoardWhiteSide(game.game());
                     displayBoardBlackSide(game.game());

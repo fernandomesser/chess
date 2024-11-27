@@ -33,37 +33,36 @@ public class WebSocketHandler {
       }
       case MAKE_MOVE -> {
         MakeMoveCommand makeMoveCommand = new Gson().fromJson(message, MakeMoveCommand.class);
-        makeMove(makeMoveCommand.getAuthToken(), makeMoveCommand.getMove());
+        makeMove(makeMoveCommand.getGameID(), makeMoveCommand.getAuthToken(), makeMoveCommand.getMove());
       }
-      case LEAVE -> leave(action.getAuthToken());
+      case LEAVE -> leave(action.getGameID(), action.getAuthToken());
       case RESIGN -> resign(action.getAuthToken());
     }
   }
 
   private void connect(String auth, int gameID, Session session) throws IOException, SQLException, DataAccessException {
-    connections.add(auth, session);
+    connections.add(gameID, auth, session);
     AuthData authData = authDAO.getAuth(auth);
     var message = String.format("%s is in the shop", authData.username());
     var notification = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);
-    connections.add(auth, session);
-    connections.broadcast(auth, notification);
+    connections.broadcast(gameID, auth, notification);
   }
 
-  public void makeMove(String auth, ChessMove move) throws ResponseException {
+  public void makeMove(int gameID, String auth, ChessMove move) throws ResponseException {
     try {
       var message = String.format("");
       var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
-      connections.broadcast(auth, notification);
+      connections.broadcast(gameID, auth, notification);
     } catch (Exception ex) {
       throw new ResponseException(500, ex.getMessage());
     }
   }
 
-  private void leave(String auth) throws IOException {
-    connections.remove(auth);
+  private void leave(int gameID, String auth) throws IOException {
+    connections.remove(gameID, auth);
     var message = String.format("%s left the shop", auth);
     var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
-    connections.broadcast(auth, notification);
+    connections.broadcast(gameID, auth, notification);
   }
 
   private void resign(String authToken) {

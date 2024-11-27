@@ -1,30 +1,42 @@
 package server.websocket;
 
+import com.google.gson.Gson;
 import org.eclipse.jetty.websocket.api.Session;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ConnectionManager {
-    public final ConcurrentHashMap<String, Connection> connections = new ConcurrentHashMap<>();
+    public final ConcurrentHashMap<Integer, Set<Connection>> connections = new ConcurrentHashMap<>();
 
-    public void add(String visitorName, Session session) {
-        var connection = new Connection(visitorName, session);
-        connections.put(visitorName, connection);
+    public void add(int gameID, String auth, Session session) {
+        Set<Connection> players;
+        if (connections.containsKey(gameID)) {
+            players = connections.get(gameID);
+        } else {
+            players = new HashSet<>();
+        }
+        players.add(new Connection(auth, session));
+        connections.put(gameID, players);
     }
 
-    public void remove(String visitorName) {
-        connections.remove(visitorName);
+    public void remove(int gameID, String auth) {
+        Set<Connection> players = connections.get(gameID);
+        players.removeIf(player -> player.auth.equals(auth));
+        connections.put(gameID, players);
     }
 
-    public void broadcast(String excludeVisitorName, ServerMessage notification) throws IOException {
+    public void broadcast(int gameID, String auth, ServerMessage notification) throws IOException {
         var removeList = new ArrayList<Connection>();
-        for (var c : connections.values()) {
+        Set<Connection> players = connections.get(gameID);
+        for (var c : players) {
             if (c.session.isOpen()) {
-                if (!c.auth.equals(excludeVisitorName)) {
-                    c.send(notification.toString());
+                if (!c.auth.equals(auth)) {
+                    c.send(new Gson().toJson(notification));
                 }
             } else {
                 removeList.add(c);
@@ -33,7 +45,8 @@ public class ConnectionManager {
 
         // Clean up any connections that were left open.
         for (var c : removeList) {
-            connections.remove(c.auth);
+            players.remove(c);
+            connections.put(gameID, players);
         }
     }
 }
