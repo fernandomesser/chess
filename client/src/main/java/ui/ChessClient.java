@@ -161,8 +161,11 @@ public class ChessClient {
                 String color = params[1].toUpperCase();
                 if (color.equalsIgnoreCase("white") || color.equalsIgnoreCase("black")) {
                     server.joinGame(id, color, auth.authToken());
-                    displayBoardWhiteSide(new ChessGame());
-                    displayBoardBlackSide(new ChessGame());
+                    ws = new WebSocketFacade(serverUrl, notificationHandler);
+                    ws.connect(auth, id);
+
+                    displayBoardWhiteSide(game.game());
+                    displayBoardBlackSide(game.game());
                     return String.format("Joined %s team", color);
                 } else {
                     return "Please enter a valid color <WHITE|BLACK>";

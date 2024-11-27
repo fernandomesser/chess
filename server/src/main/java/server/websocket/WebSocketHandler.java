@@ -1,5 +1,6 @@
 package server.websocket;
 
+import chess.ChessMove;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.SqlAuthDAO;
@@ -8,6 +9,7 @@ import model.AuthData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import websocket.commands.MakeMoveCommand;
 import websocket.messages.ServerMessage;
 import websocket.commands.UserGameCommand;
 
@@ -26,36 +28,42 @@ public class WebSocketHandler {
   public void onMessage(Session session, String message) throws IOException, ResponseException, SQLException, DataAccessException {
     UserGameCommand action = new Gson().fromJson(message, UserGameCommand.class);
     switch (action.getCommandType()) {
-      case CONNECT -> join(action.getAuthToken(), session);
-      case MAKE_MOVE -> makeMove(action.getAuthToken(), "T");
+      case CONNECT -> {
+        connect(action.getAuthToken(), action.getGameID(), session);
+      }
+      case MAKE_MOVE -> {
+        MakeMoveCommand makeMoveCommand = new Gson().fromJson(message, MakeMoveCommand.class);
+        makeMove(makeMoveCommand.getAuthToken(), makeMoveCommand.getMove());
+      }
       case LEAVE -> leave(action.getAuthToken());
       case RESIGN -> resign(action.getAuthToken());
     }
   }
 
-  private void join(String auth, Session session) throws IOException, SQLException, DataAccessException {
+  private void connect(String auth, int gameID, Session session) throws IOException, SQLException, DataAccessException {
     connections.add(auth, session);
     AuthData authData = authDAO.getAuth(auth);
     var message = String.format("%s is in the shop", authData.username());
     var notification = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);
+    connections.add(auth, session);
     connections.broadcast(auth, notification);
   }
 
-  public void makeMove(String start, String end) throws ResponseException {
+  public void makeMove(String auth, ChessMove move) throws ResponseException {
     try {
-      var message = String.format("%s says %s", start, end);
+      var message = String.format("");
       var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
-      connections.broadcast("", notification);
+      connections.broadcast(auth, notification);
     } catch (Exception ex) {
       throw new ResponseException(500, ex.getMessage());
     }
   }
 
-  private void leave(String visitorName) throws IOException {
-    connections.remove(visitorName);
-    var message = String.format("%s left the shop", visitorName);
+  private void leave(String auth) throws IOException {
+    connections.remove(auth);
+    var message = String.format("%s left the shop", auth);
     var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
-    connections.broadcast(visitorName, notification);
+    connections.broadcast(auth, notification);
   }
 
   private void resign(String authToken) {

@@ -1,23 +1,19 @@
 package websocket.commands;
 
+import chess.ChessMove;
+
 import java.util.Objects;
 
 public class MakeMoveCommand extends UserGameCommand {
-    private final int row;
-    private final int col;
+    private final ChessMove move;
 
-    public MakeMoveCommand(String authToken, Integer gameID, int row, int col) {
+    public MakeMoveCommand(String authToken, int gameID, ChessMove move) {
         super(CommandType.MAKE_MOVE, authToken, gameID);
-        this.row = row;
-        this.col = col;
+        this.move = move;
     }
 
-    public int getRow() {
-        return row;
-    }
-
-    public int getCol() {
-        return col;
+    public ChessMove getMove() {
+        return move;
     }
 
     @Override
@@ -31,11 +27,11 @@ public class MakeMoveCommand extends UserGameCommand {
         if (!super.equals(o)) {
             return false;
         }
-        return row == that.row && col == that.col;
+        return move == that.move;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), row, col);
+        return Objects.hash(super.hashCode(), move);
     }
 }

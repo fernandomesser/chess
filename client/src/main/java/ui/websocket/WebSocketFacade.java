@@ -1,7 +1,10 @@
 package ui.websocket;
 
+import chess.ChessMove;
 import com.google.gson.Gson;
 import exception.ResponseException;
+import model.AuthData;
+import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
@@ -44,20 +47,20 @@ public class WebSocketFacade extends Endpoint {
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
-    public void joinGame(String auth, int gameID) throws ResponseException {
+    public void connect(AuthData auth, int gameID) throws ResponseException {
         try {
-            var action = new UserGameCommand(UserGameCommand.CommandType.CONNECT, auth, gameID);
+            var action = new UserGameCommand(UserGameCommand.CommandType.CONNECT, auth.authToken(), gameID);
+
             this.session.getBasicRemote().sendText(new Gson().toJson(action));
         } catch (IOException ex) {
             throw new ResponseException(500, ex.getMessage());
         }
     }
 
-    public void leavePetShop(String visitorName) throws ResponseException {
+    public void makeMove(String authToken, int gameId, ChessMove move) throws ResponseException {
         try {
-            var action = new UserGameCommand(UserGameCommand.CommandType.LEAVE, visitorName, 0);
+            var action = new MakeMoveCommand(authToken, gameId, move);
             this.session.getBasicRemote().sendText(new Gson().toJson(action));
-            this.session.close();
         } catch (IOException ex) {
             throw new ResponseException(500, ex.getMessage());
         }
