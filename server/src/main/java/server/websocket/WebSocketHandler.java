@@ -4,12 +4,15 @@ import chess.ChessMove;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.SqlAuthDAO;
+import dataaccess.SqlGameDAO;
 import exception.ResponseException;
 import model.AuthData;
+import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import websocket.commands.MakeMoveCommand;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.ServerMessage;
 import websocket.commands.UserGameCommand;
 
@@ -20,6 +23,7 @@ import java.sql.SQLException;
 @WebSocket
 public class WebSocketHandler {
   SqlAuthDAO authDAO = new SqlAuthDAO();
+  SqlGameDAO gameDAO = new SqlGameDAO();
 
 
   private final ConnectionManager connections = new ConnectionManager();
@@ -43,8 +47,9 @@ public class WebSocketHandler {
   private void connect(String auth, int gameID, Session session) throws IOException, SQLException, DataAccessException {
     connections.add(gameID, auth, session);
     AuthData authData = authDAO.getAuth(auth);
-    var message = String.format("%s is in the shop", authData.username());
-    var notification = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);
+    GameData gameData = gameDAO.getGame(gameID);
+    var message = String.format("%s joined the game", authData.username());
+    var notification = new LoadGameMessage(auth, gameData.game(), message);
     connections.broadcast(gameID, auth, notification);
   }
 
