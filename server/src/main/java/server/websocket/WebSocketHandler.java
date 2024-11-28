@@ -46,21 +46,29 @@ public class WebSocketHandler {
     }
 
     private void connect(String auth, int gameID, Session session) throws IOException, SQLException, DataAccessException {
-        connections.add(gameID, auth, session);
         AuthData authData = authDAO.getAuth(auth);
         GameData gameData = gameDAO.getGame(gameID);
         connections.add(gameID, auth, session);
-        //use auth to get username and check teams
-        var message = String.format("%s joined the game", authData.username());
-        var loadGameMessage = new LoadGameMessage(auth, gameData, message);
+        var message = "";
+        if (gameData.blackUsername() != null && authData.username().equals(gameData.blackUsername())) {
+            message = String.format("%s joined the black team", authData.username());
+            System.out.println("White");
+        } else if (gameData.whiteUsername() != null && authData.username().equals(gameData.whiteUsername())) {
+            System.out.println("Black");
+            message = String.format("%s joined the white team", authData.username());
+        } else {
+            System.out.println("Observer");
+            message = String.format("%s joined the game as an Observer", authData.username());
+        }
+
+        var loadGameMessage = new LoadGameMessage(auth, gameData);
         session.getRemote().sendString(new Gson().toJson(loadGameMessage));
-        var notification = new NotificationMessage(message);
-        connections.broadcast(gameID, auth, notification);
+        connections.broadcast(gameID, auth, new NotificationMessage(message));
     }
 
     public void makeMove(int gameID, String auth, ChessMove move) throws ResponseException {
         try {
-            var message = String.format("");
+            var message = "";
             var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
             connections.broadcast(gameID, auth, notification);
         } catch (Exception ex) {

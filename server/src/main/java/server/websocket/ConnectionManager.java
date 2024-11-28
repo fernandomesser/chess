@@ -33,7 +33,7 @@ public class ConnectionManager {
     public void broadcast(int gameID, String auth, ServerMessage notification) throws IOException {
         var removeList = new ArrayList<Connection>();
         Set<Connection> players = connections.get(gameID);
-        for (var c : players) {
+        for (Connection c : players) {
             if (c.session.isOpen()) {
                 if (!c.auth.equals(auth)) {
                     c.send(new Gson().toJson(notification));
