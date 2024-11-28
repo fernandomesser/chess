@@ -12,6 +12,7 @@ import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import websocket.commands.MakeMoveCommand;
+import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
@@ -30,7 +31,7 @@ public class WebSocketHandler {
     private final ConnectionManager connections = new ConnectionManager();
 
     @OnWebSocketMessage
-    public void onMessage(Session session, String message) throws IOException, ResponseException, SQLException, DataAccessException {
+    public void onMessage(Session session, String message) throws Exception {
         UserGameCommand action = new Gson().fromJson(message, UserGameCommand.class);
         switch (action.getCommandType()) {
             case CONNECT -> {
@@ -45,25 +46,36 @@ public class WebSocketHandler {
         }
     }
 
-    private void connect(String auth, int gameID, Session session) throws IOException, SQLException, DataAccessException {
-        AuthData authData = authDAO.getAuth(auth);
-        GameData gameData = gameDAO.getGame(gameID);
-        connections.add(gameID, auth, session);
-        var message = "";
-        if (gameData.blackUsername() != null && authData.username().equals(gameData.blackUsername())) {
-            message = String.format("%s joined the black team", authData.username());
-            System.out.println("White");
-        } else if (gameData.whiteUsername() != null && authData.username().equals(gameData.whiteUsername())) {
-            System.out.println("Black");
-            message = String.format("%s joined the white team", authData.username());
+    private void connect(String auth, int gameID, Session session) throws Exception {
+        AuthData authData = null;
+        GameData gameData = null;
+        try {
+            gameData = gameDAO.getGame(gameID);
+            authData = authDAO.getAuth(auth);
+        } catch (DataAccessException e) {
+            throw new Exception(e.getMessage());
+        }
+        if (gameData == null) {
+            session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Invalid Game Id")));
         } else {
-            System.out.println("Observer");
-            message = String.format("%s joined the game as an Observer", authData.username());
+            connections.add(gameID, auth, session);
+            var message = "";
+            if (gameData.blackUsername() != null && authData.username().equals(gameData.blackUsername())) {
+                message = String.format("%s joined the black team", authData.username());
+                System.out.println("White");
+            } else if (gameData.whiteUsername() != null && authData.username().equals(gameData.whiteUsername())) {
+                System.out.println("Black");
+                message = String.format("%s joined the white team", authData.username());
+            } else {
+                System.out.println("Observer");
+                message = String.format("%s joined the game as an Observer", authData.username());
+            }
+
+            var loadGameMessage = new LoadGameMessage(auth, gameData);
+            session.getRemote().sendString(new Gson().toJson(loadGameMessage));
+            connections.broadcast(gameID, auth, new NotificationMessage(message));
         }
 
-        var loadGameMessage = new LoadGameMessage(auth, gameData);
-        session.getRemote().sendString(new Gson().toJson(loadGameMessage));
-        connections.broadcast(gameID, auth, new NotificationMessage(message));
     }
 
     public void makeMove(int gameID, String auth, ChessMove move) throws ResponseException {
