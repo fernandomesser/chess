@@ -32,26 +32,32 @@ public class WebSocketHandler {
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws Exception {
-        UserGameCommand action = new Gson().fromJson(message, UserGameCommand.class);
-        switch (action.getCommandType()) {
-            case CONNECT -> {
-                connect(action.getAuthToken(), action.getGameID(), session);
+        try{
+            UserGameCommand action = new Gson().fromJson(message, UserGameCommand.class);
+            switch (action.getCommandType()) {
+                case CONNECT -> {
+                    connect(action.getAuthToken(), action.getGameID(), session);
+                }
+                case MAKE_MOVE -> {
+                    MakeMoveCommand makeMoveCommand = new Gson().fromJson(message, MakeMoveCommand.class);
+                    makeMove(makeMoveCommand.getGameID(), makeMoveCommand.getAuthToken(), makeMoveCommand.getMove());
+                }
+                case LEAVE -> leave(action.getGameID(), action.getAuthToken());
+                case RESIGN -> resign(action.getAuthToken());
             }
-            case MAKE_MOVE -> {
-                MakeMoveCommand makeMoveCommand = new Gson().fromJson(message, MakeMoveCommand.class);
-                makeMove(makeMoveCommand.getGameID(), makeMoveCommand.getAuthToken(), makeMoveCommand.getMove());
-            }
-            case LEAVE -> leave(action.getGameID(), action.getAuthToken());
-            case RESIGN -> resign(action.getAuthToken());
+        }catch (Exception e){
+            session.getRemote().sendString(new Gson().toJson(new ErrorMessage(e.getMessage())));
         }
+
     }
 
     private void connect(String auth, int gameID, Session session) throws Exception {
-        AuthData authData = null;
+        String username = "";
         GameData gameData = null;
         try {
             gameData = gameDAO.getGame(gameID);
-            authData = authDAO.getAuth(auth);
+            AuthData authData = authDAO.getAuth(auth);
+            username = authData.username();
         } catch (DataAccessException e) {
             throw new Exception(e.getMessage());
         }
@@ -60,15 +66,15 @@ public class WebSocketHandler {
         } else {
             connections.add(gameID, auth, session);
             var message = "";
-            if (gameData.blackUsername() != null && authData.username().equals(gameData.blackUsername())) {
-                message = String.format("%s joined the black team", authData.username());
+            if (gameData.blackUsername() != null && username.equals(gameData.blackUsername())) {
+                message = String.format("%s joined the black team", username);
                 System.out.println("White");
-            } else if (gameData.whiteUsername() != null && authData.username().equals(gameData.whiteUsername())) {
+            } else if (gameData.whiteUsername() != null && username.equals(gameData.whiteUsername())) {
                 System.out.println("Black");
-                message = String.format("%s joined the white team", authData.username());
+                message = String.format("%s joined the white team", username);
             } else {
                 System.out.println("Observer");
-                message = String.format("%s joined the game as an Observer", authData.username());
+                message = String.format("%s joined the game as an Observer", username);
             }
 
             var loadGameMessage = new LoadGameMessage(auth, gameData);
