@@ -3,5 +3,7 @@ package ui;
 public enum State {
     SIGNEDOUT,
     SIGNEDIN,
-    INGAME
+    INGAME_WHITE,
+    INGAME_BLACK,
+    INGAME_OBSERVER
 }

@@ -1,15 +1,23 @@
 package ui;
 
 
+import com.google.gson.Gson;
+import model.GameData;
 import ui.websocket.NotificationHandler;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
+import javax.management.Notification;
 import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static ui.EscapeSequences.*;
 
 public class Repl implements NotificationHandler {
     private final ChessClient client;
+    static AtomicReference<GameData> gameData = new AtomicReference<>();
 
     public Repl(String serverUrl) {
         client = new ChessClient(serverUrl, this);
@@ -41,11 +49,31 @@ public class Repl implements NotificationHandler {
     }
 
     @Override
-    public void notify(ServerMessage notification) {
+    public void notify(String message) {
+        ServerMessage notification = new Gson().fromJson(message, ServerMessage.class);
         switch (notification.getServerMessageType()){
-            case ERROR -> System.out.println();
-            case NOTIFICATION -> System.out.println();
-            case LOAD_GAME -> System.out.println();
+            case ERROR -> {
+                ErrorMessage errorMessage = new Gson().fromJson(message, ErrorMessage.class);
+                System.out.println(errorMessage.getMessage());
+
+            }
+            case NOTIFICATION -> {
+                NotificationMessage notificationMessage = new Gson().fromJson(message, NotificationMessage.class);
+                System.out.println(notificationMessage.getMessage());
+            }
+            case LOAD_GAME -> {
+                LoadGameMessage loadGameMessage = new Gson().fromJson(message, LoadGameMessage.class);
+                if (client.state == State.INGAME_WHITE){
+                    gameData.set(loadGameMessage.getGame());
+                    new DrawBoard(loadGameMessage.getGame().game(), "WHITE");
+                }else if (client.state == State.INGAME_BLACK){
+                    gameData.set(loadGameMessage.getGame());
+                    new DrawBoard(loadGameMessage.getGame().game(), "BLACK");
+                }else {
+                    gameData.set(loadGameMessage.getGame());
+                    new DrawBoard(loadGameMessage.getGame().game(), "WHITE");
+                }
+            }
         }
     }
 }

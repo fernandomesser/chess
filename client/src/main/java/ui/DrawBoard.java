@@ -32,6 +32,9 @@ public class DrawBoard {
     private void printBoard(PrintStream out) {
         if (view.equals("WHITE")) {
             for (int i = 0; i < 10; i++) {
+                if (i != 0){
+                    System.out.print("    ");
+                }
                 for (int j = 0; j < 10; j++) {
                     drawHeaders(out, i, j);
                     drawBoard(out, i, j);
@@ -40,6 +43,9 @@ public class DrawBoard {
             }
         } else {
             for (int i = 9; i >= 0; i--) {
+                if (i != 9){
+                    System.out.print("    ");
+                }
                 for (int j = 9; j >= 0; j--) {
                     drawHeaders(out, i, j);
                     drawBoard(out, i, j);

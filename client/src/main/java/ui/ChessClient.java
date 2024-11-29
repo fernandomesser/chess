@@ -11,12 +11,14 @@ import model.GameData;
 import model.UserData;
 import ui.websocket.NotificationHandler;
 import ui.websocket.WebSocketFacade;
+
 import static ui.InGameHelper.*;
 
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class ChessClient {
     SqlGameDAO gameDAO = new SqlGameDAO();
@@ -25,8 +27,8 @@ public class ChessClient {
     private final String serverUrl;
     private final NotificationHandler notificationHandler;
     private WebSocketFacade ws;
-    private State state = State.SIGNEDOUT;
-    public static GameData currentGame = null;
+    public State state = State.SIGNEDOUT;
+    static AtomicReference<GameData> gameData = new AtomicReference<>();
     private String teamColor = null;
 
     public ChessClient(String serverUrl, NotificationHandler notificationHandler) {
@@ -78,8 +80,8 @@ public class ChessClient {
     }
 
     private String makeMove(String... params) throws ResponseException, InvalidMoveException {
-       ChessMove move = moveValidation(params[0],params[1], null);
-        currentGame.game().makeMove(move);
+        ChessMove move = moveValidation(params[0], params[1], null);
+        gameData.get().game().makeMove(move);
         ws.notifyAll();
         return "";
     }
@@ -172,17 +174,17 @@ public class ChessClient {
             if (params.length == 2) {
                 List<GameData> games = (List<GameData>) server.listGames(auth.authToken());
                 int id = games.get(Integer.parseInt(params[0]) - 1).gameID();
-                currentGame = gameDAO.getGame(id);
+                gameData.set(gameDAO.getGame(id));
                 String color = params[1].toUpperCase();
                 if (color.equalsIgnoreCase("white") || color.equalsIgnoreCase("black")) {
                     server.joinGame(id, color, auth.authToken());
                     teamColor = color;
-                    if (color.equalsIgnoreCase("WHITE")) {
-                        displayBoardWhiteSide(currentGame.game());
-                    } else {
-                        displayBoardBlackSide(currentGame.game());
-                    }
-                    state = State.INGAME;
+//                    if (color.equalsIgno  reCase("WHITE")) {
+//                        displayBoardWhiteSide(gameData.get().game());
+//                    } else {
+//                        displayBoardBlackSide(gameData.get().game());
+//                    }
+                    state = color.equalsIgnoreCase("WHITE") ? State.INGAME_WHITE : State.INGAME_BLACK;
                     ws = new WebSocketFacade(serverUrl, notificationHandler);
                     ws.connect(auth.authToken(), id);
                     return String.format("Joined %s team", color);
@@ -212,8 +214,8 @@ public class ChessClient {
             if (params.length == 1) {
                 List<GameData> games = (List<GameData>) server.listGames(auth.authToken());
                 int id = games.get(Integer.parseInt(params[0]) - 1).gameID();
-                currentGame = gameDAO.getGame(id);
-                ChessGame board = currentGame.game();
+                gameData.set(gameDAO.getGame(id));
+                ChessGame board = gameData.get().game();
                 displayBoardWhiteSide(board);
                 return "";
             }
@@ -265,10 +267,11 @@ public class ChessClient {
     private void assertSignedIn() throws ResponseException {
         if (state == State.SIGNEDOUT) {
             throw new ResponseException(400, "You must sign in");
-        } else if (state == State.INGAME) {
+        } else if (state == State.INGAME_WHITE||state == State.INGAME_BLACK||state == State.INGAME_OBSERVER) {
             throw new ResponseException(400, "You must leave the game first");
         }
     }
+
     private void assertInGame() throws ResponseException {
         if (state == State.SIGNEDOUT) {
             throw new ResponseException(400, "You must sign in");
