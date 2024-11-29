@@ -1,6 +1,8 @@
 package ui;
 
 import chess.ChessGame;
+import dataaccess.DataAccessException;
+import dataaccess.SqlGameDAO;
 import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
@@ -8,11 +10,13 @@ import model.UserData;
 import ui.websocket.NotificationHandler;
 import ui.websocket.WebSocketFacade;
 
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 public class ChessClient {
+    SqlGameDAO gameDAO = new SqlGameDAO();
     private AuthData auth = null;
     private final ServerFacade server;
     private final String serverUrl;
@@ -20,6 +24,7 @@ public class ChessClient {
     private WebSocketFacade ws;
     private State state = State.SIGNEDOUT;
     public static GameData currentGame = null;
+    private String teamColor = null;
 
     public ChessClient(String serverUrl, NotificationHandler notificationHandler) {
         this.server = new ServerFacade(serverUrl);
@@ -42,11 +47,11 @@ public class ChessClient {
                 case "join" -> joinGame(params);
                 case "observe" -> observeGame(params);
 
+                case "redraw" -> redraw();
+                case "move" -> makeMove(params);
                 case "highlight" -> highlight(params);
                 case "resign" -> resign();
-                case "move" -> makeMove(params);
                 case "leave" -> leaveGame();
-                case "redraw" -> redraw();
 
                 case "quit", "exit" -> {
                     System.out.println("Chess Program Closed");
@@ -160,16 +165,20 @@ public class ChessClient {
         try {
             if (params.length == 2) {
                 List<GameData> games = (List<GameData>) server.listGames(auth.authToken());
-                currentGame = games.get(Integer.parseInt(params[0]) - 1);
-                int id = currentGame.gameID();
+                int id = games.get(Integer.parseInt(params[0]) - 1).gameID();
+                currentGame = gameDAO.getGame(id);
                 String color = params[1].toUpperCase();
                 if (color.equalsIgnoreCase("white") || color.equalsIgnoreCase("black")) {
                     server.joinGame(id, color, auth.authToken());
+                    teamColor = color;
+                    if (color.equalsIgnoreCase("WHITE")) {
+                        displayBoardWhiteSide(currentGame.game());
+                    } else {
+                        displayBoardBlackSide(currentGame.game());
+                    }
+                    state = State.INGAME;
                     ws = new WebSocketFacade(serverUrl, notificationHandler);
                     ws.connect(auth.authToken(), id);
-
-                    displayBoardWhiteSide(currentGame.game());
-                    displayBoardBlackSide(currentGame.game());
                     return String.format("Joined %s team", color);
                 } else {
                     return "Please enter a valid color <WHITE|BLACK>";
@@ -185,6 +194,8 @@ public class ChessClient {
             return "Error";
         } catch (NumberFormatException | IndexOutOfBoundsException ex) {
             return "Please provide a valid number";
+        } catch (SQLException | DataAccessException e) {
+            throw new RuntimeException(e);
         }
 
     }
@@ -194,8 +205,8 @@ public class ChessClient {
         try {
             if (params.length == 1) {
                 List<GameData> games = (List<GameData>) server.listGames(auth.authToken());
-                currentGame = games.get(Integer.parseInt(params[0]) - 1);
-                int id = currentGame.gameID();
+                int id = games.get(Integer.parseInt(params[0]) - 1).gameID();
+                currentGame = gameDAO.getGame(id);
                 ChessGame board = currentGame.game();
                 displayBoardWhiteSide(board);
                 return "";
@@ -205,6 +216,8 @@ public class ChessClient {
             return "Error";
         } catch (NumberFormatException | IndexOutOfBoundsException ex) {
             return "Please provide a valid number";
+        } catch (SQLException | DataAccessException e) {
+            throw new RuntimeException(e);
         }
 
     }
@@ -246,6 +259,15 @@ public class ChessClient {
     private void assertSignedIn() throws ResponseException {
         if (state == State.SIGNEDOUT) {
             throw new ResponseException(400, "You must sign in");
+        } else if (state == State.INGAME) {
+            throw new ResponseException(400, "You must leave the game first");
+        }
+    }
+    private void assertInGame() throws ResponseException {
+        if (state == State.SIGNEDOUT) {
+            throw new ResponseException(400, "You must sign in");
+        } else if (state == State.SIGNEDIN) {
+            throw new ResponseException(400, "You must join a game first");
         }
     }
 
