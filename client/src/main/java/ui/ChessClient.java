@@ -19,6 +19,7 @@ public class ChessClient {
     private final NotificationHandler notificationHandler;
     private WebSocketFacade ws;
     private State state = State.SIGNEDOUT;
+    public static GameData currentGame = null;
 
     public ChessClient(String serverUrl, NotificationHandler notificationHandler) {
         this.server = new ServerFacade(serverUrl);
@@ -35,15 +36,18 @@ public class ChessClient {
                 case "register", "r" -> register(params);
                 case "login", "l" -> logIn(params);
                 case "logout" -> logOut();
+
                 case "list" -> listGames();
                 case "create", "c" -> createGame(params);
                 case "join" -> joinGame(params);
                 case "observe" -> observeGame(params);
+
                 case "highlight" -> highlight(params);
                 case "resign" -> resign();
                 case "move" -> makeMove(params);
                 case "leave" -> leaveGame();
                 case "redraw" -> redraw();
+
                 case "quit", "exit" -> {
                     System.out.println("Chess Program Closed");
                     System.exit(0);
@@ -156,16 +160,16 @@ public class ChessClient {
         try {
             if (params.length == 2) {
                 List<GameData> games = (List<GameData>) server.listGames(auth.authToken());
-                GameData game = games.get(Integer.parseInt(params[0]) - 1);
-                int id = game.gameID();
+                currentGame = games.get(Integer.parseInt(params[0]) - 1);
+                int id = currentGame.gameID();
                 String color = params[1].toUpperCase();
                 if (color.equalsIgnoreCase("white") || color.equalsIgnoreCase("black")) {
                     server.joinGame(id, color, auth.authToken());
                     ws = new WebSocketFacade(serverUrl, notificationHandler);
                     ws.connect(auth.authToken(), id);
 
-                    displayBoardWhiteSide(game.game());
-                    displayBoardBlackSide(game.game());
+                    displayBoardWhiteSide(currentGame.game());
+                    displayBoardBlackSide(currentGame.game());
                     return String.format("Joined %s team", color);
                 } else {
                     return "Please enter a valid color <WHITE|BLACK>";
@@ -190,9 +194,9 @@ public class ChessClient {
         try {
             if (params.length == 1) {
                 List<GameData> games = (List<GameData>) server.listGames(auth.authToken());
-                GameData game = games.get(Integer.parseInt(params[0]) - 1);
-                int id = game.gameID();
-                ChessGame board = game.game();
+                currentGame = games.get(Integer.parseInt(params[0]) - 1);
+                int id = currentGame.gameID();
+                ChessGame board = currentGame.game();
                 displayBoardWhiteSide(board);
                 return "";
             }
