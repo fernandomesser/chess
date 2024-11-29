@@ -1,6 +1,8 @@
 package ui;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.InvalidMoveException;
 import dataaccess.DataAccessException;
 import dataaccess.SqlGameDAO;
 import exception.ResponseException;
@@ -9,6 +11,7 @@ import model.GameData;
 import model.UserData;
 import ui.websocket.NotificationHandler;
 import ui.websocket.WebSocketFacade;
+import static ui.InGameHelper.*;
 
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -61,7 +64,7 @@ public class ChessClient {
                 case "clear" -> clearApp();
                 default -> help();
             };
-        } catch (ResponseException ex) {
+        } catch (ResponseException | InvalidMoveException ex) {
             return ex.getMessage();
         }
     }
@@ -74,7 +77,10 @@ public class ChessClient {
         return "";
     }
 
-    private String makeMove(String... params) {
+    private String makeMove(String... params) throws ResponseException, InvalidMoveException {
+       ChessMove move = moveValidation(params[0],params[1], null);
+        currentGame.game().makeMove(move);
+        ws.notifyAll();
         return "";
     }
 

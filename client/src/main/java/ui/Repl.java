@@ -42,6 +42,10 @@ public class Repl implements NotificationHandler {
 
     @Override
     public void notify(ServerMessage notification) {
-        System.out.println(notification.getServerMessageType());
+        switch (notification.getServerMessageType()){
+            case ERROR -> System.out.println();
+            case NOTIFICATION -> System.out.println();
+            case LOAD_GAME -> System.out.println();
+        }
     }
 }

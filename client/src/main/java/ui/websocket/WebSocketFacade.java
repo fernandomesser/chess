@@ -50,7 +50,6 @@ public class WebSocketFacade extends Endpoint {
         try {
             var action = new UserGameCommand(UserGameCommand.CommandType.CONNECT, auth, gameID);
             this.session.getBasicRemote().sendText(new Gson().toJson(action));
-            notificationHandler.notify();
         } catch (IOException ex) {
             throw new ResponseException(500, ex.getMessage());
         }
