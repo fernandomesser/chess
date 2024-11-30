@@ -2,6 +2,8 @@ package server.websocket;
 
 import chess.ChessGame;
 import chess.ChessMove;
+import chess.ChessPiece;
+import chess.ChessPosition;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.SqlAuthDAO;
@@ -20,7 +22,6 @@ import websocket.messages.ServerMessage;
 import websocket.commands.UserGameCommand;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Collection;
 
 
@@ -42,7 +43,7 @@ public class WebSocketHandler {
                 }
                 case MAKE_MOVE -> {
                     MakeMoveCommand makeMoveCommand = new Gson().fromJson(message, MakeMoveCommand.class);
-                    makeMove(makeMoveCommand.getGameID(), makeMoveCommand.getAuthToken(), makeMoveCommand.getMove());
+                    makeMove(makeMoveCommand.getGameID(), makeMoveCommand.getAuthToken(), makeMoveCommand.getMove(), session);
                 }
                 case LEAVE -> leave(action.getGameID(), action.getAuthToken());
                 case RESIGN -> resign(action.getAuthToken());
@@ -86,9 +87,12 @@ public class WebSocketHandler {
 
     }
 
-    public void makeMove(int gameID, String auth, ChessMove move) throws Exception {
+    public void makeMove(int gameID, String auth, ChessMove move, Session session) throws Exception {
         GameData gameData = null;
         String username = "";
+        String message = "";
+        ChessPosition start = move.getStartPosition();
+        ChessPosition end = move.getEndPosition();
         try {
             gameData = gameDAO.getGame(gameID);
             AuthData authData = authDAO.getAuth(auth);
@@ -96,6 +100,30 @@ public class WebSocketHandler {
         } catch (DataAccessException e) {
             throw new Exception(e.getMessage());
         }
+
+        try{
+            canMove(username, gameData, move);
+        }catch (Exception e){
+            message = new Gson().toJson(new ErrorMessage(message));
+            session.getRemote().sendString(message);
+            return;
+        }
+        gameData.game().makeMove(move);
+        gameDAO.updateGame(gameID, gameData);
+
+        try {
+            var moveNotification = new LoadGameMessage(auth, gameData);
+            connections.broadcast(gameID, auth, moveNotification);
+            ChessPiece.PieceType movedPieceType = gameData.game().getBoard().getPiece(move.getStartPosition()).getPieceType();
+            message = String.format("%s moved %s from %s to %s",username,movedPieceType.toString(),start.toString(),end.toString());
+            var notification = new NotificationMessage(message);
+            connections.broadcast(gameID, auth, notification);
+        } catch (Exception ex) {
+            throw new ResponseException(500, ex.getMessage());
+        }
+    }
+
+    private void canMove(String username, GameData gameData, ChessMove move) throws Exception {
         String white = gameData.whiteUsername();
         String black = gameData.blackUsername();
         ChessGame.TeamColor turn = gameData.game().getTeamTurn();
@@ -117,13 +145,6 @@ public class WebSocketHandler {
         }
         if (gameOver(gameData.game(), turn)){
             throw new Exception("Game is over");
-        }
-
-        try {
-            var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
-            connections.broadcast(gameID, auth, notification);
-        } catch (Exception ex) {
-            throw new ResponseException(500, ex.getMessage());
         }
     }
 
