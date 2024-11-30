@@ -115,8 +115,9 @@ public class WebSocketHandler {
         if (!turn.equals(userTeam)){
             throw new Exception("Not your turn to move");
         }
-        //game over
-        if ()
+        if (gameOver(gameData.game(), turn)){
+            throw new Exception("Game is over");
+        }
 
         try {
             var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
@@ -126,6 +127,9 @@ public class WebSocketHandler {
         }
     }
 
+    private boolean gameOver(ChessGame game, ChessGame.TeamColor color){
+        return game.isInCheckmate(color) || game.isInStalemate(color);
+    }
     private void leave(int gameID, String auth) throws IOException {
         connections.remove(gameID, auth);
         var message = String.format("%s left the shop", auth);
