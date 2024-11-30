@@ -6,6 +6,7 @@ import chess.ChessPiece;
 import chess.ChessPosition;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
+import dataaccess.GameDAO;
 import dataaccess.SqlAuthDAO;
 import dataaccess.SqlGameDAO;
 import exception.ResponseException;
@@ -35,7 +36,7 @@ public class WebSocketHandler {
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws Exception {
-        try{
+        try {
             UserGameCommand action = new Gson().fromJson(message, UserGameCommand.class);
             switch (action.getCommandType()) {
                 case CONNECT -> {
@@ -48,7 +49,7 @@ public class WebSocketHandler {
                 case LEAVE -> leave(action.getGameID(), action.getAuthToken());
                 case RESIGN -> resign(action.getAuthToken());
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             session.getRemote().sendString(new Gson().toJson(new ErrorMessage(e.getMessage())));
         }
 
@@ -71,12 +72,9 @@ public class WebSocketHandler {
             var message = "";
             if (gameData.blackUsername() != null && username.equals(gameData.blackUsername())) {
                 message = String.format("%s joined the black team", username);
-                System.out.println("White");
             } else if (gameData.whiteUsername() != null && username.equals(gameData.whiteUsername())) {
-                System.out.println("Black");
                 message = String.format("%s joined the white team", username);
             } else {
-                System.out.println("Observer");
                 message = String.format("%s joined the game as an Observer", username);
             }
 
@@ -88,69 +86,86 @@ public class WebSocketHandler {
     }
 
     public void makeMove(int gameID, String auth, ChessMove move, Session session) throws Exception {
-        GameData gameData = null;
+        GameData gameData;
         String username = "";
         String message = "";
+        ChessGame game = null;
         ChessPosition start = move.getStartPosition();
         ChessPosition end = move.getEndPosition();
         try {
             gameData = gameDAO.getGame(gameID);
+            game = gameData.game();
             AuthData authData = authDAO.getAuth(auth);
             username = authData.username();
         } catch (DataAccessException e) {
             throw new Exception(e.getMessage());
         }
-
-        try{
-            canMove(username, gameData, move);
-        }catch (Exception e){
-            message = new Gson().toJson(new ErrorMessage(message));
-            session.getRemote().sendString(message);
-            return;
-        }
-        gameData.game().makeMove(move);
-        gameDAO.updateGame(gameID, gameData);
-
-        try {
-            var moveNotification = new LoadGameMessage(auth, gameData);
-            connections.broadcast(gameID, auth, moveNotification);
-            ChessPiece.PieceType movedPieceType = gameData.game().getBoard().getPiece(move.getStartPosition()).getPieceType();
-            message = String.format("%s moved %s from %s to %s",username,movedPieceType.toString(),start.toString(),end.toString());
-            var notification = new NotificationMessage(message);
-            connections.broadcast(gameID, auth, notification);
-        } catch (Exception ex) {
-            throw new ResponseException(500, ex.getMessage());
-        }
-    }
-
-    private void canMove(String username, GameData gameData, ChessMove move) throws Exception {
         String white = gameData.whiteUsername();
         String black = gameData.blackUsername();
-        ChessGame.TeamColor turn = gameData.game().getTeamTurn();
+        if (!(black != null && username.equals(black) || (white != null && username.equals(white)))) {
+            message = new Gson().toJson(new ErrorMessage("You are observing the game"));
+            session.getRemote().sendString(message);
+        } else {
+            try {
+                canMove(username, gameData, move, game);
+                System.out.println("Test reach after");
+            } catch (Exception e) {
+                message = new Gson().toJson(new ErrorMessage(message));
+                session.getRemote().sendString(message);
+                return;
+            }
+            game.makeMove(move);
+            gameDAO.updateGame(gameID, gameData);
+
+            try {
+                var moveNotification = new LoadGameMessage(auth, gameData);
+                connections.broadcast(gameID, auth, moveNotification);
+                ChessPiece.PieceType movedPieceType = gameData.game().getBoard().getPiece(move.getStartPosition()).getPieceType();
+                message = String.format("%s moved %s from %s to %s", username, movedPieceType.toString(), start.toString(), end.toString());
+                var notification = new NotificationMessage(message);
+                connections.broadcast(gameID, auth, notification);
+            } catch (Exception ex) {
+                throw new ResponseException(500, ex.getMessage());
+            }
+        }
+
+
+    }
+
+    private void canMove(String username, GameData gameData, ChessMove move, ChessGame game) throws Exception {
+        String white = gameData.whiteUsername();
+        String black = gameData.blackUsername();
+        ChessGame.TeamColor turn = null;
+        try {
+            turn = game.getTeamTurn();
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
         ChessGame.TeamColor userTeam = null;
-        if (username.equals(black)){
+        if (username.equals(black)) {
             userTeam = ChessGame.TeamColor.BLACK;
-        }else if (username.equals(white)){
+        } else if (username.equals(white)) {
             userTeam = ChessGame.TeamColor.WHITE;
-        }else {
+        } else {
             throw new Exception("No player in the game");
         }
 
-        Collection<ChessMove> validMoves = gameData.game().validMoves(move.getStartPosition());
-        if (!validMoves.contains(move)){
+        Collection<ChessMove> validMoves = game.validMoves(move.getStartPosition());
+        if (!validMoves.contains(move)) {
             throw new Exception("Invalid Move");
         }
-        if (!turn.equals(userTeam)){
+        if (turn!= null &&!turn.equals(userTeam)) {
             throw new Exception("Not your turn to move");
         }
-        if (gameOver(gameData.game(), turn)){
+        if (gameOver(game, turn)) {
             throw new Exception("Game is over");
         }
     }
 
-    private boolean gameOver(ChessGame game, ChessGame.TeamColor color){
+    private boolean gameOver(ChessGame game, ChessGame.TeamColor color) {
         return game.isInCheckmate(color) || game.isInStalemate(color);
     }
+
     private void leave(int gameID, String auth) throws IOException {
         connections.remove(gameID, auth);
         var message = String.format("%s left the shop", auth);

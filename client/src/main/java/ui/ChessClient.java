@@ -9,9 +9,11 @@ import model.GameData;
 import model.UserData;
 import ui.websocket.NotificationHandler;
 import ui.websocket.WebSocketFacade;
+import websocket.commands.UserGameCommand;
 
 import static ui.InGameHelper.*;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -67,12 +69,13 @@ public class ChessClient {
                 case "clear" -> clearApp();
                 default -> help();
             };
-        } catch (ResponseException | InvalidMoveException ex) {
+        } catch (ResponseException | InvalidMoveException | IOException ex) {
             return ex.getMessage();
         }
     }
 
     private String redraw() {
+
         return "";
     }
 
@@ -104,11 +107,12 @@ public class ChessClient {
             move.setPromotionPiece(promotionPiece);
 
         }
-        ws.makeMove(auth.authToken(), currentGameID, move);
+        ws.makeMove(auth.authToken(), gameData.get().gameID(), move);
         return "";
     }
 
-    private String resign() {
+    private String resign() throws ResponseException, IOException {
+        ws.resign(auth.authToken(), currentGameID);
         return "";
     }
 
