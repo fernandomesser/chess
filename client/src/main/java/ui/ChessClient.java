@@ -30,6 +30,7 @@ public class ChessClient {
     public State state = State.SIGNEDOUT;
     static AtomicReference<GameData> gameData = new AtomicReference<>();
     private String teamColor = null;
+    private int currentGameID = 0;
 
     public ChessClient(String serverUrl, NotificationHandler notificationHandler) {
         this.server = new ServerFacade(serverUrl);
@@ -80,28 +81,31 @@ public class ChessClient {
     }
 
     private String makeMove(String... params) throws ResponseException, InvalidMoveException {
+        ChessGame currentGame = gameData.get().game();
         ChessMove move;
         ChessGame.TeamColor color = teamColor.equalsIgnoreCase("WHITE") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
-        if (!gameData.get().game().getTeamTurn().equals(color)){
+        if (!currentGame.getTeamTurn().equals(color)) {
             throw new ResponseException(400, "It is not your turn");
         }
         try {
-            move = moveValidation(params[0], params[1], null, gameData.get().game(), color);
+            move = moveValidation(params[0], params[1], null, currentGame, color);
         } catch (Exception e) {
             return e.getMessage();
         }
         ChessPosition start = move.getStartPosition();
         ChessPosition end = move.getEndPosition();
-        ChessPiece piece = gameData.get().game().getBoard().getPiece(start);
+        ChessPiece piece = currentGame.getBoard().getPiece(start);
         if (!piece.getTeamColor().equals(color)) {
             return "You can only move pieces on your team";
         }
         //Check if is promotion
-        if (piece.getPieceType().equals(ChessPiece.PieceType.PAWN) || end.getRow() == 8 || end.getRow() == 1){
-            ChessPiece promotionPiece = getPromotion(in, color);
+        if (piece.getPieceType().equals(ChessPiece.PieceType.PAWN) || end.getRow() == 8 || end.getRow() == 1) {
+            ChessPiece.PieceType promotionPiece = getPromotion(in, color);
+            move.setPromotionPiece(promotionPiece);
+
         }
-            gameData.get().game().makeMove(move);
-        ws.makeMove(auth.authToken(), 0, move);
+        gameData.get().game().makeMove(move);
+        ws.makeMove(auth.authToken(), currentGameID, move);
         return "";
     }
 
@@ -192,20 +196,15 @@ public class ChessClient {
         try {
             if (params.length == 2) {
                 List<GameData> games = (List<GameData>) server.listGames(auth.authToken());
-                int id = games.get(Integer.parseInt(params[0]) - 1).gameID();
-                gameData.set(gameDAO.getGame(id));
+                currentGameID = games.get(Integer.parseInt(params[0]) - 1).gameID();
+                gameData.set(gameDAO.getGame(currentGameID));
                 String color = params[1].toUpperCase();
                 if (color.equalsIgnoreCase("white") || color.equalsIgnoreCase("black")) {
-                    server.joinGame(id, color, auth.authToken());
+                    server.joinGame(currentGameID, color, auth.authToken());
                     teamColor = color;
-//                    if (color.equalsIgno  reCase("WHITE")) {
-//                        displayBoardWhiteSide(gameData.get().game());
-//                    } else {
-//                        displayBoardBlackSide(gameData.get().game());
-//                    }
                     state = color.equalsIgnoreCase("WHITE") ? State.INGAME_WHITE : State.INGAME_BLACK;
                     ws = new WebSocketFacade(serverUrl, notificationHandler);
-                    ws.connect(auth.authToken(), id);
+                    ws.connect(auth.authToken(), currentGameID);
                     return String.format("Joined %s team", color);
                 } else {
                     return "Please enter a valid color <WHITE|BLACK>";
@@ -232,8 +231,8 @@ public class ChessClient {
         try {
             if (params.length == 1) {
                 List<GameData> games = (List<GameData>) server.listGames(auth.authToken());
-                int id = games.get(Integer.parseInt(params[0]) - 1).gameID();
-                gameData.set(gameDAO.getGame(id));
+                currentGameID = games.get(Integer.parseInt(params[0]) - 1).gameID();
+                gameData.set(gameDAO.getGame(currentGameID));
                 ChessGame board = gameData.get().game();
                 displayBoardWhiteSide(board);
                 return "";

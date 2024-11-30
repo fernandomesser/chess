@@ -30,7 +30,7 @@ public class InGameHelper {
         }
     }
 
-    static ChessPiece getPromotion(Scanner in, ChessGame.TeamColor color) throws ResponseException {
+    static ChessPiece.PieceType getPromotion(Scanner in, ChessGame.TeamColor color) throws ResponseException {
         System.out.println("What piece do you want to promote to?");
         System.out.println("1. Queen" +
                 "2. Bishop" +
@@ -44,16 +44,16 @@ public class InGameHelper {
         }
         switch (promo) {
             case 1 -> {
-                return new ChessPiece(color, ChessPiece.PieceType.QUEEN);
+                return ChessPiece.PieceType.QUEEN;
             }
             case 2 -> {
-                return new ChessPiece(color, ChessPiece.PieceType.BISHOP);
+                return ChessPiece.PieceType.BISHOP;
             }
             case 3 -> {
-                return new ChessPiece(color, ChessPiece.PieceType.KNIGHT);
+                return ChessPiece.PieceType.KNIGHT;
             }
             case 4 -> {
-                return new ChessPiece(color, ChessPiece.PieceType.ROOK);
+                return ChessPiece.PieceType.ROOK;
             }
             default -> throw new ResponseException(400, "Please provide a valid number");
         }

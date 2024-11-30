@@ -1,5 +1,6 @@
 package server.websocket;
 
+import chess.ChessGame;
 import chess.ChessMove;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
@@ -84,7 +85,8 @@ public class WebSocketHandler {
 
     }
 
-    public void makeMove(int gameID, String auth, ChessMove move) throws ResponseException {
+    public void makeMove(int gameID, String auth, ChessMove move) throws ResponseException, SQLException, DataAccessException {
+        GameData gameData = gameDAO.getGame(gameID);
         try {
             var message = "";
             var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
