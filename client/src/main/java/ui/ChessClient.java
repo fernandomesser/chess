@@ -1,8 +1,6 @@
 package ui;
 
-import chess.ChessGame;
-import chess.ChessMove;
-import chess.InvalidMoveException;
+import chess.*;
 import dataaccess.DataAccessException;
 import dataaccess.SqlGameDAO;
 import exception.ResponseException;
@@ -18,9 +16,11 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class ChessClient {
+    Scanner in = new Scanner(System.in);
     SqlGameDAO gameDAO = new SqlGameDAO();
     private AuthData auth = null;
     private final ServerFacade server;
@@ -80,9 +80,28 @@ public class ChessClient {
     }
 
     private String makeMove(String... params) throws ResponseException, InvalidMoveException {
-        ChessMove move = moveValidation(params[0], params[1], null);
-        gameData.get().game().makeMove(move);
-        ws.notifyAll();
+        ChessMove move;
+        ChessGame.TeamColor color = teamColor.equalsIgnoreCase("WHITE") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+        if (!gameData.get().game().getTeamTurn().equals(color)){
+            throw new ResponseException(400, "It is not your turn");
+        }
+        try {
+            move = moveValidation(params[0], params[1], null, gameData.get().game(), color);
+        } catch (Exception e) {
+            return e.getMessage();
+        }
+        ChessPosition start = move.getStartPosition();
+        ChessPosition end = move.getEndPosition();
+        ChessPiece piece = gameData.get().game().getBoard().getPiece(start);
+        if (!piece.getTeamColor().equals(color)) {
+            return "You can only move pieces on your team";
+        }
+        //Check if is promotion
+        if (piece.getPieceType().equals(ChessPiece.PieceType.PAWN) || end.getRow() == 8 || end.getRow() == 1){
+            ChessPiece promotionPiece = getPromotion(in, color);
+        }
+            gameData.get().game().makeMove(move);
+        ws.makeMove(auth.authToken(), 0, move);
         return "";
     }
 
@@ -267,7 +286,7 @@ public class ChessClient {
     private void assertSignedIn() throws ResponseException {
         if (state == State.SIGNEDOUT) {
             throw new ResponseException(400, "You must sign in");
-        } else if (state == State.INGAME_WHITE||state == State.INGAME_BLACK||state == State.INGAME_OBSERVER) {
+        } else if (state == State.INGAME_WHITE || state == State.INGAME_BLACK || state == State.INGAME_OBSERVER) {
             throw new ResponseException(400, "You must leave the game first");
         }
     }

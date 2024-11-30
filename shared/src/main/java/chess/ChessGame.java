@@ -55,7 +55,7 @@ public class ChessGame {
         TeamColor color = board.getPiece(startPosition).getTeamColor();
         MoveValidation moveValidation = new MoveValidation(color, startPosition, piece);
 
-        return new ArrayList<>(moveValidation.validMoves(board, startPosition));
+        return new ArrayList<>(moveValidation.validateMoves(board, startPosition));
     }
 
     /**

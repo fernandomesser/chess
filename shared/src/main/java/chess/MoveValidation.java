@@ -16,7 +16,7 @@ public class MoveValidation {
     }
 
     //Validate All Possible Moves
-    public Collection<ChessMove> validMoves(ChessBoard board, ChessPosition startPosition) {
+    public Collection<ChessMove> validateMoves(ChessBoard board, ChessPosition startPosition) {
         Collection<ChessMove> validMoves = new ArrayList<>();
         Collection<ChessMove> pieceMoves = piece.pieceMoves(board, startPosition);
         for (ChessMove move : pieceMoves) {

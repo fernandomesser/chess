@@ -1,26 +1,62 @@
 package ui;
 
+import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
 import exception.ResponseException;
 
+import java.util.Collection;
+import java.util.Scanner;
+
 public class InGameHelper {
 
-    public static ChessMove moveValidation(String start, String end, ChessPiece.PieceType promotionPiece) throws ResponseException {
+    public static ChessMove moveValidation(String start, String end, ChessPiece.PieceType promotionPiece, ChessGame game, ChessGame.TeamColor playerColor) throws ResponseException {
         char colStartChar = start.charAt(0);
         char colEndChar = end.charAt(0);
         int rowStart = Character.getNumericValue(start.charAt(1));
         int colStart = (colStartChar - 'a') + 1;
-        int rowEnd= Character.getNumericValue(end.charAt(1));
+        int rowEnd = Character.getNumericValue(end.charAt(1));
         int colEnd = (colEndChar - 'a') + 1;
-        if ((rowStart >= 1 && rowStart <= 8)&& (colStart >= 1 && colStart <= 8) && (rowEnd >= 1 && rowEnd <= 8) &&(colEnd >= 1 && colEnd <= 8)){
-            throw new ResponseException(400,"Invalid Position.");
+        ChessPosition startP = new ChessPosition(rowStart, colStart);
+        ChessPosition endP = new ChessPosition(rowEnd, colEnd);
+        ChessMove possibleMove = new ChessMove(startP, endP, promotionPiece);
+        Collection<ChessMove> moves = game.validMoves(startP);
+
+        if (moves.contains(possibleMove)) {
+            return possibleMove;
+        } else {
+            throw new ResponseException(400, "Invalid Move.");
         }
-        return new ChessMove(new ChessPosition(rowStart,colStart),new ChessPosition(rowEnd,colEnd), promotionPiece);
     }
 
-
-
+    static ChessPiece getPromotion(Scanner in, ChessGame.TeamColor color) throws ResponseException {
+        System.out.println("What piece do you want to promote to?");
+        System.out.println("1. Queen" +
+                "2. Bishop" +
+                "3. Knight" +
+                "4. Rook");
+        int promo;
+        try {
+            promo = in.nextInt();
+        } catch (Exception e) {
+            throw new ResponseException(400, "Please provide a valid number");
+        }
+        switch (promo) {
+            case 1 -> {
+                return new ChessPiece(color, ChessPiece.PieceType.QUEEN);
+            }
+            case 2 -> {
+                return new ChessPiece(color, ChessPiece.PieceType.BISHOP);
+            }
+            case 3 -> {
+                return new ChessPiece(color, ChessPiece.PieceType.KNIGHT);
+            }
+            case 4 -> {
+                return new ChessPiece(color, ChessPiece.PieceType.ROOK);
+            }
+            default -> throw new ResponseException(400, "Please provide a valid number");
+        }
+    }
 
 }
