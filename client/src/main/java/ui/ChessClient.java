@@ -104,7 +104,6 @@ public class ChessClient {
             move.setPromotionPiece(promotionPiece);
 
         }
-        gameData.get().game().makeMove(move);
         ws.makeMove(auth.authToken(), currentGameID, move);
         return "";
     }

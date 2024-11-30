@@ -21,6 +21,7 @@ import websocket.commands.UserGameCommand;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Collection;
 
 
 @WebSocket
@@ -85,10 +86,39 @@ public class WebSocketHandler {
 
     }
 
-    public void makeMove(int gameID, String auth, ChessMove move) throws ResponseException, SQLException, DataAccessException {
-        GameData gameData = gameDAO.getGame(gameID);
+    public void makeMove(int gameID, String auth, ChessMove move) throws Exception {
+        GameData gameData = null;
+        String username = "";
         try {
-            var message = "";
+            gameData = gameDAO.getGame(gameID);
+            AuthData authData = authDAO.getAuth(auth);
+            username = authData.username();
+        } catch (DataAccessException e) {
+            throw new Exception(e.getMessage());
+        }
+        String white = gameData.whiteUsername();
+        String black = gameData.blackUsername();
+        ChessGame.TeamColor turn = gameData.game().getTeamTurn();
+        ChessGame.TeamColor userTeam = null;
+        if (username.equals(black)){
+            userTeam = ChessGame.TeamColor.BLACK;
+        }else if (username.equals(white)){
+            userTeam = ChessGame.TeamColor.WHITE;
+        }else {
+            throw new Exception("No player in the game");
+        }
+
+        Collection<ChessMove> validMoves = gameData.game().validMoves(move.getStartPosition());
+        if (!validMoves.contains(move)){
+            throw new Exception("Invalid Move");
+        }
+        if (!turn.equals(userTeam)){
+            throw new Exception("Not your turn to move");
+        }
+        //game over
+        if ()
+
+        try {
             var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
             connections.broadcast(gameID, auth, notification);
         } catch (Exception ex) {
