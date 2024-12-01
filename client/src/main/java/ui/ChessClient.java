@@ -108,7 +108,7 @@ public class ChessClient {
         try {
             move = moveValidation(params[0], params[1], null, currentGame, color);
         } catch (Exception e) {
-            return e.getMessage();
+            return "Invalid Move";
         }
         ChessPosition start = move.getStartPosition();
         ChessPosition end = move.getEndPosition();

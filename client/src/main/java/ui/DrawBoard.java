@@ -35,7 +35,7 @@ public class DrawBoard {
                 if (i != 0){
                     System.out.print("    ");
                 }
-                for (int j = 0; j < 10; j++) {
+                for (int j = 9; j >= 0; j--) {
                     drawHeaders(out, i, j);
                     drawBoard(out, i, j);
                 }
@@ -46,7 +46,7 @@ public class DrawBoard {
                 if (i != 9){
                     System.out.print("    ");
                 }
-                for (int j = 9; j >= 0; j--) {
+                for (int j = 0; j < 10; j++) {
                     drawHeaders(out, i, j);
                     drawBoard(out, i, j);
                 }
@@ -135,7 +135,7 @@ public class DrawBoard {
     }
 
     private void drawHeaders(PrintStream out, int i, int j) {
-        String[] horizontal = {"h", "g", "f", "e", "d", "c", "b", "a"};
+        String[] horizontal = {"a", "b", "c", "d", "e", "f", "g", "h"};
         String[] vertical = {"1", "2", "3", "4", "5", "6", "7", "8"};
         out.print(setColor(false, 95, 94, 98));
         out.print(setColor(true, 0, 0, 0));
