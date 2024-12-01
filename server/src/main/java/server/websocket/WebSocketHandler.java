@@ -22,6 +22,7 @@ import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 import websocket.commands.UserGameCommand;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Collection;
@@ -175,19 +176,37 @@ public class WebSocketHandler {
         connections.broadcast(gameID, auth, notification);
     }
 
-    private void resign(String authToken, int gameID, Session session) throws SQLException, DataAccessException, IOException {
+    private void resign(String auth, int gameID, Session session) throws Exception {
         GameData gameData = gameDAO.getGame(gameID);
-        AuthData authData = authDAO.getAuth(authToken);
+        AuthData authData = authDAO.getAuth(auth);
         String username = authData.username();
         String black = gameData.blackUsername();
         String white = gameData.whiteUsername();
         String message = "";
+        ChessGame game = gameData.game();
 
         if (!(black != null && username.equals(black) || (white != null && username.equals(white)))) {
             message = new Gson().toJson(new ErrorMessage("You are observing the game"));
             session.getRemote().sendString(message);
         }else {
-            
+            if (game.isGameOver()){
+                message = new Gson().toJson(new ErrorMessage("Game is Over"));
+                session.getRemote().sendString(message);
+            }
+            gameData.game().setGameOver(true);
+            if (username.equals(black)){
+                game.setWinner(ChessGame.TeamColor.WHITE);
+                game.setWinnerName(white);
+            }else if (username.equals(white)){
+                game.setWinner(ChessGame.TeamColor.BLACK);
+                game.setWinnerName(black);
+            }else {
+                throw new Exception("No player in the game");
+            }
+            gameDAO.updateGame(gameID,gameData);
+
+            NotificationMessage notificationMessage = new NotificationMessage(String.format("%s has resigned", username));
+            connections.broadcast(gameID,auth,notificationMessage);
         }
     }
 
