@@ -85,7 +85,7 @@ public class WebSocketHandler {
 
             var loadGameMessage = new LoadGameMessage(auth, gameData);
             session.getRemote().sendString(new Gson().toJson(loadGameMessage));
-            connections.broadcast(gameID, auth, new NotificationMessage(message));
+            connections.broadcast(gameID, auth, new NotificationMessage(message), false);
         }
 
     }
@@ -106,7 +106,7 @@ public class WebSocketHandler {
             throw new Exception(e.getMessage());
         }
         ChessPiece.PieceType movedPieceType = gameData.game().getBoard().getPiece(move.getStartPosition()).getPieceType();
-        
+
         String white = gameData.whiteUsername();
         String black = gameData.blackUsername();
         if (!(black != null && username.equals(black) || (white != null && username.equals(white)))) {
@@ -125,10 +125,10 @@ public class WebSocketHandler {
 
             try {
                 var moveNotification = new LoadGameMessage(auth, gameData);
-                connections.broadcast(gameID, auth, moveNotification);
+                connections.broadcast(gameID, auth, moveNotification, true);
                 message = String.format("%s moved %s from %s to %s", username, movedPieceType.toString(), start.toString(), end.toString());
                 var notification = new NotificationMessage(message);
-                connections.broadcast(gameID, auth, notification);
+                connections.broadcast(gameID, auth, notification, false);
             } catch (Exception ex) {
                 throw new ResponseException(500, ex.getMessage());
             }
@@ -146,7 +146,7 @@ public class WebSocketHandler {
             game.game().setGameOver(true);
 
             gameDAO.updateGame(gameID, game);
-            connections.broadcast(gameID, auth, notification);
+            connections.broadcast(gameID, auth, notification, true);
         } else if (game.game().isInCheckmate(ChessGame.TeamColor.WHITE)) {
             message = String.format("%s has won. White in Checkmate", game.blackUsername());
             var notification = new NotificationMessage(message);
@@ -155,20 +155,20 @@ public class WebSocketHandler {
             game.game().setGameOver(true);
 
             gameDAO.updateGame(gameID, game);
-            connections.broadcast(gameID, auth, notification);
+            connections.broadcast(gameID, auth, notification, true);
         } else if (game.game().isInStalemate(ChessGame.TeamColor.BLACK) || game.game().isInStalemate(ChessGame.TeamColor.WHITE)) {
             message = "Stalemate. Tie!";
             var notification = new NotificationMessage(message);
             game.game().setGameOver(true);
 
             gameDAO.updateGame(gameID, game);
-            connections.broadcast(gameID, auth, notification);
+            connections.broadcast(gameID, auth, notification, true);
         } else if (game.game().isInCheck(ChessGame.TeamColor.BLACK)) {
             var notification = new NotificationMessage("Black in check");
-            connections.broadcast(gameID, auth, notification);
+            connections.broadcast(gameID, auth, notification, true);
         } else if (game.game().isInCheck(ChessGame.TeamColor.WHITE)) {
             var notification = new NotificationMessage("White in check");
-            connections.broadcast(gameID, auth, notification);
+            connections.broadcast(gameID, auth, notification, true);
         }
     }
 
@@ -219,21 +219,23 @@ public class WebSocketHandler {
             if (game.isGameOver()) {
                 message = new Gson().toJson(new ErrorMessage("Game is Over"));
                 session.getRemote().sendString(message);
-            }
-            gameData.game().setGameOver(true);
-            if (username.equals(black)) {
-                game.setWinner(ChessGame.TeamColor.WHITE);
-                game.setWinnerName(white);
-            } else if (username.equals(white)) {
-                game.setWinner(ChessGame.TeamColor.BLACK);
-                game.setWinnerName(black);
             } else {
-                throw new Exception("No player in the game");
-            }
-            gameDAO.updateGame(gameID, gameData);
+                gameData.game().setGameOver(true);
+                if (username.equals(black)) {
+                    game.setWinner(ChessGame.TeamColor.WHITE);
+                    game.setWinnerName(white);
+                } else if (username.equals(white)) {
+                    game.setWinner(ChessGame.TeamColor.BLACK);
+                    game.setWinnerName(black);
+                } else {
+                    throw new Exception("No player in the game");
+                }
+                gameDAO.updateGame(gameID, gameData);
 
-            NotificationMessage notificationMessage = new NotificationMessage(String.format("%s has resigned", username));
-            connections.broadcast(gameID, auth, notificationMessage);
+                NotificationMessage notificationMessage = new NotificationMessage(String.format("%s has resigned", username));
+                connections.broadcast(gameID, auth, notificationMessage, true);
+            }
+
         }
     }
 
@@ -254,7 +256,7 @@ public class WebSocketHandler {
         connections.remove(gameID, auth);
         var message = String.format("%s has left the Game", username);
         var notification = new NotificationMessage(message);
-        connections.broadcast(gameID, auth, notification);
+        connections.broadcast(gameID, auth, notification, false);
     }
 
 }

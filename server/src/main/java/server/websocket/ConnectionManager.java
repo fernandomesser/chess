@@ -30,18 +30,30 @@ public class ConnectionManager {
         connections.put(gameID, players);
     }
 
-    public void broadcast(int gameID, String auth, ServerMessage notification) throws IOException {
+    public void broadcast(int gameID, String auth, ServerMessage notification, boolean all) throws IOException {
         var removeList = new ArrayList<Connection>();
         Set<Connection> players = connections.get(gameID);
-        for (Connection c : players) {
-            if (c.session.isOpen()) {
-                if (!c.auth.equals(auth)) {
-                    c.send(new Gson().toJson(notification));
+        if (!all){
+            for (Connection c : players) {
+                if (c.session.isOpen()) {
+                    if (!c.auth.equals(auth)) {
+                        c.send(new Gson().toJson(notification));
+                    }
+                } else {
+                    removeList.add(c);
                 }
-            } else {
-                removeList.add(c);
+            }
+        }else {
+            for (Connection c : players) {
+                if (c.session.isOpen()) {
+                    c.send(new Gson().toJson(notification));
+                } else {
+                    removeList.add(c);
+                }
             }
         }
+
+
 
         // Clean up any connections that were left open.
         for (var c : removeList) {
