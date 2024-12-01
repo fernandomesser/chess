@@ -32,7 +32,7 @@ public class SqlGameDAO extends BaseSqlDAO implements GameDAO {
     @Override
     public int createGame(GameData game) throws DataAccessException {
         String statement = "INSERT INTO games (whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?)";
-        return executeUpdate(statement, game.whiteUsername(), game.blackUsername(), game.gameName(), game.game());
+        return executeUpdate(statement, game.whiteUsername(), game.blackUsername(), game.gameName(), new ChessGame());
     }
 
     //Retrieve a game from the database

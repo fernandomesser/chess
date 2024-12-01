@@ -81,7 +81,7 @@ public class ChessClient {
         return "";
     }
 
-    private String leaveGame() {
+    private String leaveGame() throws ResponseException {
         state = State.SIGNEDIN;
         ws.leave(auth.authToken(), currentGameID);
         new PrintStream(System.out, true, StandardCharsets.UTF_8).print(EscapeSequences.ERASE_SCREEN);
