@@ -76,8 +76,14 @@ public class ChessClient {
         }
     }
 
-    private String redraw() {
-
+    private String redraw() throws ResponseException {
+        assertInGame();
+        ChessGame game = gameData.get().game();
+        if (teamColor.equalsIgnoreCase("BLACK")){
+            displayBoardBlackSide(game);
+        }else {
+            displayBoardWhiteSide(game);
+        }
         return "";
     }
 
