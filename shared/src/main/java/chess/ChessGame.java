@@ -12,12 +12,40 @@ import java.util.Objects;
  */
 public class ChessGame {
 
+    private TeamColor winner = null;
+    private String winnerName = "";
+    private boolean gameOver = false;
+
     private TeamColor turn = TeamColor.WHITE;
     private ChessBoard board = new ChessBoard();
 
     public ChessGame() {
         board.resetBoard();
     }
+
+    public TeamColor getWinner() {
+        return winner;
+    }
+
+    public String getWinnerName() {
+        return winnerName;
+    }
+
+    public boolean isGameOver() {
+        return gameOver;
+    }
+
+    public void setWinner(TeamColor color){
+        this.winner = color;
+    }
+    public void setWinnerName(String name){
+        this.winnerName = name;
+    }
+
+    public void setGameOver(boolean gameOver){
+        this.gameOver = gameOver;
+    }
+
 
     /**
      * @return Which team's turn it is
@@ -108,7 +136,10 @@ public class ChessGame {
      */
     public boolean isInCheckmate(TeamColor teamColor) {
         if (check(board, teamColor)) {
-            return isGameOver(board, teamColor);
+            if (isGameOver(board, teamColor)) {
+                gameOver = true;
+            }
+            return gameOver;
         } else {
             return false;
         }
@@ -123,7 +154,10 @@ public class ChessGame {
      */
     public boolean isInStalemate(TeamColor teamColor) {
         if (!check(board, teamColor)) {
-            return isGameOver(board, teamColor);
+            if (isGameOver(board, teamColor)) {
+                gameOver = true;
+            }
+            return gameOver;
         } else {
             return false;
         }

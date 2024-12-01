@@ -113,7 +113,8 @@ public class ChessClient {
 
     private String resign() throws ResponseException, IOException {
         ws.resign(auth.authToken(), currentGameID);
-        return "";
+        state = State.SIGNEDIN;
+        return "Resigned. The game is over";
     }
 
     private String highlight(String... params) {

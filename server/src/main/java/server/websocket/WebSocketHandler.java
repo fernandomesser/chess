@@ -23,7 +23,9 @@ import websocket.messages.ServerMessage;
 import websocket.commands.UserGameCommand;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Set;
 
 
 @WebSocket
@@ -47,7 +49,7 @@ public class WebSocketHandler {
                     makeMove(makeMoveCommand.getGameID(), makeMoveCommand.getAuthToken(), makeMoveCommand.getMove(), session);
                 }
                 case LEAVE -> leave(action.getGameID(), action.getAuthToken());
-                case RESIGN -> resign(action.getAuthToken());
+                case RESIGN -> resign(action.getAuthToken(), action.getGameID(), session);
             }
         } catch (Exception e) {
             session.getRemote().sendString(new Gson().toJson(new ErrorMessage(e.getMessage())));
@@ -173,7 +175,20 @@ public class WebSocketHandler {
         connections.broadcast(gameID, auth, notification);
     }
 
-    private void resign(String authToken) {
+    private void resign(String authToken, int gameID, Session session) throws SQLException, DataAccessException, IOException {
+        GameData gameData = gameDAO.getGame(gameID);
+        AuthData authData = authDAO.getAuth(authToken);
+        String username = authData.username();
+        String black = gameData.blackUsername();
+        String white = gameData.whiteUsername();
+        String message = "";
+
+        if (!(black != null && username.equals(black) || (white != null && username.equals(white)))) {
+            message = new Gson().toJson(new ErrorMessage("You are observing the game"));
+            session.getRemote().sendString(message);
+        }else {
+            
+        }
     }
 
 
