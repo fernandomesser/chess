@@ -30,7 +30,7 @@ public class DrawBoard {
     }
 
     private void printBoard(PrintStream out) {
-        if (view.equals("WHITE")) {
+        if (view.equals("BLACK")) {
             for (int i = 0; i < 10; i++) {
                 if (i != 0){
                     System.out.print("    ");
@@ -63,40 +63,40 @@ public class DrawBoard {
         String piece = getPiece(i, j);
         switch (piece) {
             case "P" -> {
-                pieceColor(out, BLACK_PAWN, blackPiece);
-            }
-            case "R" -> {
-                pieceColor(out, BLACK_ROOK, blackPiece);
-            }
-            case "K" -> {
-                pieceColor(out, BLACK_KING, blackPiece);
-            }
-            case "Q" -> {
-                pieceColor(out, BLACK_QUEEN, blackPiece);
-            }
-            case "B" -> {
-                pieceColor(out, BLACK_BISHOP, blackPiece);
-            }
-            case "N" -> {
-                pieceColor(out, BLACK_KNIGHT, blackPiece);
-            }
-            case "p" -> {
                 pieceColor(out, BLACK_PAWN, whitePiece);
             }
-            case "r" -> {
+            case "R" -> {
                 pieceColor(out, BLACK_ROOK, whitePiece);
             }
-            case "k" -> {
+            case "K" -> {
                 pieceColor(out, BLACK_KING, whitePiece);
             }
-            case "q" -> {
+            case "Q" -> {
                 pieceColor(out, BLACK_QUEEN, whitePiece);
             }
-            case "b" -> {
+            case "B" -> {
                 pieceColor(out, BLACK_BISHOP, whitePiece);
             }
-            case "n" -> {
+            case "N" -> {
                 pieceColor(out, BLACK_KNIGHT, whitePiece);
+            }
+            case "p" -> {
+                pieceColor(out, BLACK_PAWN, blackPiece);
+            }
+            case "r" -> {
+                pieceColor(out, BLACK_ROOK, blackPiece);
+            }
+            case "k" -> {
+                pieceColor(out, BLACK_KING, blackPiece);
+            }
+            case "q" -> {
+                pieceColor(out, BLACK_QUEEN, blackPiece);
+            }
+            case "b" -> {
+                pieceColor(out, BLACK_BISHOP, blackPiece);
+            }
+            case "n" -> {
+                pieceColor(out, BLACK_KNIGHT, blackPiece);
             }
             default -> {
                 System.out.print(EMPTY);
@@ -135,8 +135,8 @@ public class DrawBoard {
     }
 
     private void drawHeaders(PrintStream out, int i, int j) {
-        String[] horizontal = {"a", "b", "c", "d", "e", "f", "g", "h"};
-        String[] vertical = {"8", "7", "6", "5", "4", "3", "2", "1"};
+        String[] horizontal = {"h", "g", "f", "e", "d", "c", "b", "a"};
+        String[] vertical = {"1", "2", "3", "4", "5", "6", "7", "8"};
         out.print(setColor(false, 95, 94, 98));
         out.print(setColor(true, 0, 0, 0));
 

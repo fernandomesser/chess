@@ -73,15 +73,19 @@ public class ChessClient {
             };
         } catch (ResponseException | InvalidMoveException | IOException ex) {
             return ex.getMessage();
+        } catch (SQLException | DataAccessException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    private String redraw() throws ResponseException {
+    private String redraw() throws ResponseException, SQLException, DataAccessException {
         assertInGame();
-        ChessGame game = gameData.get().game();
+        ChessGame game = gameDAO.getGame(currentGameID).game();
         if (teamColor.equalsIgnoreCase("BLACK")){
+            System.out.print(">>> ");
             displayBoardBlackSide(game);
         }else {
+            System.out.print(">>> ");
             displayBoardWhiteSide(game);
         }
         return "";
@@ -113,7 +117,7 @@ public class ChessClient {
             return "You can only move pieces on your team";
         }
         //Check if is promotion
-        if (piece.getPieceType().equals(ChessPiece.PieceType.PAWN) || end.getRow() == 8 || end.getRow() == 1) {
+        if (piece.getPieceType().equals(ChessPiece.PieceType.PAWN) && (end.getRow() == 8 || end.getRow() == 1)) {
             ChessPiece.PieceType promotionPiece = getPromotion(in, color);
             move.setPromotionPiece(promotionPiece);
 

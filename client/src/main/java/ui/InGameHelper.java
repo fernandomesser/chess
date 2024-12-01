@@ -12,12 +12,19 @@ import java.util.Scanner;
 public class InGameHelper {
 
     public static ChessMove moveValidation(String start, String end, ChessPiece.PieceType promotionPiece, ChessGame game, ChessGame.TeamColor playerColor) throws ResponseException {
-        char colStartChar = start.charAt(0);
-        char colEndChar = end.charAt(0);
+        char[] colMap = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
+        int colStart = 0;
+        int colEnd = 0;
+        for (int i = 0; i < colMap.length; i++){
+            if (colMap[i] == start.charAt(0)){
+                colStart = i+1;
+            }
+            if (colMap[i] == end.charAt(0)){
+                colEnd = i+1;
+            }
+        }
         int rowStart = Character.getNumericValue(start.charAt(1));
-        int colStart = (colStartChar - 'a') + 1;
         int rowEnd = Character.getNumericValue(end.charAt(1));
-        int colEnd = (colEndChar - 'a') + 1;
         ChessPosition startP = new ChessPosition(rowStart, colStart);
         ChessPosition endP = new ChessPosition(rowEnd, colEnd);
         ChessMove possibleMove = new ChessMove(startP, endP, promotionPiece);
@@ -32,10 +39,11 @@ public class InGameHelper {
 
     static ChessPiece.PieceType getPromotion(Scanner in, ChessGame.TeamColor color) throws ResponseException {
         System.out.println("What piece do you want to promote to?");
-        System.out.println("1. Queen" +
-                "2. Bishop" +
-                "3. Knight" +
-                "4. Rook");
+        System.out.println("""
+                1. Queen
+                2. Bishop
+                3. Knight
+                4. Rook""");
         int promo;
         try {
             promo = in.nextInt();
