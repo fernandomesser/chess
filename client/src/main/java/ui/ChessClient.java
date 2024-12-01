@@ -14,6 +14,8 @@ import websocket.commands.UserGameCommand;
 import static ui.InGameHelper.*;
 
 import java.io.IOException;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -80,6 +82,9 @@ public class ChessClient {
     }
 
     private String leaveGame() {
+        state = State.SIGNEDIN;
+        ws.leave(auth.authToken(), currentGameID);
+        new PrintStream(System.out, true, StandardCharsets.UTF_8).print(EscapeSequences.ERASE_SCREEN);
         return "";
     }
 

@@ -6,7 +6,6 @@ import chess.ChessPiece;
 import chess.ChessPosition;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
-import dataaccess.GameDAO;
 import dataaccess.SqlAuthDAO;
 import dataaccess.SqlGameDAO;
 import exception.ResponseException;
@@ -22,11 +21,8 @@ import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 import websocket.commands.UserGameCommand;
 
-import java.io.EOFException;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Collection;
-import java.util.Set;
 
 
 @WebSocket
@@ -49,7 +45,7 @@ public class WebSocketHandler {
                     MakeMoveCommand makeMoveCommand = new Gson().fromJson(message, MakeMoveCommand.class);
                     makeMove(makeMoveCommand.getGameID(), makeMoveCommand.getAuthToken(), makeMoveCommand.getMove(), session);
                 }
-                case LEAVE -> leave(action.getGameID(), action.getAuthToken());
+                case LEAVE -> leave(action.getGameID(), action.getAuthToken(), session);
                 case RESIGN -> resign(action.getAuthToken(), action.getGameID(), session);
             }
         } catch (Exception e) {
@@ -169,12 +165,6 @@ public class WebSocketHandler {
         return game.isInCheckmate(color) || game.isInStalemate(color);
     }
 
-    private void leave(int gameID, String auth) throws IOException {
-        connections.remove(gameID, auth);
-        var message = String.format("%s left the shop", auth);
-        var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
-        connections.broadcast(gameID, auth, notification);
-    }
 
     private void resign(String auth, int gameID, Session session) throws Exception {
         GameData gameData = gameDAO.getGame(gameID);
@@ -209,6 +199,11 @@ public class WebSocketHandler {
             connections.broadcast(gameID,auth,notificationMessage);
         }
     }
-
+    private void leave(int gameID, String auth, Session session) throws IOException {
+        connections.remove(gameID, auth);
+        var message = String.format("%s left the shop", auth);
+        var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
+        connections.broadcast(gameID, auth, notification);
+    }
 
 }
