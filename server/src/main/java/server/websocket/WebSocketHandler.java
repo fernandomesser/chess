@@ -18,10 +18,8 @@ import websocket.commands.MakeMoveCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
-import websocket.messages.ServerMessage;
 import websocket.commands.UserGameCommand;
 
-import javax.xml.transform.Source;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Collection;
@@ -105,7 +103,13 @@ public class WebSocketHandler {
         } catch (DataAccessException e) {
             throw new Exception(e.getMessage());
         }
-        ChessPiece.PieceType movedPieceType = gameData.game().getBoard().getPiece(move.getStartPosition()).getPieceType();
+        ChessPiece.PieceType movedPieceType;
+        try {
+            movedPieceType = gameData.game().getBoard().getPiece(move.getStartPosition()).getPieceType();
+
+        }catch (Exception e){
+            throw new Exception(e.getMessage());
+        }
 
         String white = gameData.whiteUsername();
         String black = gameData.blackUsername();
@@ -114,13 +118,20 @@ public class WebSocketHandler {
             session.getRemote().sendString(message);
         } else {
             try {
+                System.out.println("Line 121 Handler");
                 canMove(username, gameData, move, game);
             } catch (Exception e) {
+                System.out.println("line 123 handler");
                 message = new Gson().toJson(new ErrorMessage(message));
                 session.getRemote().sendString(message);
-                return;
+                System.out.println("line 125 handler");
             }
-            game.makeMove(move);
+            try {
+                game.makeMove(move);
+            }catch (Exception e){
+                System.out.println("Line 130 handler");
+                throw new Exception(e.getMessage()+" line 133 "+ e.toString());
+            }
             gameDAO.updateGame(gameID, gameData);
 
             try {
@@ -130,6 +141,7 @@ public class WebSocketHandler {
                 var notification = new NotificationMessage(message);
                 connections.broadcast(gameID, auth, notification, false);
             } catch (Exception ex) {
+                System.out.println("Line 141 handler");
                 throw new ResponseException(500, ex.getMessage());
             }
         }
@@ -179,7 +191,7 @@ public class WebSocketHandler {
         try {
             turn = game.getTeamTurn();
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            throw new Exception("Error");
         }
         ChessGame.TeamColor userTeam = null;
         if (username.equals(black)) {
@@ -192,7 +204,7 @@ public class WebSocketHandler {
 
         Collection<ChessMove> validMoves = game.validMoves(move.getStartPosition());
         if (!validMoves.contains(move)) {
-            throw new Exception("Invalid Move");
+            throw new Exception("Invalid Move- Line 199");
         }
         if (turn != null && !turn.equals(userTeam)) {
             throw new Exception("Not your turn to move");

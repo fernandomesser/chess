@@ -11,7 +11,7 @@ import java.util.Scanner;
 
 public class InGameHelper {
 
-    public static ChessMove moveValidation(String start, String end, ChessPiece.PieceType promotionPiece, ChessGame game, ChessGame.TeamColor playerColor) throws ResponseException {
+    public static ChessMove moveValidation(String start, String end, ChessGame game, ChessGame.TeamColor playerColor, Scanner in) throws ResponseException {
         char[] colMap = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
         int colStart = 0;
         int colEnd = 0;
@@ -27,12 +27,19 @@ public class InGameHelper {
         int rowEnd = Character.getNumericValue(end.charAt(1));
         ChessPosition startP = new ChessPosition(rowStart, colStart);
         ChessPosition endP = new ChessPosition(rowEnd, colEnd);
-        ChessMove possibleMove = new ChessMove(startP, endP, promotionPiece);
+        ChessMove possibleMove = new ChessMove(startP, endP, null);
         Collection<ChessMove> moves = game.validMoves(startP);
+        //Check if is promotion
+        ChessPiece piece = game.getBoard().getPiece(startP);
+        if (piece.getPieceType().equals(ChessPiece.PieceType.PAWN) && (endP.getRow() == 8 || endP.getRow() == 1)) {
+            ChessPiece.PieceType promotionPiece = getPromotion(in, playerColor);
+            possibleMove.setPromotionPiece(promotionPiece);
 
+        }
         if (moves.contains(possibleMove)) {
             return possibleMove;
         } else {
+            System.out.print ("Ingame Helper  line 36 ");
             throw new ResponseException(400, "Invalid Move.");
         }
     }

@@ -1,6 +1,7 @@
 package ui;
 
 import chess.*;
+import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.SqlGameDAO;
 import exception.ResponseException;
@@ -9,7 +10,10 @@ import model.GameData;
 import model.UserData;
 import ui.websocket.NotificationHandler;
 import ui.websocket.WebSocketFacade;
-import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
 
 import static ui.InGameHelper.*;
 
@@ -21,25 +25,23 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Scanner;
-import java.util.concurrent.atomic.AtomicReference;
 
-public class ChessClient {
+public class ChessClient implements NotificationHandler{
     Scanner in = new Scanner(System.in);
     SqlGameDAO gameDAO = new SqlGameDAO();
     private AuthData auth = null;
     private final ServerFacade server;
     private final String serverUrl;
-    private final NotificationHandler notificationHandler;
     private WebSocketFacade ws;
     public State state = State.SIGNEDOUT;
-    static AtomicReference<GameData> gameData = new AtomicReference<>();
+    private GameData gameData;
     private String teamColor = null;
     private int currentGameID = 0;
 
-    public ChessClient(String serverUrl, NotificationHandler notificationHandler) {
+    public ChessClient(String serverUrl,  GameData gameData) {
         this.server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
-        this.notificationHandler = notificationHandler;
+        this.gameData = gameData;
     }
 
     public String eval(String input) {
@@ -81,11 +83,9 @@ public class ChessClient {
     private String redraw() throws ResponseException, SQLException, DataAccessException {
         assertInGame();
         ChessGame game = gameDAO.getGame(currentGameID).game();
-        if (teamColor.equalsIgnoreCase("BLACK")){
-            System.out.print(">>> ");
+        if (teamColor.equalsIgnoreCase("BLACK")) {
             displayBoardBlackSide(game);
-        }else {
-            System.out.print(">>> ");
+        } else {
             displayBoardWhiteSide(game);
         }
         return "";
@@ -99,30 +99,22 @@ public class ChessClient {
     }
 
     private String makeMove(String... params) throws ResponseException, InvalidMoveException {
-        ChessGame currentGame = gameData.get().game();
+        ChessGame currentGame = gameData.game();
         ChessMove move;
         ChessGame.TeamColor color = teamColor.equalsIgnoreCase("WHITE") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
-        if (!currentGame.getTeamTurn().equals(color)) {
-            throw new ResponseException(400, "It is not your turn");
-        }
         try {
-            move = moveValidation(params[0], params[1], null, currentGame, color);
+            move = moveValidation(params[0], params[1], currentGame, color, in);
         } catch (Exception e) {
-            return "Invalid Move";
+            System.out.println("Client line 105");
+            return e.getMessage();
         }
         ChessPosition start = move.getStartPosition();
-        ChessPosition end = move.getEndPosition();
         ChessPiece piece = currentGame.getBoard().getPiece(start);
         if (!piece.getTeamColor().equals(color)) {
             return "You can only move pieces on your team";
         }
-        //Check if is promotion
-        if (piece.getPieceType().equals(ChessPiece.PieceType.PAWN) && (end.getRow() == 8 || end.getRow() == 1)) {
-            ChessPiece.PieceType promotionPiece = getPromotion(in, color);
-            move.setPromotionPiece(promotionPiece);
 
-        }
-        ws.makeMove(auth.authToken(), gameData.get().gameID(), move);
+        ws.makeMove(auth.authToken(), gameData.gameID(), move);
         return "";
     }
 
@@ -216,13 +208,13 @@ public class ChessClient {
             if (params.length == 2) {
                 List<GameData> games = (List<GameData>) server.listGames(auth.authToken());
                 currentGameID = games.get(Integer.parseInt(params[0]) - 1).gameID();
-                gameData.set(gameDAO.getGame(currentGameID));
+                gameData = gameDAO.getGame(currentGameID);
                 String color = params[1].toUpperCase();
                 if (color.equalsIgnoreCase("white") || color.equalsIgnoreCase("black")) {
                     server.joinGame(currentGameID, color, auth.authToken());
                     teamColor = color;
                     state = color.equalsIgnoreCase("WHITE") ? State.INGAME_WHITE : State.INGAME_BLACK;
-                    ws = new WebSocketFacade(serverUrl, notificationHandler);
+                    ws = new WebSocketFacade(serverUrl, this);
                     ws.connect(auth.authToken(), currentGameID);
                     return String.format("Joined %s team", color);
                 } else {
@@ -251,8 +243,8 @@ public class ChessClient {
             if (params.length == 1) {
                 List<GameData> games = (List<GameData>) server.listGames(auth.authToken());
                 currentGameID = games.get(Integer.parseInt(params[0]) - 1).gameID();
-                gameData.set(gameDAO.getGame(currentGameID));
-                ChessGame board = gameData.get().game();
+                gameData = gameDAO.getGame(currentGameID);
+                ChessGame board = gameData.game();
                 displayBoardWhiteSide(board);
                 return "";
             }
@@ -325,4 +317,32 @@ public class ChessClient {
         new DrawBoard(game, "BLACK");
     }
 
+    @Override
+    public void notify(String message) {
+        ServerMessage notification = new Gson().fromJson(message, ServerMessage.class);
+        switch (notification.getServerMessageType()) {
+            case ERROR -> {
+                ErrorMessage errorMessage = new Gson().fromJson(message, ErrorMessage.class);
+                System.out.println(errorMessage.getMessage());
+
+            }
+            case NOTIFICATION -> {
+                NotificationMessage notificationMessage = new Gson().fromJson(message, NotificationMessage.class);
+                System.out.println(notificationMessage.getMessage());
+            }
+            case LOAD_GAME -> {
+                LoadGameMessage loadGameMessage = new Gson().fromJson(message, LoadGameMessage.class);
+                if (state == State.INGAME_WHITE) {
+                    gameData = loadGameMessage.getGame();
+                    new DrawBoard(loadGameMessage.getGame().game(), "WHITE");
+                } else if (state == State.INGAME_BLACK) {
+                    gameData = (loadGameMessage.getGame());
+                    new DrawBoard(loadGameMessage.getGame().game(), "BLACK");
+                } else {
+                    gameData = (loadGameMessage.getGame());
+                    new DrawBoard(loadGameMessage.getGame().game(), "WHITE");
+                }
+            }
+        }
+    }
 }

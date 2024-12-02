@@ -9,18 +9,16 @@ import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
-import javax.management.Notification;
 import java.util.Scanner;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static ui.EscapeSequences.*;
 
-public class Repl implements NotificationHandler {
+public class Repl {
     private final ChessClient client;
-    static AtomicReference<GameData> gameData = new AtomicReference<>();
+    static GameData gameData;
 
     public Repl(String serverUrl) {
-        client = new ChessClient(serverUrl, this);
+        client = new ChessClient(serverUrl, gameData);
     }
 
     public void run() {
@@ -45,35 +43,35 @@ public class Repl implements NotificationHandler {
     }
 
     private void printPrompt() {
-        System.out.print("\n" + RESET_TEXT_COLOR + ">>> " + SET_TEXT_COLOR_GREEN);
+        System.out.print("\n" + RESET_TEXT_COLOR + SET_TEXT_COLOR_GREEN);
     }
 
-    @Override
-    public void notify(String message) {
-        ServerMessage notification = new Gson().fromJson(message, ServerMessage.class);
-        switch (notification.getServerMessageType()){
-            case ERROR -> {
-                ErrorMessage errorMessage = new Gson().fromJson(message, ErrorMessage.class);
-                System.out.println(errorMessage.getMessage());
-
-            }
-            case NOTIFICATION -> {
-                NotificationMessage notificationMessage = new Gson().fromJson(message, NotificationMessage.class);
-                System.out.println(notificationMessage.getMessage());
-            }
-            case LOAD_GAME -> {
-                LoadGameMessage loadGameMessage = new Gson().fromJson(message, LoadGameMessage.class);
-                if (client.state == State.INGAME_WHITE){
-                    gameData.set(loadGameMessage.getGame());
-                    new DrawBoard(loadGameMessage.getGame().game(), "WHITE");
-                }else if (client.state == State.INGAME_BLACK){
-                    gameData.set(loadGameMessage.getGame());
-                    new DrawBoard(loadGameMessage.getGame().game(), "BLACK");
-                }else {
-                    gameData.set(loadGameMessage.getGame());
-                    new DrawBoard(loadGameMessage.getGame().game(), "WHITE");
-                }
-            }
-        }
-    }
+//    @Override
+//    public void notify(String message) {
+//        ServerMessage notification = new Gson().fromJson(message, ServerMessage.class);
+//        switch (notification.getServerMessageType()) {
+//            case ERROR -> {
+//                ErrorMessage errorMessage = new Gson().fromJson(message, ErrorMessage.class);
+//                System.out.println(errorMessage.getMessage());
+//
+//            }
+//            case NOTIFICATION -> {
+//                NotificationMessage notificationMessage = new Gson().fromJson(message, NotificationMessage.class);
+//                System.out.println(notificationMessage.getMessage());
+//            }
+//            case LOAD_GAME -> {
+//                LoadGameMessage loadGameMessage = new Gson().fromJson(message, LoadGameMessage.class);
+//                if (client.state == State.INGAME_WHITE) {
+//                    gameData = loadGameMessage.getGame();
+//                    new DrawBoard(loadGameMessage.getGame().game(), "WHITE");
+//                } else if (client.state == State.INGAME_BLACK) {
+//                    gameData = (loadGameMessage.getGame());
+//                    new DrawBoard(loadGameMessage.getGame().game(), "BLACK");
+//                } else {
+//                    gameData = (loadGameMessage.getGame());
+//                    new DrawBoard(loadGameMessage.getGame().game(), "WHITE");
+//                }
+//            }
+//        }
+//    }
 }

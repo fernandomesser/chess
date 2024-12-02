@@ -17,9 +17,10 @@ public class ChessGame {
     private boolean gameOver = false;
 
     private TeamColor turn = TeamColor.WHITE;
-    private ChessBoard board = new ChessBoard();
+    private ChessBoard board;
 
     public ChessGame() {
+        board = new ChessBoard();
         board.resetBoard();
     }
 
@@ -35,14 +36,15 @@ public class ChessGame {
         return gameOver;
     }
 
-    public void setWinner(TeamColor color){
+    public void setWinner(TeamColor color) {
         this.winner = color;
     }
-    public void setWinnerName(String name){
+
+    public void setWinnerName(String name) {
         this.winnerName = name;
     }
 
-    public void setGameOver(boolean gameOver){
+    public void setGameOver(boolean gameOver) {
         this.gameOver = gameOver;
     }
 
@@ -108,7 +110,7 @@ public class ChessGame {
         }
         if (moveValid) {
             ChessBoard.movePiece(board, move, move.getPromotionPiece());
-            if (getTeamTurn().equals(TeamColor.BLACK)) {
+            if (turn.equals(TeamColor.BLACK)) {
                 setTeamTurn(TeamColor.WHITE);
             } else {
                 setTeamTurn(TeamColor.BLACK);
@@ -136,10 +138,8 @@ public class ChessGame {
      */
     public boolean isInCheckmate(TeamColor teamColor) {
         if (check(board, teamColor)) {
-            if (isGameOver(board, teamColor)) {
-                gameOver = true;
-            }
-            return gameOver;
+            gameOver = true;
+            return isGameOver(board, teamColor);
         } else {
             return false;
         }
@@ -154,10 +154,8 @@ public class ChessGame {
      */
     public boolean isInStalemate(TeamColor teamColor) {
         if (!check(board, teamColor)) {
-            if (isGameOver(board, teamColor)) {
-                gameOver = true;
-            }
-            return gameOver;
+            gameOver = true;
+            return isGameOver(board, teamColor);
         } else {
             return false;
         }
