@@ -2,8 +2,6 @@ package ui;
 
 import chess.*;
 import com.google.gson.Gson;
-import dataaccess.DataAccessException;
-import dataaccess.SqlGameDAO;
 import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
@@ -28,7 +26,6 @@ import java.util.Scanner;
 
 public class ChessClient implements NotificationHandler {
     Scanner in = new Scanner(System.in);
-    SqlGameDAO gameDAO = new SqlGameDAO();
     private AuthData auth = null;
     private final ServerFacade server;
     private final String serverUrl;
@@ -73,16 +70,14 @@ public class ChessClient implements NotificationHandler {
                 case "clear" -> clearApp();
                 default -> help();
             };
-        } catch (ResponseException | InvalidMoveException | IOException ex) {
+        } catch (Exception ex) {
             return ex.getMessage();
-        } catch (SQLException | DataAccessException e) {
-            throw new RuntimeException(e);
         }
     }
 
-    private String redraw() throws ResponseException, SQLException, DataAccessException {
+    private String redraw() throws ResponseException, SQLException {
         assertInGame();
-        ChessGame game = gameDAO.getGame(currentGameID).game();
+        ChessGame game = gameData.game();
         if (teamColor.equalsIgnoreCase("BLACK")) {
             displayBoardBlackSide(game);
         } else {
@@ -218,7 +213,6 @@ public class ChessClient implements NotificationHandler {
             if (params.length == 2) {
                 List<GameData> games = (List<GameData>) server.listGames(auth.authToken());
                 currentGameID = games.get(Integer.parseInt(params[0]) - 1).gameID();
-                gameData = gameDAO.getGame(currentGameID);
                 String color = params[1].toUpperCase();
                 if (color.equalsIgnoreCase("white") || color.equalsIgnoreCase("black")) {
                     server.joinGame(currentGameID, color, auth.authToken());
@@ -241,8 +235,6 @@ public class ChessClient implements NotificationHandler {
             return "Error";
         } catch (NumberFormatException | IndexOutOfBoundsException ex) {
             return "Please provide a valid number";
-        } catch (SQLException | DataAccessException e) {
-            throw new RuntimeException(e);
         }
 
     }
@@ -253,7 +245,6 @@ public class ChessClient implements NotificationHandler {
             if (params.length == 1) {
                 List<GameData> games = (List<GameData>) server.listGames(auth.authToken());
                 currentGameID = games.get(Integer.parseInt(params[0]) - 1).gameID();
-                gameData = gameDAO.getGame(currentGameID);
                 ChessGame board = gameData.game();
                 displayBoardWhiteSide(board);
                 return "";
@@ -263,8 +254,6 @@ public class ChessClient implements NotificationHandler {
             return "Error";
         } catch (NumberFormatException | IndexOutOfBoundsException ex) {
             return "Please provide a valid number";
-        } catch (SQLException | DataAccessException e) {
-            throw new RuntimeException(e);
         }
 
     }
