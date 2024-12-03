@@ -1,12 +1,10 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 
 import static ui.EscapeSequences.*;
 import static ui.EscapeSequences.setColor;
@@ -15,7 +13,7 @@ public class DrawBoard {
     private final ChessGame game;
     private final String view;
 
-    public DrawBoard(ChessGame game, String view) {
+    public DrawBoard(ChessGame game, String view, Collection<ChessMove> moves) {
         this.game = game;
         this.view = view;
         draw();

@@ -309,11 +309,11 @@ public class ChessClient implements NotificationHandler{
     }
 
     private void displayBoardWhiteSide(ChessGame game) {
-        new DrawBoard(game, "WHITE");
+        new DrawBoard(game, "WHITE", null);
     }
 
     private void displayBoardBlackSide(ChessGame game) {
-        new DrawBoard(game, "BLACK");
+        new DrawBoard(game, "BLACK", null);
     }
 
     @Override
@@ -333,13 +333,13 @@ public class ChessClient implements NotificationHandler{
                 LoadGameMessage loadGameMessage = new Gson().fromJson(message, LoadGameMessage.class);
                 if (state == State.INGAME_WHITE) {
                     gameData = loadGameMessage.getGame();
-                    new DrawBoard(loadGameMessage.getGame().game(), "WHITE");
+                    new DrawBoard(loadGameMessage.getGame().game(), "WHITE", null);
                 } else if (state == State.INGAME_BLACK) {
                     gameData = (loadGameMessage.getGame());
-                    new DrawBoard(loadGameMessage.getGame().game(), "BLACK");
+                    new DrawBoard(loadGameMessage.getGame().game(), "BLACK", null);
                 } else {
                     gameData = (loadGameMessage.getGame());
-                    new DrawBoard(loadGameMessage.getGame().game(), "WHITE");
+                    new DrawBoard(loadGameMessage.getGame().game(), "WHITE", null);
                 }
             }
         }
