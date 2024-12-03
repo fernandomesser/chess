@@ -11,19 +11,19 @@ import java.util.Scanner;
 
 public class InGameHelper {
 
-    public static ChessMove moveValidation(String start, String end, ChessGame game, ChessGame.TeamColor playerColor, Scanner in) throws ResponseException {
+    public static ChessMove moveValidation(String strt, String end, ChessGame game, ChessGame.TeamColor color, Scanner in) throws ResponseException {
         char[] colMap = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
         int colStart = 0;
         int colEnd = 0;
         for (int i = 0; i < colMap.length; i++){
-            if (colMap[i] == start.charAt(0)){
+            if (colMap[i] == strt.charAt(0)){
                 colStart = i+1;
             }
             if (colMap[i] == end.charAt(0)){
                 colEnd = i+1;
             }
         }
-        int rowStart = Character.getNumericValue(start.charAt(1));
+        int rowStart = Character.getNumericValue(strt.charAt(1));
         int rowEnd = Character.getNumericValue(end.charAt(1));
         ChessPosition startP = new ChessPosition(rowStart, colStart);
         ChessPosition endP = new ChessPosition(rowEnd, colEnd);
@@ -32,7 +32,7 @@ public class InGameHelper {
         //Check if is promotion
         ChessPiece piece = game.getBoard().getPiece(startP);
         if (piece.getPieceType().equals(ChessPiece.PieceType.PAWN) && (endP.getRow() == 8 || endP.getRow() == 1)) {
-            ChessPiece.PieceType promotionPiece = getPromotion(in, playerColor);
+            ChessPiece.PieceType promotionPiece = getPromotion(in, color);
             possibleMove.setPromotionPiece(promotionPiece);
 
         }
