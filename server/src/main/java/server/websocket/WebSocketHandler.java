@@ -120,9 +120,7 @@ public class WebSocketHandler {
             try {
                 canMove(username, gameData, move, game);
             } catch (Exception e) {
-                message = e.getMessage();
-                var errorMessage = new ErrorMessage(message);
-                session.getRemote().sendString(new Gson().toJson(errorMessage));
+                throw new Exception(e.getMessage());
             }
             try {
                 game.makeMove(move);
