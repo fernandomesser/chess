@@ -39,7 +39,6 @@ public class InGameHelper {
         if (moves.contains(possibleMove)) {
             return possibleMove;
         } else {
-            System.out.print ("Ingame Helper  line 36 ");
             throw new ResponseException(400, "Invalid Move.");
         }
     }

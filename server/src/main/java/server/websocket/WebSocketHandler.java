@@ -53,7 +53,7 @@ public class WebSocketHandler {
                 }
             }
         } catch (Exception e) {
-            session.getRemote().sendString(new Gson().toJson(new ErrorMessage(e.getMessage())));
+            session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Server Error")));
         }
 
     }
@@ -66,7 +66,7 @@ public class WebSocketHandler {
             AuthData authData = authDAO.getAuth(auth);
             username = authData.username();
         } catch (DataAccessException e) {
-            throw new Exception(e.getMessage());
+            throw new Exception("Failed to load game");
         }
         if (gameData == null) {
             session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Invalid Game Id")));
@@ -101,14 +101,14 @@ public class WebSocketHandler {
             AuthData authData = authDAO.getAuth(auth);
             username = authData.username();
         } catch (DataAccessException e) {
-            throw new Exception(e.getMessage());
+            throw new Exception("Failed to load game");
         }
         ChessPiece.PieceType movedPieceType;
         try {
             movedPieceType = gameData.game().getBoard().getPiece(move.getStartPosition()).getPieceType();
 
         }catch (Exception e){
-            throw new Exception(e.getMessage());
+            throw new Exception("Internal error");
         }
 
         String white = gameData.whiteUsername();
@@ -118,19 +118,16 @@ public class WebSocketHandler {
             session.getRemote().sendString(message);
         } else {
             try {
-                System.out.println("Line 121 Handler");
                 canMove(username, gameData, move, game);
             } catch (Exception e) {
-                System.out.println("line 123 handler");
-                message = new Gson().toJson(new ErrorMessage(message));
-                session.getRemote().sendString(message);
-                System.out.println("line 125 handler");
+                message = e.getMessage();
+                var errorMessage = new ErrorMessage(message);
+                session.getRemote().sendString(new Gson().toJson(errorMessage));
             }
             try {
                 game.makeMove(move);
             }catch (Exception e){
-                System.out.println("Line 130 handler");
-                throw new Exception(e.getMessage()+" line 133 "+ e.toString());
+                throw new Exception("Failed to make move");
             }
             gameDAO.updateGame(gameID, gameData);
 
@@ -141,8 +138,7 @@ public class WebSocketHandler {
                 var notification = new NotificationMessage(message);
                 connections.broadcast(gameID, auth, notification, false);
             } catch (Exception ex) {
-                System.out.println("Line 141 handler");
-                throw new ResponseException(500, ex.getMessage());
+                throw new Exception("Failed to send message");
             }
         }
         checkGameOver(gameData, gameID, auth);
@@ -204,7 +200,7 @@ public class WebSocketHandler {
 
         Collection<ChessMove> validMoves = game.validMoves(move.getStartPosition());
         if (!validMoves.contains(move)) {
-            throw new Exception("Invalid Move- Line 199");
+            throw new Exception("Invalid Move");
         }
         if (turn != null && !turn.equals(userTeam)) {
             throw new Exception("Not your turn to move");
