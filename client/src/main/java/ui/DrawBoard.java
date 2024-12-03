@@ -12,8 +12,10 @@ import static ui.EscapeSequences.setColor;
 public class DrawBoard {
     private final ChessGame game;
     private final String view;
+    private final Collection<ChessMove> moves;
 
     public DrawBoard(ChessGame game, String view, Collection<ChessMove> moves) {
+        this.moves = moves;
         this.game = game;
         this.view = view;
         draw();
@@ -24,27 +26,23 @@ public class DrawBoard {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         out.print(ERASE_SCREEN);
         printBoard(out);
-
     }
+
 
     private void printBoard(PrintStream out) {
         if (view.equals("BLACK")) {
             for (int i = 0; i < 10; i++) {
-                if (i != 0){
-                }
                 for (int j = 9; j >= 0; j--) {
                     drawHeaders(out, i, j);
-                    drawBoard(out, i, j);
+                    drawBoard(out, i, j, this.moves);
                 }
                 out.println();
             }
         } else {
             for (int i = 9; i >= 0; i--) {
-                if (i != 9){
-                }
                 for (int j = 0; j < 10; j++) {
                     drawHeaders(out, i, j);
-                    drawBoard(out, i, j);
+                    drawBoard(out, i, j, this.moves);
                 }
                 out.println();
             }
@@ -112,21 +110,55 @@ public class DrawBoard {
         out.print(RESET_TEXT_COLOR);
     }
 
+    private void highlight(PrintStream out, int i, int j, Collection<ChessMove> moves, boolean pattern) {
+        for (ChessMove move : moves) {
+            ChessPosition end = move.getEndPosition();
+            if (end.getColumn() == j && end.getRow() == i) {
+                out.print(setColor(false, 22, 38, 76));
+                break;
+            }
+            if (!pattern) {
+                out.print(setColor(false, 255, 255, 255));
+            } else {
+                out.print(setColor(false, 85, 0, 21));
+            }
 
-    private void drawBoard(PrintStream out, int i, int j) {
+
+        }
+    }
+
+    private void drawBoard(PrintStream out, int i, int j, Collection<ChessMove> moves) {
         int i0 = i % 2 == 0 ? 1 : 0;
         int i1 = i % 2 == 0 ? 0 : 1;
         if (i < 9 && j < 9 && i > 0 && j > 0) {
             if (j % 2 == i0) {
-                out.print(setColor(false, 85, 0, 21));
+                if (moves != null) {
+                    if (!moves.isEmpty()){
+                        highlight(out, i, j, moves, true);
+                    }else {
+                        out.print(setColor(false, 85, 0, 21));
+                    }
+                } else {
+                    out.print(setColor(false, 85, 0, 21));
+                }
                 printPiece(i, j, out);
                 out.print(RESET_BG_COLOR);
             }
             if (j % 2 == i1) {
-                out.print(setColor(false, 255, 255, 255));
+                if (moves != null) {
+                    if (!moves.isEmpty()){
+                        highlight(out, i, j, moves, false);
+                    }else {
+                        out.print(setColor(false, 255, 255, 255));
+                    }
+                } else {
+                    out.print(setColor(false, 255, 255, 255));
+                }
                 printPiece(i, j, out);
                 out.print(RESET_BG_COLOR);
             }
+
+
         }
     }
 

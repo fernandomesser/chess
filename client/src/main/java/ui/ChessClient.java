@@ -26,7 +26,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Scanner;
 
-public class ChessClient implements NotificationHandler{
+public class ChessClient implements NotificationHandler {
     Scanner in = new Scanner(System.in);
     SqlGameDAO gameDAO = new SqlGameDAO();
     private AuthData auth = null;
@@ -38,7 +38,7 @@ public class ChessClient implements NotificationHandler{
     private String teamColor = null;
     private int currentGameID = 0;
 
-    public ChessClient(String serverUrl,  GameData gameData) {
+    public ChessClient(String serverUrl, GameData gameData) {
         this.server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
         this.gameData = gameData;
@@ -95,26 +95,31 @@ public class ChessClient implements NotificationHandler{
         state = State.SIGNEDIN;
         ws.leave(auth.authToken(), currentGameID);
         new PrintStream(System.out, true, StandardCharsets.UTF_8).print(EscapeSequences.ERASE_SCREEN);
-        return "";
+        return "You have left the game";
     }
 
     private String makeMove(String... params) throws ResponseException, InvalidMoveException {
-        ChessGame currentGame = gameData.game();
-        ChessMove move;
-        ChessGame.TeamColor color = teamColor.equalsIgnoreCase("WHITE") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
-        try {
-            move = moveValidation(params[0], params[1], currentGame, color, in);
-        } catch (Exception e) {
-            return "Invalid Move";
-        }
-        ChessPosition start = move.getStartPosition();
-        ChessPiece piece = currentGame.getBoard().getPiece(start);
-        if (!piece.getTeamColor().equals(color)) {
-            return "You can only move pieces on your team";
+        if (params.length == 2) {
+            ChessGame currentGame = gameData.game();
+            ChessMove move;
+            ChessGame.TeamColor color = teamColor.equalsIgnoreCase("WHITE") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+            try {
+                move = moveValidation(params[0], params[1], currentGame, color, in);
+            } catch (Exception e) {
+                return "Invalid Move";
+            }
+            ChessPosition start = move.getStartPosition();
+            ChessPiece piece = currentGame.getBoard().getPiece(start);
+            if (!piece.getTeamColor().equals(color)) {
+                return "You can only move pieces on your team";
+            }
+
+            ws.makeMove(auth.authToken(), gameData.gameID(), move);
+            return "";
+        } else {
+            return "Expected: <START POSITION> <END POSITION>";
         }
 
-        ws.makeMove(auth.authToken(), gameData.gameID(), move);
-        return "";
     }
 
     private String resign() throws ResponseException, IOException {
@@ -124,7 +129,13 @@ public class ChessClient implements NotificationHandler{
     }
 
     private String highlight(String... params) {
-        return "";
+        if (params.length == 1) {
+            new DrawBoard(gameData.game(), teamColor, possibleHighlight(params[0], gameData.game()));
+            return "";
+        } else {
+            return "Expected: <START POSITION>";
+        }
+
     }
 
     private String clearApp() throws ResponseException {
