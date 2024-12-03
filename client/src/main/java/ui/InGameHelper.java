@@ -11,16 +11,16 @@ import java.util.Scanner;
 
 public class InGameHelper {
 
-    public static ChessMove moveValidation(String strt, String end, ChessGame game, ChessGame.TeamColor color, Scanner in) throws ResponseException {
+    public static ChessMove moveValidation(String strt, String end, ChessGame game, ChessGame.TeamColor color, Scanner in) throws Exception {
         char[] colMap = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
         int colStart = 0;
         int colEnd = 0;
-        for (int i = 0; i < colMap.length; i++){
-            if (colMap[i] == strt.charAt(0)){
-                colStart = i+1;
+        for (int i = 0; i < colMap.length; i++) {
+            if (colMap[i] == strt.charAt(0)) {
+                colStart = i + 1;
             }
-            if (colMap[i] == end.charAt(0)){
-                colEnd = i+1;
+            if (colMap[i] == end.charAt(0)) {
+                colEnd = i + 1;
             }
         }
         int rowStart = Character.getNumericValue(strt.charAt(1));
@@ -28,9 +28,21 @@ public class InGameHelper {
         ChessPosition startP = new ChessPosition(rowStart, colStart);
         ChessPosition endP = new ChessPosition(rowEnd, colEnd);
         ChessMove possibleMove = new ChessMove(startP, endP, null);
-        Collection<ChessMove> moves = game.validMoves(startP);
-        //Check if is promotion
-        ChessPiece piece = game.getBoard().getPiece(startP);
+        Collection<ChessMove> moves;
+        ChessPiece piece;
+        try {
+            moves = game.validMoves(startP);
+            piece = game.getBoard().getPiece(startP);
+        }catch (Exception e){
+            throw new Exception("Please select a valid piece to move");
+        }
+
+        if (!game.getTeamTurn().equals(color)){
+            throw new Exception("Not your turn to move");
+        }
+        if (!piece.getTeamColor().equals(color)) {
+            throw new Exception("You can only move pieces on your team");
+        }
         if (piece.getPieceType().equals(ChessPiece.PieceType.PAWN) && (endP.getRow() == 8 || endP.getRow() == 1)) {
             ChessPiece.PieceType promotionPiece = getPromotion(in, color);
             possibleMove.setPromotionPiece(promotionPiece);

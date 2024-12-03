@@ -101,7 +101,7 @@ public class ChessClient implements NotificationHandler {
             try {
                 move = moveValidation(params[0], params[1], currentGame, color, in);
             } catch (Exception e) {
-                return "Invalid Move";
+                return e.getMessage();
             }
             ChessPosition start = move.getStartPosition();
             ChessPiece piece = currentGame.getBoard().getPiece(start);
