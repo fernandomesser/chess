@@ -88,7 +88,6 @@ public class InGameHelper {
     static Collection<ChessMove> possibleHighlight(String start, ChessGame game) {
         char[] colMap = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
         int colStart = 0;
-        int colEnd = 0;
         for (int i = 0; i < colMap.length; i++) {
             if (colMap[i] == start.charAt(0)) {
                 colStart = i + 1;

@@ -8,7 +8,6 @@ import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.SqlAuthDAO;
 import dataaccess.SqlGameDAO;
-import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
@@ -145,19 +144,15 @@ public class WebSocketHandler {
     private void checkGameOver(GameData game, int gameID, String auth) throws DataAccessException, IOException {
         String message = "";
         if (game.game().isInCheckmate(ChessGame.TeamColor.BLACK)) {
-            message = String.format("%s has won. Black in Checkmate", game.whiteUsername());
+            message = String.format("%s has won. %s in Checkmate", game.whiteUsername(),game.blackUsername());
             var notification = new NotificationMessage(message);
-            game.game().setWinnerName(game.whiteUsername());
-            game.game().setWinner(ChessGame.TeamColor.WHITE);
             game.game().setGameOver(true);
 
             gameDAO.updateGame(gameID, game);
             connections.broadcast(gameID, auth, notification, true);
         } else if (game.game().isInCheckmate(ChessGame.TeamColor.WHITE)) {
-            message = String.format("%s has won. White in Checkmate", game.blackUsername());
+            message = String.format("%s has won. %s in Checkmate", game.blackUsername(),game.whiteUsername());
             var notification = new NotificationMessage(message);
-            game.game().setWinnerName(game.blackUsername());
-            game.game().setWinner(ChessGame.TeamColor.BLACK);
             game.game().setGameOver(true);
 
             gameDAO.updateGame(gameID, game);
@@ -203,7 +198,7 @@ public class WebSocketHandler {
         if (turn != null && !turn.equals(userTeam)) {
             throw new Exception("Not your turn to move");
         }
-        if (game.isGameOver()) {
+        if (game.isOver()) {
             throw new Exception("Game is over");
         }
     }
@@ -222,7 +217,7 @@ public class WebSocketHandler {
             message = new Gson().toJson(new ErrorMessage("You are observing the game"));
             session.getRemote().sendString(message);
         } else {
-            if (game.isGameOver()) {
+            if (game.isOver()) {
                 message = new Gson().toJson(new ErrorMessage("Game is Over"));
                 session.getRemote().sendString(message);
             } else {

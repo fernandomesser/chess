@@ -8,7 +8,6 @@ import model.GameData;
 import model.UserData;
 import ui.websocket.NotificationHandler;
 import ui.websocket.WebSocketFacade;
-import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
@@ -95,39 +94,61 @@ public class ChessClient implements NotificationHandler {
     }
 
     private String makeMove(String... params) throws ResponseException, InvalidMoveException {
-        if (params.length == 2) {
-            ChessGame currentGame = gameData.game();
-            ChessMove move;
-            ChessGame.TeamColor color = teamColor.equalsIgnoreCase("WHITE") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
-            try {
-                move = moveValidation(params[0], params[1], currentGame, color, in);
-            } catch (Exception e) {
-                return e.getMessage();
-            }
-            ChessPosition start = move.getStartPosition();
-            ChessPiece piece = currentGame.getBoard().getPiece(start);
-            if (!piece.getTeamColor().equals(color)) {
-                return "You can only move pieces on your team";
-            }
+        if (!gameData.game().isOver()){
+            if (params.length == 2) {
+                ChessGame currentGame = gameData.game();
+                ChessMove move;
+                ChessGame.TeamColor color = teamColor.equalsIgnoreCase("WHITE") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+                try {
+                    move = moveValidation(params[0], params[1], currentGame, color, in);
+                } catch (Exception e) {
+                    return e.getMessage();
+                }
+                ChessPosition start = move.getStartPosition();
+                ChessPiece piece = currentGame.getBoard().getPiece(start);
+                if (!piece.getTeamColor().equals(color)) {
+                    return "You can only move pieces on your team";
+                }
 
-            ws.makeMove(auth.authToken(), gameData.gameID(), move);
-            return "";
-        } else {
-            return "Expected: <START POSITION> <END POSITION>";
+                ws.makeMove(auth.authToken(), gameData.gameID(), move);
+                return "";
+            } else {
+                return "Expected: <START POSITION> <END POSITION>";
+            }
+        }else {
+            return "Game is over";
+        }
+    }
+
+    private String resign() throws ResponseException, IOException {
+        if (!state.equals(State.INGAME_OBSERVER)){
+            System.out.println("Are you sure you want to resign? <YES> <NO>");
+            String resign = in.nextLine();
+            if (resign.equalsIgnoreCase("yes")||resign.equalsIgnoreCase("no")){
+                if (resign.equalsIgnoreCase("yes")){
+                    ws.resign(auth.authToken(), currentGameID);
+                    state = State.SIGNEDIN;
+                    return "Resigned. The game is over";
+                }else {
+                    return "Not resigned";
+                }
+            }else {
+                return "YES or NO";
+            }
+        }else {
+            return "You are observing the game";
         }
 
     }
 
-    private String resign() throws ResponseException, IOException {
-        ws.resign(auth.authToken(), currentGameID);
-        state = State.SIGNEDIN;
-        return "Resigned. The game is over";
-    }
-
     private String highlight(String... params) {
         if (params.length == 1) {
-            new DrawBoard(gameData.game(), teamColor, possibleHighlight(params[0], gameData.game()));
-            return "";
+            try {
+                new DrawBoard(gameData.game(), teamColor, possibleHighlight(params[0], gameData.game()));
+                return "";
+            }catch (Exception e){
+                return "Please choose a valid piece";
+            }
         } else {
             return "Expected: <START POSITION>";
         }
@@ -248,6 +269,8 @@ public class ChessClient implements NotificationHandler {
                 currentGameID = games.get(Integer.parseInt(params[0]) - 1).gameID();
                 ws = new WebSocketFacade(serverUrl, this);
                 ws.connect(auth.authToken(),currentGameID);
+                state = State.INGAME_OBSERVER;
+                teamColor = "WHITE";
                 return "You are now observing";
             }
             return "Expected: <GAME INDEX>";

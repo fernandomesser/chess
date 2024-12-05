@@ -32,7 +32,7 @@ public class ChessGame {
         return winnerName;
     }
 
-    public boolean isGameOver() {
+    public boolean isOver() {
         return gameOver;
     }
 
@@ -138,7 +138,6 @@ public class ChessGame {
      */
     public boolean isInCheckmate(TeamColor teamColor) {
         if (check(board, teamColor)) {
-            gameOver = true;
             return isGameOver(board, teamColor);
         } else {
             return false;
@@ -154,7 +153,6 @@ public class ChessGame {
      */
     public boolean isInStalemate(TeamColor teamColor) {
         if (!check(board, teamColor)) {
-            gameOver = true;
             return isGameOver(board, teamColor);
         } else {
             return false;
@@ -257,22 +255,19 @@ public class ChessGame {
 
     //Check if Game over. No valid moves to save King
     private static boolean isGameOver(ChessBoard board, TeamColor teamColor) {
-        boolean mate = true;
         for (int i = 1; i < 9; i++) {
             for (int j = 1; j < 9; j++) {
                 ChessPosition position = new ChessPosition(i, j);
                 ChessPiece piece = board.getPiece(position);
-                if (piece != null && piece.getTeamColor().equals(teamColor)) {
+                if (piece != null && piece.getTeamColor() == teamColor) {
                     Collection<ChessMove> pieceMoves = piece.pieceMoves(board, position);
-                    mate = avoidCheck(board, pieceMoves, teamColor);
-                    break;
+                    if (!avoidCheck(board, pieceMoves, teamColor)) {
+                        return false;
+                    }
                 }
             }
-            if (!mate) {
-                break;
-            }
         }
-        return mate;
+        return true;
     }
 
     //Check if Check can be avoided
