@@ -8,6 +8,7 @@ import model.GameData;
 import model.UserData;
 import ui.websocket.NotificationHandler;
 import ui.websocket.WebSocketFacade;
+import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
@@ -245,9 +246,9 @@ public class ChessClient implements NotificationHandler {
             if (params.length == 1) {
                 List<GameData> games = (List<GameData>) server.listGames(auth.authToken());
                 currentGameID = games.get(Integer.parseInt(params[0]) - 1).gameID();
-                ChessGame board = gameData.game();
-                displayBoardWhiteSide(board);
-                return "";
+                ws = new WebSocketFacade(serverUrl, this);
+                ws.connect(auth.authToken(),currentGameID);
+                return "You are now observing";
             }
             return "Expected: <GAME INDEX>";
         } catch (ResponseException e) {
